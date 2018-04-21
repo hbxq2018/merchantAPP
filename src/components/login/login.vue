@@ -1,9 +1,9 @@
 <template>
     <div class="login">
-        <img class="login_background" src="../common/images/background.png" alt="" />
+        <img class="login_background" src="../../common/images/background.png" alt="" />
         <div class="login_Box">
 			<div class="login_icon">
-				<img class="" src="../common/images/aboutMe.png" alt="" />
+				<img class="" src="../../common/images/aboutMe.png" alt="" />
 			</div>
 			<form class="login_form">
 				<div class="login_form_tele">
@@ -14,7 +14,7 @@
 					<input type="text" class="login_form_inp" placeholder="请输入验证码">
 				</div>
 				<div class="login_form_btn">
-					<router-link to="Income">
+					<router-link to="Process">
 						<button type="button"></button>
 					</router-link>
 				</div>
@@ -22,7 +22,7 @@
 			<div class="othor_login">
 				<p class="othor_login_text">————<span>其他登陆方式</span>————</p>
 				<div id="returnIcon" class="othor_login_type">
-					<img class="login_weixin" src="../common/images/wx-icon.png" alt="" />
+					<img class="login_weixin" src="../../common/images/wx-icon.png" alt="" />
 				</div>
 			</div>
 		</div>
@@ -112,7 +112,7 @@ export default {
           width: 80px;
           height: 80px;
           border: 0;
-          background: #fc5e2d url(../common/images/enter.png) no-repeat center
+          background: #fc5e2d url(../../common/images/enter.png) no-repeat center
             center;
           background-size: 80px 80px;
         }
