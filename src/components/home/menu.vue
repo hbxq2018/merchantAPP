@@ -1,12 +1,12 @@
 <template>
   <div class="menu">
       <div class="menu_top">
-           <img class="eaves" src="../../common/images/eaves.png" alt="顶部图片">
+           <img class="eaves" src="../../../static/images/eaves.png" alt="顶部图片">
             <div class="info">
-                <img class="avatar" :src='src' alt="用户头像">
+                <img class="avatar" :src='userdata.src' alt="用户头像">
                 <div class="username">
-                    <p class="name"></p>
-                    <p class="heat">人气{{}}</p>
+                    <p class="name">{{userdata.name}}</p>
+                    <p class="heat">人气{{userdata.heat}}</p>
                 </div>
             </div>
       </div>
@@ -26,9 +26,8 @@ export default {
     data(){
         return {
             msg:'menu',
-            src:'../../../common/images/timg (2).jpg',
             userdata:{
-                src:'../../common/images/timg (2).jpg',
+                src:'../../../static/images/timg (2).jpg',
                 name:'恩施映像',
                 heat:'1382',
             }
@@ -60,6 +59,14 @@ export default {
                     float: left;
                     border-radius: 50%;
                     margin-left: 31px;
+                }
+                &>.username{
+                    height: 100px;
+                    p{
+                        height: 50px;
+                        line-height: 50px;
+                        
+                    }
                 }
             }
         }
