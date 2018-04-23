@@ -1,14 +1,14 @@
 <template>
     <div class="login">
-        <img class="login_background" src="../../common/images/background.png" alt="" />
+        <img class="login_background" src="../../../static/images/background.png" alt="" />
         <div class="login_Box">
 			<div class="login_icon">
-				<img class="" src="../../common/images/aboutMe.png" alt="" />
+				<img class="" src="../../../static/images/aboutMe.png" alt="" />
 			</div>
 			<form class="login_form">
 				<div class="login_form_tele">
-					<input type="text" class="login_form_inp" placeholder="请输入手机号">
-					<span id="securityCode" class="securityCode">获取验证码</span>
+					<input type="text" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
+					<span id="securityCode" class="securityCode" @click="securityCode">获取验证码</span>
 				</div>
 				<div class="login_form_code">
 					<input type="text" class="login_form_inp" placeholder="请输入验证码">
@@ -22,7 +22,7 @@
 			<div class="othor_login">
 				<p class="othor_login_text">————<span>其他登陆方式</span>————</p>
 				<div id="returnIcon" class="othor_login_type">
-					<img class="login_weixin" src="../../common/images/wx-icon.png" alt="" />
+					<img class="login_weixin" src="../../../static/images/wx-icon.png" alt="" />
 				</div>
 			</div>
 		</div>
@@ -30,23 +30,32 @@
 </template>
 
 <script>
+import GLOBAL from "../../../untils/config/config";
 export default {
   name: "Login",
   data() {
-    return {};
+    return {
+      API: GLOBAL.GLOBAL_API_DOMAIN,
+      telephone: ""
+    };
   },
-  watch: {},
-  created: function() {},
   methods: {
-    
-  },
-  computed: {},
-  updated: {}
+    securityCode() {
+      console.log(this.telephone);
+      // let _parms = {
+      //   shopMobile: this.telephone
+      // };
+      // this.$axios.get(this.API+"app/sms/sendForShopAppRegister",_parms).then(res=>{
+      //   console.log(res.data);
+      // });
+    }
+  }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
+@import url(../../common/css/common.css);
 .login {
   width: 100%;
   height: 100%;
@@ -67,7 +76,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-	// z-index: 100;
+    // z-index: 100;
     .login_icon {
       text-align: center;
       padding: 88px 0;
@@ -112,8 +121,8 @@ export default {
           width: 80px;
           height: 80px;
           border: 0;
-          background: #fc5e2d url(../../common/images/enter.png) no-repeat center
-            center;
+          background: #fc5e2d url(../../../static/images/enter.png) no-repeat
+            center center;
           background-size: 80px 80px;
         }
       }

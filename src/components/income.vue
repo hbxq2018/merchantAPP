@@ -28,7 +28,7 @@
                 </p>
             </div>
             <div class="income_operate_time">
-                <img src="../common/images/calendar.png" alt="">
+                <img src="../../static/images/calendar.png" alt="">
             </div>
         </div>
         <div class="income_list">
