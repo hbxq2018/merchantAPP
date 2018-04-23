@@ -1,6 +1,9 @@
 <template>
   <div class="settle">
       {{msg}}
+    <router-link to="review">
+            <mt-button type="default">下一页面</mt-button>
+        </router-link>
   </div>
 </template>
 <script>
@@ -8,7 +11,7 @@ export default {
   name:'Settle',
   data(){
       return {
-          msg:"Settle in"
+          msg:"表单页面"
       }
   }
 }

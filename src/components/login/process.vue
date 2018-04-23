@@ -1,6 +1,9 @@
 <template>
   <div class="process">
         {{msg}}
+        <router-link to="settlein">
+            <mt-button type="default">下一页面</mt-button>
+        </router-link>
   </div>
 </template>
 <script>
