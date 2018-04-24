@@ -6,7 +6,8 @@ import Home from '@/components/home/home'
 import Income from '@/components/income'
 import Process from '@/components/login/process'
 import Settlein from '@/components/login/settlein'
-import Review from '@/components/login/review'
+import Agreement from '@/components/login/agreement'
+import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
 Vue.use(Router)
 
@@ -33,9 +34,14 @@ export default new Router({
       component: Settlein
     },
     {
-      path: '/review',
-      name: 'Review',
-      component: Review
+      path: '/agreement',
+      name: 'Agreement',
+      component: Agreement
+    },
+    {
+      path: '/axamine',
+      name: 'Examine',
+      component: Examine
     },
     {
       path: '/menu',
