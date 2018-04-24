@@ -64,7 +64,7 @@
         </div>
         <div class="submit_btn">
           <!-- <span>提交申请</span> -->
-          <router-link to="examine">
+          <router-link to="home">
               <mt-button type="default">提交申请</mt-button>
           </router-link>
         </div>

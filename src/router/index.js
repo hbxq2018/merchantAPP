@@ -9,6 +9,7 @@ import Settlein from '@/components/login/settlein'
 import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
+import Manage from '@/components/home/manage/manage'
 Vue.use(Router)
 
 export default new Router({
@@ -22,6 +23,11 @@ export default new Router({
       path: '/home',
       name: 'Home',
       component: Home
+    },
+    {
+      path: '/manage',
+      name: 'Manage',
+      component: Manage
     },
     {
       path: '/process',
