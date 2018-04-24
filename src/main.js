@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
+import './assets/css/my-mint.css'; //全局修改mint-UI样式  
 import 'lib-flexible'
 import axios from "axios"
 Vue.config.productionTip = false

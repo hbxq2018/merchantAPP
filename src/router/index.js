@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/login/login'
 import Home from '@/components/home/home'
-import Income from '@/components/income'
+import Income from '@/components/home/income/income'
 import Process from '@/components/login/process'
 import Settlein from '@/components/login/settlein'
 import Agreement from '@/components/login/agreement'
@@ -45,7 +45,7 @@ export default new Router({
       component: Agreement
     },
     {
-      path: '/axamine',
+      path: '/examine',
       name: 'Examine',
       component: Examine
     },
@@ -53,6 +53,11 @@ export default new Router({
       path: '/menu',
       name: 'Menu',
       component: Menu
+    },
+    {
+      path: '/income',
+      name: 'Income',
+      component: Income
     }
   ]
 })

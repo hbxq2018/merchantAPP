@@ -1,7 +1,7 @@
 <template>
     <div class="income">
 		<mt-header title="营业数据" class="income_header">
-            <router-link to="/" slot="left">
+            <router-link to="/menu" slot="left">
                 <mt-button icon="back"></mt-button>
                 <mt-button></mt-button>
             </router-link>
@@ -28,7 +28,7 @@
                 </p>
             </div>
             <div class="income_operate_time">
-                <img src="../../static/images/calendar.png" alt="">
+                <img src="../../../../static/images/calendar.png" alt="">
             </div>
         </div>
         <div class="income_list">
@@ -77,17 +77,8 @@ export default {
   font-family: "微软雅黑";
   position: relative;
   font-size: 30px;
-  .income_header {
-    width: 100%;
-    height: 88px;
-    background-color: #fc5e2d;
-    font-size: 34px;
-    line-height: 88px;
-    .income_header_date {
-        font-size: 28px;
-    }
-  }
   .income_banner {
+    margin-top: -1px;
     background-color: #fc5e2d;
     display: flex;
     height: 264px;

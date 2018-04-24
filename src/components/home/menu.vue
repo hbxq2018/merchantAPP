@@ -18,9 +18,11 @@
       <div class="menu_content">
           <ul class="conul">
               <li class="conli" v-for="(item,index) in lidata" :key="index" :id="item.id" @click="clickli">
+                <router-link :to="item.href">
                   <img :src="item.src" :alt="item.name">
                   <p class="con_name">{{item.name}}</p>
                   <p class="con_con">{{item.con}}</p>
+                </router-link>
               </li>
           </ul>
       </div>
@@ -38,22 +40,26 @@ export default {
               src:'../../../static/images/scan.png',
               id:'1',
               name:'扫码验证',
-              con:'核销券票'
+              con:'核销券票',
+              href: '#'
           },{
               src:'../../../static/images/orders.png',
               id:'2',
               name:'营业数据',
-              con:'核销记录、数据统计'
+              con:'核销记录、数据统计',
+              href: 'income'
           },{
               src:'../../../static/images/stores.png',
               id:'3',
               name:'店铺管理',
-              con:'更改店铺信息、员工管理'
+              con:'更改店铺信息、员工管理',
+              href: '#'
           },{
               src:'../../../static/images/voucher.png',
               id:'4',
               name:'享7券',
-              con:'自定义满减额度'
+              con:'自定义满减额度',
+              href: '#'
           }
       ],
       userdata: {

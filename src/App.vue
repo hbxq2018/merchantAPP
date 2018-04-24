@@ -11,7 +11,8 @@ export default {
 };
 </script>
 
-<style>
+<style lang='less'>
+@import url(common/css/common.css);
 html,
 body {
   margin: 0;
@@ -26,6 +27,5 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  /* margin-top: 60px; */
 }
 </style>

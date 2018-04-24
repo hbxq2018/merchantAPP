@@ -64,7 +64,7 @@
         </div>
         <div class="submit_btn">
           <!-- <span>提交申请</span> -->
-          <router-link to="home">
+          <router-link to="examine">
               <mt-button type="default">提交申请</mt-button>
           </router-link>
         </div>
@@ -96,24 +96,8 @@ export default {
   width: 100%;
   background-color: #ebebeb;
   color: #b1b1b1;
-  .mint-header {
-    width: 100%;
-    height: 88px;
-    line-height: 88px;
-    background-color: #fc5e2d;
-    font-size: 34px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    letter-spacing: 4px;
-    .is-left {
-      i {
-        font-size: 44px;
-      }
-    }
-  }
   .settle_head {
-    margin-top: 87px;
+    margin-top: -1px;
     img {
       width: 100%;
     }
@@ -195,14 +179,18 @@ export default {
       }
     }
     .submit_btn {
-      width: 100%;
-      height: 90px;
-      line-height: 90px;
-      background-color: #FC5E2D;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 36px;
-      margin: 19px 0;
+      button {
+        box-shadow: 0 0 0 #FC5E2D;
+        font-size: 36px;
+        width: 100%;
+        height: 90px;
+        line-height: 90px;
+        background-color: #FC5E2D;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 36px;
+        margin: 19px 0;
+      }
     }
   }
 }

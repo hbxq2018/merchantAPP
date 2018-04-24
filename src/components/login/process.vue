@@ -36,7 +36,6 @@ export default {
 }
 </script>
 <style lang="less">
-@import url(../../common/css/common.css);
     .process{
         position: relative;
         width:100%;

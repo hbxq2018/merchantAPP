@@ -95,24 +95,8 @@ export default {
   font-size: 28px;
   letter-spacing: 4px;
   text-align: left;
-  .mint-header {
-    width: 100%;
-    height: 88px;
-    line-height: 88px;
-    background-color: #fc5e2d;
-    font-size: 34px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    letter-spacing: 4px;
-    .is-left {
-      i {
-        font-size: 44px;
-      }
-    }
-  }
   .agreement_content {
-    margin: 110px 0 30px 0;
+    margin: 30px 0 30px 0;
     padding: 0 18px 0 28px;
     p {
         text-indent: 2em;
