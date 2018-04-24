@@ -53,6 +53,9 @@
 </template>
 
 <script>
+import Vue from "vue"
+import { DatetimePicker } from 'mint-ui';
+Vue.component(DatetimePicker.name, DatetimePicker);
 export default {
   name: "Income",
   data() {

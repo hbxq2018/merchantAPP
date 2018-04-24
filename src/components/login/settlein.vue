@@ -1,82 +1,102 @@
 <template>
   <div class="settle">
-      <mt-header title="商家入驻">
-          <router-link to="/process" slot="left">
-              <mt-button icon="back"></mt-button>
+    <mt-header title="商家入驻">
+        <router-link to="/process" slot="left">
+            <mt-button icon="back"></mt-button>
+        </router-link>
+    </mt-header>
+    
+    <div class="settle_head">
+        <img src="../../../static/images/setting_head.png" alt="">
+    </div>
+    <p class="form_title">商户信息</p>
+    <div class="form">
+        <mt-field label="申请人" placeholder="输入申请人姓名" v-model="username"></mt-field>
+        <mt-field label="联系方式" placeholder="输入手机或电话号码" type="tel" v-model="phone"></mt-field>
+        <mt-field label="店铺名称" placeholder="输入店铺的全称" type="url" v-model="shopname"></mt-field>
+        <mt-field label="详细地址" placeholder="定位选择详细地址" type="number" v-model="address"></mt-field>
+        <!-- <mt-field label="经营品类" placeholder="选择经营品类" type="" v-model="type"></mt-field> -->
+        <div class="category clearfix">
+          <router-link to="#">
+            <div class="category_l">经营品类</div>
+            <div class="category_r">
+              <span class="category_text fl">选择经营品类</span>
+              <span class="category_arrow fr"></span>
+            </div>
           </router-link>
-      </mt-header>
-      
-      <div class="settle_head">
-          <img src="../../../static/images/setting_head.png" alt="">
-      </div>
-      <p class="form_title">商户信息</p>
-      <div class="form">
-          <mt-field label="申请人" placeholder="输入申请人姓名" v-model="username"></mt-field>
-          <mt-field label="联系方式" placeholder="输入手机或电话号码" type="tel" v-model="phone"></mt-field>
-          <mt-field label="店铺名称" placeholder="输入店铺的全称" type="url" v-model="shopname"></mt-field>
-          <mt-field label="详细地址" placeholder="定位选择详细地址" type="number" v-model="address"></mt-field>
-          <mt-field label="经营品类" placeholder="选择经营品类" type="" v-model="type"></mt-field>
-          <!-- <mt-cell-swipe
-            title="经营品类"
-            :right="[
-              {
-                content: '火锅',
-                style: { background: 'red', color: '#fff' },
-                handler: () => this.$messagebox('火锅')
-              },
-              {
-                content: '川菜',
-                style: { background: 'red', color: '#fff' },
-                handler: () => this.$messagebox('川菜')
-              }
-            ]"></mt-cell-swipe> -->
-      </div>
-      <p class="form_title">提交资质</p>
-      <div class="qualification">
-        <div class="q_item clearfix">
-          <p class="q_item_l fl">营业执照</p>
-          <div class="q_item_r fl">
-            <p>上传营业执照</p>
-            <img src="../../../static/images/add.png" alt="">
-          </div>
         </div>
-        <div class="q_item clearfix">
-          <p class="q_item_l fl">卫生许可证</p>
-          <div class="q_item_r fl">
-            <p>上传卫生许可证</p>
+        <!-- <mt-cell-swipe
+          title="经营品类"
+          :right="[
+            {
+              content: '火锅',
+              style: { background: 'red', color: '#fff' },
+              handler: () => this.$messagebox('火锅')
+            },
+            {
+              content: '川菜',
+              style: { background: 'red', color: '#fff' },
+              handler: () => this.$messagebox('川菜')
+            }
+          ]"></mt-cell-swipe> -->
+    </div>
+    <p class="form_title">提交资质</p>
+    <div class="qualification">
+      <div class="q_item clearfix">
+        <p class="q_item_l fl">营业执照</p>
+        <div class="q_item_r fl">
+          <p>上传营业执照</p>
+          <div class="files">
             <img src="../../../static/images/add.png" alt="">
-          </div>
-        </div>
-        <div class="q_item clearfix">
-          <p class="q_item_l fl">门头照</p>
-          <div class="q_item_r fl">
-            <p>上传门头照(限1张)</p>
-            <img src="../../../static/images/add.png" alt="">
+            <input type="file" v-on:change="getFile">
           </div>
         </div>
       </div>
-      <div class="submitBox">
-        <div class="agreement">
-          <span>同意</span>
-          <router-link to="Agreement">
-            <mt-button type="default">《享7商家服务协议》</mt-button>
-          </router-link>
+      <div class="q_item clearfix">
+        <p class="q_item_l fl">卫生许可证</p>
+        <div class="q_item_r fl">
+          <p>上传卫生许可证</p>
+          <div class="files">
+            <img src="../../../static/images/add.png" alt="">
+            <input type="file" v-on:change="getFile">
+          </div>
         </div>
-        <div class="submit_btn">
-          <!-- <span>提交申请</span> -->
-          <router-link to="examine">
-              <mt-button type="default">提交申请</mt-button>
-          </router-link>
-        </div>
-        <p>入驻过程如有问题可拨打400-100-111</p>
       </div>
+      <div class="q_item clearfix">
+        <p class="q_item_l fl">门头照</p>
+        <div class="q_item_r fl">
+          <p>上传门头照(限1张)</p>
+          <div class="files">
+            <img src="../../../static/images/add.png" alt="">
+            <input type="file" v-on:change="getFile">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="submitBox">
+      <div class="agreement">
+        <span>同意</span>
+        <router-link to="Agreement">
+          <mt-button type="default">《享7商家服务协议》</mt-button>
+        </router-link>
+      </div>
+      <div class="submit_btn">
+        <!-- <span>提交申请</span> -->
+        <router-link to="examine">
+            <mt-button type="default">提交申请</mt-button>
+        </router-link>
+      </div>
+      <p>入驻过程如有问题可拨打400-100-111</p>
+    </div>
+    <!-- <mt-actionsheet :actions="actions" v-model="sheetVisible"></mt-actionsheet> -->
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { Field, CellSwipe } from "mint-ui";
-Vue.component(CellSwipe.name, CellSwipe);
+import { Field, CellSwipe, Actionsheet } from "mint-ui";
 Vue.component(Field.name, Field);
+Vue.component(CellSwipe.name, CellSwipe);
+Vue.component(Actionsheet.name, Actionsheet);
 export default {
   name: "Settle",
   data() {
@@ -85,8 +105,33 @@ export default {
       phone: "",
       shopname: "",
       address: "",
-      type: ""
+      type: "",
+      imgUrl: "../../../static/images/add.png"
+      // actions: [
+      //   {
+      //     name: '拍照',
+      //     method: function() {
+      //       console.log('拍照');
+      //     }
+      //   },
+      //   {
+      //     name: '从相册中选择',
+      //     method: function() {
+      //       console.log('从相册中选择');
+      //     }
+      //   }
+      // ],
+      // sheetVisible: false
     };
+  },
+  methods: {
+    // add: function(){
+    //   this.sheetVisible = !this.sheetVisible;
+    // }
+    getFile: function(e) {
+      console.log(e.target.files);
+      // this.imgUrl = e.target.files[0].name
+    }
   }
 };
 </script>
@@ -119,8 +164,7 @@ export default {
         padding-left: 28px;
         .mint-cell-title {
           text-align: left;
-          margin-right: 59px;
-          width: 120px;
+          width: 160px;
           color: #000;
           span {
             display: inline-block;
@@ -137,6 +181,60 @@ export default {
         }
       }
     }
+    .category {
+      background-color: #fff;
+      width: 100%;
+      height: 100px;
+      line-height: 100px;
+      font-size: 30px;
+      color: #000;
+      padding: 0 15px 0 28px;
+      box-sizing: border-box;
+      .category_l {
+        float: left;
+        height: 100%;
+        width: 25%;
+        text-align: left;
+      }
+      .category_r {
+        float: right;
+        height: 100%;
+        width: 75%;
+        .category_text {
+          font-size: 28px;
+          color: #b1b1b1;
+        }
+        .category_arrow {
+          width: 40px;
+          height: 40px;
+          position: relative;
+          margin-top: 35px;
+          &:after,
+          &:before {
+            content: "";
+            position: absolute;
+            top: 0;
+          }
+          &:after {
+            left: 0px;
+            border-left: 15px solid #fff;
+            border-right: 15px solid transparent;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+          }
+          &:before {
+            left: 2px;
+            border-left: 15px solid #b1b1b1;
+            border-right: 15px solid transparent;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+          }
+        }
+      }
+    }
+    // .category:hover {     //经营品类点击样式
+    //   background-color: #ebebeb;
+    // }
   }
   .qualification {
     background-color: #fff;
@@ -146,7 +244,7 @@ export default {
       width: 100%;
       padding: 28px 0 28px 28px;
       box-sizing: border-box;
-      border-bottom: 1px solid #E0E0E0;
+      border-bottom: 1px solid #e0e0e0;
       .q_item_l {
         text-align: left;
         width: 120px;
@@ -155,10 +253,27 @@ export default {
       }
       .q_item_r {
         text-align: left;
-        img {
+        .files {
           margin-top: 28px;
           width: 210px;
           height: 210px;
+          position: relative;
+          img {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+          input {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            z-index: 100;
+          }
         }
       }
     }
@@ -175,17 +290,17 @@ export default {
         background-color: #fff;
         box-shadow: 0 0 0 #fff;
         font-size: 28px;
-        color: #FC5E2D;
+        color: #fc5e2d;
       }
     }
     .submit_btn {
       button {
-        box-shadow: 0 0 0 #FC5E2D;
+        box-shadow: 0 0 0 #fc5e2d;
         font-size: 36px;
         width: 100%;
         height: 90px;
         line-height: 90px;
-        background-color: #FC5E2D;
+        background-color: #fc5e2d;
         border-radius: 10px;
         color: #fff;
         font-size: 36px;

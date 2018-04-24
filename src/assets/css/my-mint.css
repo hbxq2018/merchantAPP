@@ -10,3 +10,9 @@
 .mint-header .is-left i {
     font-size: 44px;
 }
+
+.mint-actionsheet .mint-actionsheet-listitem, .mint-actionsheet .mint-actionsheet-button {
+    height: 80px;
+    line-height: 80px;
+    font-size: 30px;
+}
