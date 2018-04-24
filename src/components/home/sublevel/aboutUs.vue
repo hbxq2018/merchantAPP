@@ -48,18 +48,6 @@ export default {
 </script>
 
 <style lang="less">
-    // .mint-header{
-    //     width: 100%;
-    //     height: 88px;
-    //     background: #FC5E2D;
-    //     .mint-header-title{
-    //         font-size: 34px;
-    //         color: #FFFFFF;
-    //     }
-    //     .mintui-back{
-    //         font-size: 40px;
-    //     }
-    // }
     .weWrap{
         width: 100%;
         height: 331px;

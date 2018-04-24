@@ -12,6 +12,7 @@ import Menu from '@/components/home/menu'
 import Manage from '@/components/home/manage/manage'
 import AboutUs from '@/components/home/sublevel/aboutUs'
 import Historyse from '@/components/home/sublevel/historyse'
+import Historyofthebill from '@/components/home/sublevel/historyofthebill'
 Vue.use(Router)
 
 export default new Router({
@@ -70,6 +71,11 @@ export default new Router({
       path: '/historyse',
       name: 'Historyse',
       component: Historyse
-    }
+    },
+    { //我的页面-->缴费服务
+      path: '/historyofthebill',
+      name: 'Historyofthebill',
+      component: Historyofthebill
+    },
   ]
 })
