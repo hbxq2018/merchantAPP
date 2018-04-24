@@ -10,6 +10,8 @@ import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
 import Manage from '@/components/home/manage/manage'
+import AboutUs from '@/components/home/sublevel/aboutUs'
+import Historyse from '@/components/home/sublevel/historyse'
 Vue.use(Router)
 
 export default new Router({
@@ -58,6 +60,16 @@ export default new Router({
       path: '/income',
       name: 'Income',
       component: Income
+    },
+    { //我的页面-->关于我们
+      path: '/aboutUs',
+      name: 'AboutUs',
+      component: AboutUs
+    },
+    { //我的页面-->缴费服务
+      path: '/historyse',
+      name: 'Historyse',
+      component: Historyse
     }
   ]
 })
