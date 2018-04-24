@@ -13,6 +13,7 @@ import Manage from '@/components/home/manage/manage'
 import AboutUs from '@/components/home/sublevel/aboutUs'
 import Historyse from '@/components/home/sublevel/historyse'
 import Historyofthebill from '@/components/home/sublevel/historyofthebill'
+import Edit from '@/components/home/manage/edit'
 Vue.use(Router)
 
 export default new Router({
@@ -31,6 +32,11 @@ export default new Router({
       path: '/manage',
       name: 'Manage',
       component: Manage
+    },
+    {
+      path: '/edit',
+      name: 'Edit',
+      component: Edit
     },
     {
       path: '/process',

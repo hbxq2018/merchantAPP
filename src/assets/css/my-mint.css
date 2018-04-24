@@ -11,8 +11,34 @@
     font-size: 44px;
 }
 
+
 .mint-actionsheet .mint-actionsheet-listitem, .mint-actionsheet .mint-actionsheet-button {
     height: 80px;
     line-height: 80px;
     font-size: 30px;
 }
+
+.mint-cell {
+    height: 100px;
+  }
+  .mint-cell-wrapper {
+    height: 100%;
+    line-height: 100px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .mint-cell-title {
+    color: #191919;
+    font-size: 30px;
+    text-align: left;
+  }
+  .mint-cell-value.is-link {
+    margin-right: 40px;
+  }
+  .mint-cell-value span {
+    color: #808080;
+    font-size: 30px;
+  }
+  .mint-cell-allow-right::after {
+    width: 25px;
+    height: 25px;
+  }

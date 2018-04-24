@@ -141,3 +141,34 @@ ol {
 .fr {
     float: right;
 }
+/* 
+
+.mint-header {
+    width: 100%;
+    height: 88px;
+    line-height: 88px;
+    background-color: #fc5e2d;
+    font-size: 34px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    letter-spacing: 4px;
+    .is-left {
+      i {
+        font-size: 44px;
+      }
+    }
+  }
+
+   */
+
+   /* .mint-msgbox{
+    height: 25%;
+  }
+  .mint-msgbox-header{
+      height:10%;
+  }
+  .mint-msgbox-title{
+      font-size: 30px;
+      margin: 29px 0;
+  } */

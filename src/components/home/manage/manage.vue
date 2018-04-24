@@ -9,7 +9,7 @@
 
       <div class="man_info">商户信息</div>
       
-      <mt-cell v-for="(item,index) in formdata" :key="index" :title="item.name" :to="item.to" is-link :value="item.value"></mt-cell>
+      <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name}}" is-link :value="item.value" @click="clickformli"></mt-cell>
       
       <div class="man_info">员工管理</div>
 
@@ -21,13 +21,13 @@
           <li class="man_lis" v-for="(item,index) in writedata" :key="index" >
             <img class="man_src" :src="item.src" :alt="item.name">
            <span class="man_name">{{item.name}}</span>
-           <span class="nam_del" @click="clickdel">删除</span>
+           <span class="nam_del" @click="clickdel" :id="index">删除</span>
           </li>
       </ul>
   </div>
 </template>
 <script>
-import { MessageBox } from 'mint-ui';
+import { MessageBox } from "mint-ui";
 export default {
   name: "Manage",
   data() {
@@ -37,27 +37,27 @@ export default {
       formdata: [
         {
           name: "联系电话",
-          to: "",
+          to: "/edit",
           value: "13398572409"
         },
         {
           name: "经营品类",
-          to: "",
+         to: "/edit",
           value: "火锅 川菜 自助餐"
         },
         {
           name: "环境分类",
-          to: "",
+         to: "/edit",
           value: "约会"
         },
         {
           name: "详细地址",
-          to: "",
+         to: "/edit",
           value: "光谷天地光谷天地光谷天地光..."
         },
         {
           name: "店铺简介",
-          to: "",
+         to: "/edit",
           value: "光谷天地光谷天地光谷天地光..."
         }
       ],
@@ -79,39 +79,62 @@ export default {
   },
   methods: {
     save: function() {
-      console.log("save");
+      MessageBox.confirm('确定进行保存?').then(action => {
+        MessageBox('提示', '保存成功');
+      },() => {
+        MessageBox('提示', '是否放弃保存修改内容？');
+      });
+    },
+    clickformli:function(e){
+      const ind = e.currentTarget.id;
+      console.log("ind:",ind);
+      let obj={};
+      for(let i=0;i<this.formdata.length;i++){
+        if(ind == this.formdata[i].id){
+          obj = this.formdata[i]
+          this.$router.push({name:'/edit',params:{id:obj.id,name:obj.name}})
+        }
+      }
+      
     },
     clickadd: function() {
-        MessageBox.prompt('添加核销员').then(({ value, action }) => {
-            console.log("value:",value)
-            console.log("action:",action)
-        });
+      MessageBox.prompt("添加核销员").then(({ value, action }) => {
+        if(action == 'confirm'){
+          if(!value){
+            MessageBox('提示', '请输入核销员编号');
+            return false
+          }
+          let obj = {
+              src: "../../../../static/images/timg (2).jpg",
+              name: ""
+          }
+          obj.name = value
+          this.writedata.push(obj)
+        }
+      },()=>{});
     },
-    clickdel: function() {
-      console.log("clickdel");
+    clickdel: function(e) {
+      const ind = e.currentTarget.id;
+      MessageBox.confirm('确定要删除吗？?').then(action => {
+        let [...arr] = this.writedata
+        if(action == 'confirm'){
+          arr.splice(ind,1)
+          this.writedata = arr
+        }
+      },()=>{});
+    }
+  },
+  created:function(){
+    // console.log("this.$route.params.name:",this.$route.params)
+    if(this.$route.params.ind){
+      let obj = this.$route.params
+      this.formdata[obj.ind].value = obj.value
     }
   }
 };
 </script>
 <style lang="less">
 .manage {
-  padding-top: 88px;
-  .mint-header {
-    width: 100%;
-    height: 88px;
-    line-height: 88px;
-    background-color: #fc5e2d;
-    font-size: 34px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    letter-spacing: 4px;
-    .is-left {
-      i {
-        font-size: 44px;
-      }
-    }
-  }
   .man_info {
     background: #ebebeb;
     height: 68px;
@@ -121,30 +144,7 @@ export default {
     font-size: 28px;
     color: #b1b1b1;
   }
-  .mint-cell {
-    height: 100px;
-    .mint-cell-wrapper {
-      height: 100%;
-      line-height: 100px;
-      border-bottom: 1px solid #e0e0e0;
-      .mint-cell-title {
-        color: #191919;
-        font-size: 30px;
-        text-align: left;
-      }
-      .mint-cell-value.is-link {
-        margin-right: 40px;
-      }
-      .mint-cell-value span {
-        color: #808080;
-        font-size: 30px;
-      }
-      .mint-cell-allow-right::after {
-        width: 25px;
-        height: 25px;
-      }
-    }
-  }
+
   .hexiaoyuan {
     padding: 29px 20px;
     border-bottom: 1px solid #e0e0e0;
@@ -189,7 +189,20 @@ export default {
       }
     }
   }
-  
+  .mint-msgbox-title{
+      font-size: 30px!important;
+      margin: 29px 0;
+  }
+  // .mint-msgbox {
+  //   height: 25%;
+  //   .mint-msgbox-header {
+  //     height: 75px;
+  //     .mint-msgbox-title {
+  //       color: 30px;
+  //       margin: 29px 0;
+  //     }
+  //   }
+  // }
 }
 </style>
 

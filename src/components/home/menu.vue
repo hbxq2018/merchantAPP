@@ -79,9 +79,9 @@ export default {
           }else if(ind == 3){
             //三种跳转方式
             // 字符串
-              this.$router.push('/manage')
+              // this.$router.push('/manage')
             // 对象
-            // this.$router.push({ path: '/home/manage'})
+            this.$router.push({ path: '/manage'})
             // 命名的路由   (有待研究)
             // this.$router.push({ name: '/home/manage', params: {}})
           }else if(ind == 4){
@@ -96,6 +96,8 @@ export default {
 .menu {
   .menu_top {
     width: 100%;
+    height: 80%;
+    background: red;
     & > .eaves {
       position: absolute;
       top: 0;
