@@ -4,7 +4,7 @@
         <router-link to="/home" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
-        <mt-button slot="right">历史账单</mt-button>
+        <mt-button slot="right" @click="billCheck">历史账单</mt-button>
     </mt-header>
 
     <div class="history_money">
@@ -18,7 +18,7 @@
     <div class="order_history" v-for="(item,index) in data2" :key="index">
         <div class="order_h_sublevel">
             <div class="roder_left">
-                <b>{{item.tiStockFaceValueme}}</b>
+                <b>{{item.tiStockFaceValueme}}<span>元代金券</span></b>
                 <p>{{item.time}}<span>{{item.time1}}</span></p>
             </div>
             <div class="roder-right">
@@ -50,19 +50,19 @@ export default {
             },
             data2:[
                 {
-                tiStockFaceValueme:'10元代金券',
+                tiStockFaceValueme:'10',
                 time:'2018-4-24',
                 time1:'12:45:23',
                 money:'1.5',
             },
             {
-                tiStockFaceValueme:'10元代金券',
+                tiStockFaceValueme:'10',
                 time:'2018-4-24',
                 time1:'12:45:23',
                 money:'1.5',
             },
             {
-                tiStockFaceValueme:'10元代金券',
+                tiStockFaceValueme:'10',
                 time:'2018-4-24',
                 time1:'12:45:23',
                 money:'1.5',
@@ -70,15 +70,19 @@ export default {
             ],
         }
     },
-    // billCheck:function(){
-    //     console.log('11')
-    // }
+    methods:{
+        billCheck:function(e){
+            this.$router.push('/historyofthebill')
+        }
+    }
 }
 </script>
 
 
 <style lang="less">
-    body{
+    .payment{
+        width: 100%;
+        height: 100%;
         background: #EBEBEB;
         .mint-header-title{
                 font-size: 34px;
@@ -128,6 +132,7 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                letter-spacing: 2px;
                 .roder_left{
                     line-height: 50px;
                     text-align: left;

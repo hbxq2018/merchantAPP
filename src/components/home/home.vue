@@ -38,6 +38,9 @@ export default {
 
 <style lang="less">
 .home {
+  background: #FFF;
+  width: 100%;
+  height: 100%;
   .h_but {
     position: absolute;
     left: 0;
@@ -46,6 +49,7 @@ export default {
     height: 98px;
     z-index: 1999;
     border-top: 1px solid rgba(224, 224, 224, 1);
+    background: #fff;
     .h_bar {
       display: block;
       width: 50%;
