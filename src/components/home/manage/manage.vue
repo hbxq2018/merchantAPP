@@ -9,7 +9,7 @@
 
       <div class="man_info">商户信息</div>
       
-      <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name}}" is-link :value="item.value" @click="clickformli"></mt-cell>
+      <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
       
       <div class="man_info">员工管理</div>
 
@@ -42,7 +42,7 @@ export default {
         },
         {
           name: "经营品类",
-         to: "/edit",
+          to: "/edit",
           value: "火锅 川菜 自助餐"
         },
         {
@@ -52,13 +52,13 @@ export default {
         },
         {
           name: "详细地址",
-         to: "/edit",
-          value: "光谷天地光谷天地光谷天地光..."
+          to: "/edit",
+          value: "详细地址详细地址详细地址详细地址详细地址详细地址"
         },
         {
           name: "店铺简介",
          to: "/edit",
-          value: "光谷天地光谷天地光谷天地光..."
+          value: "店铺简介店铺简介店铺简介店铺简介"
         }
       ],
       writedata: [
@@ -79,6 +79,7 @@ export default {
   },
   methods: {
     save: function() {
+      console.log("formdata:",this.formdata)
       MessageBox.confirm('确定进行保存?').then(action => {
         MessageBox('提示', '保存成功');
       },() => {
@@ -122,6 +123,14 @@ export default {
           this.writedata = arr
         }
       },()=>{});
+    },
+    setvalue:function(val){
+      if(val.length>13){
+        let str = val.substring(0,13) + '...';
+        return str
+      }else{
+        return val
+      }
     }
   },
   created:function(){

@@ -4,19 +4,19 @@
         
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         
-      </mt-header>
-        <div class="geduan"></div>
+      </mt-header>  
       <mt-field v-show="ind == '0'" v-model="data.phone" label="手机号" placeholder="请输入新手机号" ref="phone" type="tel" ></mt-field>
       
         <mt-checklist  
             v-if="ind == '1' || ind == '2'" 
             :max="_max"
             align="right"
+           
             v-model="value"   
             :options="options">  
         </mt-checklist> 
 
-        <mt-field v-show="ind == 4"  label="商家简介" v-model="data.Introduction" placeholder="商家简介" type="textarea" rows="4"></mt-field>
+        <mt-field v-show="ind == 4"  label="简介" v-model="data.Introduction" placeholder="商家简介" type="textarea" rows="8"></mt-field>
   </div>
 </template>
 <script>
@@ -31,6 +31,7 @@ export default {
     return {
       name:'',
       ind:'',
+      content:'',
       _max:'',
       data:{
           phone:'',
@@ -110,7 +111,6 @@ export default {
   },
   methods: {
     clickback: function() {
-      //   console.log(this.$refs.phone.value);
       const ind = this.ind;
       if (ind == 0) {
         const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
@@ -123,13 +123,12 @@ export default {
             return false
         }
       }else if(ind == 1 || ind == 2){
-          let val = this.value.join(",");
-           this.$router.push({name: 'Manage',params:{ ind:this.ind,value:val}});
-          
+        let val = this.value.join(",");
+        this.$router.push({name: 'Manage',params:{ ind:this.ind,value:val}});
       }else if(ind == 3){
-
+        this.$router.push({name: 'Manage',params:{}});
       }else if(ind == 4){
-           this.$router.push({name: 'Manage',params:{ ind:this.ind,value:this.data.Introduction}});
+        this.$router.push({name: 'Manage',params:{ ind:this.ind,value:this.data.Introduction}});
       }
     }
   },
@@ -141,19 +140,33 @@ export default {
   created: function() {
     this.name = this.$route.query.name;
     this.ind = this.$route.query.ind;
+    this.content = this.$route.query.value;
+    if(this.ind == '0'){
+      this.data.phone = this.content;
+    }
     if(this.ind=='1'){
-        this.options = this.option1
-        this._max = 3
+        this.options = this.option1;
+        this._max = 3;
+        this.content = this.content.split(" ")
+        this.value = this.content;
     }else if(this.ind == '2'){
-        this.options = this.option2
-        this._max = 1
+        this.options = this.option2;
+        this._max = 1;
+        this.content = this.content.split(" ")
+        this.value = this.content;
+    }else{
+      this.data.Introduction = this.content;
     }
   }
 };
 </script>
-<style lang="less">
-    .geduan{
-        width: 100%;
-        height: 100px;
+<style lang="less" scoped>
+  .edit{
+    .mint-cell-title,.mint-cell-text{
+      width: 300px;
     }
+    .mint-field-core{
+      border: 1px solid #b1b1b1!important;
+    }
+  }
 </style>

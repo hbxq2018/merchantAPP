@@ -26,10 +26,24 @@
     line-height: 100px;
     border-bottom: 1px solid #e0e0e0;
   }
-  .mint-cell-title {
+  .mint-cell-title ,.mint-cell-value{
     color: #191919;
     font-size: 30px;
     text-align: left;
+  }
+  .mint-checkbox-core{
+    width: 40px;
+    height: 40px;
+    transform: rotate(-10deg);
+  }
+  .mint-checkbox-core::after{
+    top: -5px;
+    left: 1px;
+    width: 30px;
+    height: 30px;
+  }
+  .mintui,.mintui-field-error{
+    font-size: 40px;
   }
   .mint-cell-value.is-link {
     margin-right: 40px;
@@ -41,4 +55,7 @@
   .mint-cell-allow-right::after {
     width: 25px;
     height: 25px;
+  }
+  .mint-field.is-textarea{
+    min-height: 400px;
   }
