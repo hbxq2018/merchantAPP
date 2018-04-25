@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-
+      
       <Menu v-if="ismenu"></Menu>
       <Mine v-if="!ismenu"></Mine>
      
@@ -32,10 +32,6 @@ export default {
       gomine:function(){
           this.ismenu= false;
       }
-  },
-  created:function(){
-    console.log(this.ismenu)
-    // this.ismenu=true;
   }
 };
 </script>

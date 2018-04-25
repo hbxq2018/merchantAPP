@@ -67,9 +67,6 @@ export default {
 }
 </script>
 <style lang="less">
-    body{
-            background: #EBEBEB;
-        }
     .mine{
         .mine_top{
             width: 100%;

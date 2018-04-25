@@ -4,7 +4,7 @@
     <p class="examine_state">恭喜你，审核通过</p>
     <!-- <p>审核时间：预计2-3个工作日内</p> -->
     <div class="examine_btn">
-        <router-link to="menu">
+        <router-link to="home">
             <mt-button type="default">进入店铺</mt-button>
         </router-link>
     </div>
