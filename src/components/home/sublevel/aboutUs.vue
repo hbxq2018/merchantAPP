@@ -1,6 +1,6 @@
 <template>
   <div class="aboutMe">
-        <mt-header title="关于我们"><router-link to="/home" slot="left">
+        <mt-header title="关于我们"><router-link slot="left" :to="{path:'home',query:{'ind':index}}">
         <mt-button icon="back"></mt-button></router-link></mt-header>
         <div class="weWrap">
             <img :src="data.src" alt="享7Logo">
@@ -21,6 +21,7 @@ export default {
   name: "aboutMe",
   data() {
     return{
+        index:2,
           msg:'aboutMe',
           data:{
               src: "../../../../static/images/xiang7Logo.png",

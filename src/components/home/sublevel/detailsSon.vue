@@ -1,6 +1,6 @@
 <template>
   <div class="detailsSon">
-      <mt-header :title="name">
+      <mt-header fixed :title="name">
         <router-link to="/historyofthebill" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -8,7 +8,7 @@
       <div class="detailsSon_top">
           <p>{{data.times}}</p>
           <span>本月服务费：<em>&yen;{{data.money}}</em></span>
-          <img src="../../../../static/images/murcielagoimg.png" alt="">
+          <img src="../../../../static/images/murcielagoimg.png" alt="赞图标">
       </div>
       <div class="murcielago">
           <p>本月已核销<span>342432</span>张代金券，总额度<span>244.50</span>元</p>
@@ -74,6 +74,8 @@ export default {
             letter-spacing: 2px;
             line-height: 60px;
             position: relative;
+            overflow:hidden;
+            padding-top: 88px;
             p{
                 font-size: 40px;
                 color: #FC5E2D;
@@ -84,7 +86,7 @@ export default {
                 width: 183px;
                 height: 183px;
                 position: absolute;
-                top: 20px;
+                top: 108px;
                 right: -10px;
             }
         }

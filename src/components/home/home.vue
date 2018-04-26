@@ -32,6 +32,11 @@ export default {
       gomine:function(){
           this.ismenu= false;
       }
+  },
+  created:function(){
+    if(this.$route.query.ind == '2'){
+      this.ismenu= false;
+    }
   }
 };
 </script>

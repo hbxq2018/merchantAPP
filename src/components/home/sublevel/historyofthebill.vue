@@ -1,8 +1,8 @@
 <template>
   <div class="billCheck">
-        <mt-header title="历史账单"><router-link to="/historyse" slot="left">
+        <mt-header fixed title="历史账单"><router-link to="/historyse" slot="left">
         <mt-button icon="back"></mt-button></router-link></mt-header>
-        <div v-for="(item,index) in data" :key="index">
+        <div class="top_distance" v-for="(item,index) in data" :key="index">
           <div class="check_top">
             <div class="check_top_time"><span>{{item.time}}</span>年</div>
           </div>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { InfiniteScroll } from 'mint-ui';
 export default {
   name: "billCheck",
   data() {
@@ -34,22 +35,22 @@ export default {
             {
               time: "4",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             },
             {
               time: "5",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             },
             {
               time: "6",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             },
             {
               time: "7",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             }
           ]
         },
@@ -59,22 +60,22 @@ export default {
             {
               time: "4",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             },
             {
               time: "5",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             },
             {
               time: "6",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             },
             {
               time: "7",
               money: "224.50",
-              state: "待付款"
+              state: "待打款"
             }
           ]
         },
@@ -107,10 +108,9 @@ export default {
     };
   },
   methods: {
-    particularsDetails:function(e){
-      const menstrualID = e.currentTarget.id
-      console.log("ID:",menstrualID)
-      this.$router.push('/detailsSon')
+    particularsDetails: function(e) {
+      const menstrualID = e.currentTarget.id;
+      this.$router.push("/detailsSon");
     }
   }
 };
@@ -121,6 +121,9 @@ export default {
   width: 100%;
   height: 100%;
   background: #ebebeb;
+  .top_distance:nth-child(2) {
+    margin-top: 88px;
+  }
   .check_top {
     width: 100%;
     height: 80px;
@@ -166,7 +169,7 @@ export default {
       .roder-right {
         font-size: 28px;
         padding-right: 39px;
-        color: #fc5e2d;
+        color: #B1B1B1;
         span {
           vertical-align: margin;
         }

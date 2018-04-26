@@ -61,6 +61,9 @@ export default {
               this.$router.push('/aboutUs')
           }else if(listBoxID ==0){
               this.$router.push('/historyse')
+          }else if(listBoxID ==1){
+              window.location.href="tel:15827245422"
+                console.log("拨打:","拨打电话成功")
           }
       }
   }

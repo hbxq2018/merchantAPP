@@ -1,7 +1,8 @@
 <template>
   <div class="payment">
-    <mt-header :title="name">
-        <router-link to="/home" slot="left">
+    <mt-header fixed :title="name">
+        <router-link slot="left" :to="{path:'home',query:{'ind':index}}">
+             
             <mt-button icon="back"></mt-button>
         </router-link>
         <mt-button slot="right" @click="billCheck">历史账单</mt-button>
@@ -36,6 +37,7 @@ export default {
     name:'Payment',
     data(){
         return{
+            index:2,
             msg:'payment',
             name: "缴费服务",
             data:{
@@ -95,6 +97,7 @@ export default {
             width: 100%;
             height: 224px;
             background: #fff;
+            padding-top: 88px;
             p:nth-child(1){
                 font-size: 30px;
                 padding: 39px 0px 14px 0px;
