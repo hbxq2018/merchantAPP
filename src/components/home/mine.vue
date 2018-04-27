@@ -18,12 +18,15 @@
   </div>
 </template>
 
+
 <script>
+import GLOBAL from '../../../untils/config/config';
 import { MessageBox } from 'mint-ui';
 export default {
   name:'Mine',
   data(){
       return{
+          API:GLOBAL.GLOBAL_API_DOMAIN,
           msg:'mine',
           data:{
               src: "../../../static/images/timg (2).jpg",
@@ -66,6 +69,15 @@ export default {
                 console.log("拨打:","拨打电话成功")
           }
       }
+  },
+  created:function(){//请求接口
+    console.log("GLOBAL_API_DOMAIN:",this.API)
+    let _parms = {
+      mobile:'15827245422',
+    }
+    this.$axios.get(this.API+"app/user/findUserByMobile",_parms).then(res=>{
+      console.log("成功",res.data);
+    });
   }
 }
 </script>
