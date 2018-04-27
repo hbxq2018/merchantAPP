@@ -38,7 +38,8 @@ export default {
   data() {
     return {
       API: GLOBAL.GLOBAL_API_DOMAIN,
-      telephone: ""
+      telephone: "",
+      movieArr:[]
     };
   },
   methods: {
@@ -47,14 +48,45 @@ export default {
        let _parms = {
         shopMobile: this.telephone
       };
-      axios.post(this.API+'app/sms/sendForShopAppRegister', qs.stringify(_parms))
-      .then(response => {
-        console.log("response:",response);
-      })
-      .catch(err => {
-        console.log("err:",err);
-      })
+      // axios.post(this.API+'app/sms/sendForShopAppRegister', qs.stringify(_parms))
+      // .then(response => {
+      //   console.log("response:",response);
+      // })
+      // .catch(err => {
+      //   console.log("err:",err);
+      // })
+   
+      var that = new FormData(); 
+      // get('/api/1/picture?method=upload') 
+      this.$http.post('/api/app/user/findUserByMobile?mobile=13971489895',that)  
+        .then(function(sures) { console.log(sures);  
+            console.log("上产成功") })  
+        .catch(function(catchres) { console.log(catchres);  
+            console.log("上传失败") }) 
     }
+  },
+  created:function(){
+    let act = 33,vote=786;
+    let obj = {
+      page:1,
+      row:8,
+      actId:act,
+      voteUserId:vote
+    }
+    let parms='',value='';
+    for(var key in obj) {
+      value = key+'='+obj[key]+'&';
+      parms+=value;
+      value=''
+    }
+    console.log("parms:",parms)
+    // this.$axios.get('/api/actshop/list?'+parms)
+    let mobile = '18087088987';
+    this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
+    .then((response) => {
+       console.log(response)
+    })
+   
   }
 };
 </script>
