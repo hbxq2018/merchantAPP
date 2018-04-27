@@ -31,6 +31,8 @@
 
 <script>
 import GLOBAL from "../../../untils/config/config";
+import axios from 'axios';
+import qs from 'qs';
 export default {
   name: "Login",
   data() {
@@ -42,12 +44,16 @@ export default {
   methods: {
     securityCode() {
       console.log(this.telephone);
-      // let _parms = {
-      //   shopMobile: this.telephone
-      // };
-      // this.$axios.get(this.API+"app/sms/sendForShopAppRegister",_parms).then(res=>{
-      //   console.log(res.data);
-      // });
+       let _parms = {
+        shopMobile: this.telephone
+      };
+      axios.post(this.API+'app/sms/sendForShopAppRegister', qs.stringify(_parms))
+      .then(response => {
+        console.log("response:",response);
+      })
+      .catch(err => {
+        console.log("err:",err);
+      })
     }
   }
 };
