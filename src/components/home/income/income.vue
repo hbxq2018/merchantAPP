@@ -1,7 +1,7 @@
 <template>
     <div class="income">
 		<mt-header title="营业数据" class="income_header">
-            <router-link to="/menu" slot="left">
+            <router-link to="/home" slot="left">
                 <mt-button icon="back"></mt-button>
                 <mt-button></mt-button>
             </router-link>
@@ -62,7 +62,9 @@ export default {
     return {};
   },
   watch: {},
-  created: function() {},
+  created: function() {
+    
+  },
   methods: {},
   computed: {},
   updated: {}

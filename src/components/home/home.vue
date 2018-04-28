@@ -31,6 +31,7 @@ export default {
       },
       gomine:function(){
           this.ismenu= false;
+          
       }
   },
   created:function(){

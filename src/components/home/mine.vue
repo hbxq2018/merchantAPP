@@ -1,8 +1,8 @@
 <template>
   <div class="mine">
       <div class="mine_top">
-          <img class="u_img" :src="data.src" alt="用户头像">
-          <p class="u_name">{{data.name}}</p>
+          <img class="u_img" :src="data.iconUrl" alt="用户头像">
+          <p class="u_name">{{data.nickName}}</p>
       </div>
        <div class="list_ontrol" v-for="(item,index) in data1" :id="index" :key='index' @click="WeIntroduce">
           <div class="list_left">
@@ -29,8 +29,8 @@ export default {
           API:GLOBAL.GLOBAL_API_DOMAIN,
           msg:'mine',
           data:{
-              src: "../../../static/images/timg (2).jpg",
-              name:'用户名称',
+              iconUrl: "../../../static/images/timg (2).jpg",
+              nickName:'用户名称',
           },
           data1:[
             {
@@ -72,12 +72,12 @@ export default {
   },
   created:function(){//请求接口
     console.log("GLOBAL_API_DOMAIN:",this.API)
-    let _parms = {
-      mobile:'15827245422',
-    }
-    this.$axios.get(this.API+"app/user/findUserByMobile",_parms).then(res=>{
-      console.log("成功",res.data);
-    });
+    let mobile = '18087088987';
+    this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
+    .then((res) => {
+    console.log(res)
+        this.data= res.data.data
+    })
   }
 }
 </script>
