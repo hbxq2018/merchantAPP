@@ -72,12 +72,14 @@ export default {
   },
   created:function(){//请求接口
     console.log("GLOBAL_API_DOMAIN:",this.API)
-    let mobile = '18087088987';
-    this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
-    .then((res) => {
-    console.log(res)
-        this.data= res.data.data
-    })
+    if(!this.data.id){  //如果有数据，则不用再次请求
+        let mobile = '18087088987';
+        this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
+        .then((res) => {
+        console.log(res)
+            this.data= res.data.data
+        })
+    }
   }
 }
 </script>
