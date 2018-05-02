@@ -8,7 +8,10 @@
       </mt-header>
 
       <div class="man_info">商户信息</div>
-      
+{{count}}
+      <button @click="add">+</button>
+      <button @click="reduce">-</button>
+
       <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
       
       <div class="man_info">员工管理</div>
@@ -19,8 +22,8 @@
       </div>
       <ul class="man_write" v-if="writedata">
           <li class="man_lis" v-for="(item,index) in writedata" :key="index" >
-            <img class="man_src" :src="item.src" :alt="item.name">
-           <span class="man_name">{{item.name}}</span>
+            <img class="man_src" :src="item.iconUrl" :alt="item.name">
+           <span class="man_name">{{set(item)}}</span>
            <span class="nam_del" @click="clickdel" :id="index">删除</span>
           </li>
       </ul>
@@ -28,6 +31,8 @@
 </template>
 <script>
 import { MessageBox } from "mint-ui";
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters,mapActions} from 'vuex';
 export default {
   name: "Manage",
   data() {
@@ -38,7 +43,7 @@ export default {
         {
           name: "联系电话",
           to: "/edit",
-          value: "13398572409"
+          value: ""
         },
         {
           name: "经营品类",
@@ -61,23 +66,41 @@ export default {
           value: "店铺简介店铺简介店铺简介店铺简介"
         }
       ],
-      writedata: [
-        {
-          src: "../../../../static/images/timg (2).jpg",
-          name: "张三"
-        },
-        {
-          src: "../../../../static/images/timg (2).jpg",
-          name: "李四"
-        },
-        {
-          src: "../../../../static/images/timg (2).jpg",
-          name: "王五"
-        }
-      ]
+      // writedata: [
+      //   {
+      //     src: "../../../../static/images/timg (2).jpg",
+      //     name: "张三",
+      //     mobile:'13309284723'
+      //   },
+      //   {
+      //     src: "../../../../static/images/timg (2).jpg",
+      //     name: "李四",
+      //     mobile:'13309114723'
+      //   },
+      //   {
+      //     src: "../../../../static/images/timg (2).jpg",
+      //     name: "王五",
+      //     mobile:'13345184723'
+      //   }
+      // ],
+      writedata:[]
     };
   },
+  store,
+  computed:{
+    ...mapState(['count','phone','userInfo']),
+    ...mapGetters(['count','phone']),
+  },
   methods: {
+    ...mapMutations(['add','reduce','setphone','setuserInfo']),
+    set:function(val){
+      if(val.nickName){
+        return val.nickName
+      }else if(val.userName){
+        let name =  val.userName.substr(0,3)+"****"+val.userName.substr(7);  
+        return name 
+      }
+    },
     save: function() {
       console.log("formdata:",this.formdata)
       MessageBox.confirm('确定进行保存?').then(action => {
@@ -96,31 +119,66 @@ export default {
           this.$router.push({name:'/edit',params:{id:obj.id,name:obj.name}})
         }
       }
-      
     },
     clickadd: function() {
       MessageBox.prompt("添加核销员").then(({ value, action }) => {
         if(action == 'confirm'){
-          if(!value){
-            MessageBox('提示', '请输入核销员编号');
-            return false
-          }
           let obj = {
               src: "../../../../static/images/timg (2).jpg",
               name: ""
           }
-          obj.name = value
-          this.writedata.push(obj)
+          if(value){
+            const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+            if (!reg.test(value)) {
+              MessageBox('提示', '手机号输入错误');  
+              return false;  
+            }
+            let shopId='144';
+            let obj = {
+              shopId:shopId,
+              mobile:value
+            }
+            let _value='';
+            for(var key in obj) {
+              _value += key + '=' + obj[key] + '&';
+            }
+            _value = _value.substring(0, _value.length-1);
+            this.$axios.post('/api/app/user/addHxUser?'+_value)
+            .then((res) => {
+              console.log(res)
+              if(res.data.code == '0'){
+                this.getWritelist(1)
+              }else{
+                MessageBox('提示', res.data.message);  
+              }
+            })
+          }else{
+            MessageBox('提示', '请输入核销员手机号');
+          }
         }
       },()=>{});
     },
     clickdel: function(e) {
       const ind = e.currentTarget.id;
-      MessageBox.confirm('确定要删除吗？?').then(action => {
+      MessageBox.confirm('确定要删除吗？').then(action => {
         let [...arr] = this.writedata
         if(action == 'confirm'){
-          arr.splice(ind,1)
-          this.writedata = arr
+          console.log('arr[ind]',arr[ind])
+          let obj = {
+              shopId:'144',
+              mobile:arr[ind].mobile
+            }
+            let _value='';
+            for(var key in obj) {
+              _value += key + '=' + obj[key] + '&';
+            }
+            _value = _value.substring(0, _value.length-1);
+            this.$axios.post('/api/app/user/deleteHxUser?'+_value)
+            .then((res) => {
+             if(res.data.code == '0'){
+                this.getWritelist(2)
+              }
+            })
         }
       },()=>{});
     },
@@ -131,9 +189,41 @@ export default {
       }else{
         return val
       }
+    },
+    getWritelist:function(val){  //获取核销员列表
+      let shopId = '144'
+      this.$axios.post('/api/app/user/listForShopId?shopId='+shopId)
+      .then((res) => {
+        if(res.data.code ==  '0'){
+          this.writedata = res.data.data;
+          if(val == '1'){
+            MessageBox('提示', '添加成功')
+          }else if(val == '2'){
+            MessageBox('提示', '删除成功')
+          };
+        }
+      })
+    },
+    getshopinfo:function(){ //获取商家信息
+      let shopId = '144'
+      this.$axios.get('/api/shop/get/'+shopId)
+      .then((res) => {
+        if(res.data.code ==  '0'){
+          let data = res.data.data;
+          this.setuserInfo(data)
+          this.formdata[0].value=data.phone?data.phone:data.mobile;
+        }
+      })
     }
   },
   created:function(){
+    if(this.phone){
+      this.formdata[0].value = this.phone
+    }
+    if(this.writedata.length<1){
+      this.getWritelist()
+    }
+    this.getshopinfo();
     // console.log("this.$route.params.name:",this.$route.params)
     if(this.$route.params.ind){
       let obj = this.$route.params
@@ -198,20 +288,6 @@ export default {
       }
     }
   }
-  .mint-msgbox-title{
-      font-size: 30px!important;
-      margin: 29px 0;
-  }
-  // .mint-msgbox {
-  //   height: 25%;
-  //   .mint-msgbox-header {
-  //     height: 75px;
-  //     .mint-msgbox-title {
-  //       color: 30px;
-  //       margin: 29px 0;
-  //     }
-  //   }
-  // }
 }
 </style>
 

@@ -156,28 +156,6 @@ export default {
             margin-top: 20px;
         }
     }
-    .mint-msgbox{
-        width: 532px;
-        height: 305px;
-        border-radius: 8px;
-        .mint-msgbox-title{
-            font-size: 36px;
-        }
-        .mint-msgbox-message{
-            font-size: 30px;
-        }
-        .mint-msgbox-content{
-            padding: 50px 0px;
-        }
-        .mint-msgbox-btn{
-            height: 103px;
-            font-size: 30px;
-        }
-        .mint-msgbox-confirm{
-            background: #FC5E2D;
-            color: #fff;
-        }
-    }
 </style>
 
 

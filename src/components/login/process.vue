@@ -26,12 +26,17 @@
   </div>
 </template>
 <script>
+import GLOBAL from "../../../untils/config/config";
 export default {
   name: "Process",
   data(){
       return {
-          msg:'process'
+        global: this.GLOBAL,
+        msg:'process'
       }
+  },
+  created:function(){
+      console.log("global:",this.global)
   }
 }
 </script>

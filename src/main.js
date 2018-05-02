@@ -4,9 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import MintUI from 'mint-ui'
-import 'mint-ui/lib/style.css'
-import './assets/css/my-mint.css'; //全局修改mint-UI样式  
 import 'lib-flexible'
+import global from './components/tool/Global'
+Vue.prototype.GLOBAL = global
 import axios from 'axios';
 Vue.prototype.$axios = axios;
 Vue.use(MintUI);

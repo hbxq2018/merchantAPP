@@ -5,13 +5,13 @@
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         
       </mt-header>  
+      
       <mt-field v-show="ind == '0'" v-model="data.phone" label="手机号" placeholder="请输入新手机号" ref="phone" type="tel" ></mt-field>
       
         <mt-checklist  
             v-if="ind == '1' || ind == '2'" 
             :max="_max"
             align="right"
-           
             v-model="value"   
             :options="options">  
         </mt-checklist> 
@@ -23,7 +23,8 @@
 import { Field } from "mint-ui";
 import { Checklist } from "mint-ui";
 import { Toast } from 'mint-ui';
-
+import store from '@/vuex/store'
+import {mapState,mapMutations} from 'vuex';
 export default {
    
   name: "Name",
@@ -109,13 +110,19 @@ export default {
       ]
     };
   },
+  store,
+  computed:{
+    ...mapState(["count",'phone','userInfo']),
+  },
   methods: {
+    ...mapMutations(['add','reduce','setphone']),
     clickback: function() {
       const ind = this.ind;
       if (ind == 0) {
         const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
         if (reg.test(this.data.phone)) {
            this.$router.push({name: 'Manage',params:{ ind:this.ind,value:this.data.phone}});
+           this.setphone(this.data.phone)
         //    this.$router.go(-1) //返回上一页面
         }else{
             Toast('手机号码输入有误，请重新输入');

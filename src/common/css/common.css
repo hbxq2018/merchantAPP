@@ -141,3 +141,16 @@ ol {
 .fr {
     float: right;
 }
+/* 以上是处理元素默认样式以保持在各平台以相同展示 */
+
+/* 以下是对Mint UI的样式进行修改 */
+.mint-header{
+    background-color: #fc5e2d;
+}
+.mint-cell-title ,.mint-cell-value{
+    color: #191919;
+    text-align: left;
+}
+.mint-cell-value span {
+    color: #808080;
+}
