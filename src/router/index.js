@@ -10,11 +10,13 @@ import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
 import Manage from '@/components/home/manage/manage'
+import Scan from '@/components/home/scan/scan'
 import AboutUs from '@/components/home/sublevel/aboutUs'
 import Historyse from '@/components/home/sublevel/historyse'
 import Historyofthebill from '@/components/home/sublevel/historyofthebill'
 import DetailsSon from '@/components/home/sublevel/detailsSon'
 import Edit from '@/components/home/manage/edit'
+import Ticket from '@/components/home/ticket/ticket'
 Vue.use(Router)
 
 export default new Router({
@@ -33,6 +35,11 @@ export default new Router({
       path: '/manage',
       name: 'Manage',
       component: Manage
+    },
+    {
+      path: '/scan',
+      name: 'Scan',
+      component: Scan
     },
     {
       path: '/edit',
@@ -89,5 +96,10 @@ export default new Router({
       name: 'DetailsSon',
       component: DetailsSon
     },
+    {
+      path:'/ticket',
+      name:'Ticket',
+      component:Ticket
+    }
   ]
 })

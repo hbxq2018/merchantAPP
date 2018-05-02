@@ -73,7 +73,7 @@ export default {
       clickli:function(e){
           const ind = e.currentTarget.id;
           if(ind ==1){
-              console.log("aaa")
+              this.$router.push({ path: '/scan'})
           }else if(ind == 2){
               console.log("bbb")
           }else if(ind == 3){
@@ -85,7 +85,7 @@ export default {
             // 命名的路由   (有待研究)
             // this.$router.push({ name: '/home/manage', params: {}})
           }else if(ind == 4){
-              console.log("dddd")
+               this.$router.push({ path: '/ticket'})
           }
       }
   }

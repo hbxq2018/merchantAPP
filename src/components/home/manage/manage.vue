@@ -66,25 +66,8 @@ export default {
           value: "店铺简介店铺简介店铺简介店铺简介"
         }
       ],
-      // writedata: [
-      //   {
-      //     src: "../../../../static/images/timg (2).jpg",
-      //     name: "张三",
-      //     mobile:'13309284723'
-      //   },
-      //   {
-      //     src: "../../../../static/images/timg (2).jpg",
-      //     name: "李四",
-      //     mobile:'13309114723'
-      //   },
-      //   {
-      //     src: "../../../../static/images/timg (2).jpg",
-      //     name: "王五",
-      //     mobile:'13345184723'
-      //   }
-      // ],
       writedata:[]
-    };
+    }
   },
   store,
   computed:{
@@ -163,22 +146,21 @@ export default {
       MessageBox.confirm('确定要删除吗？').then(action => {
         let [...arr] = this.writedata
         if(action == 'confirm'){
-          console.log('arr[ind]',arr[ind])
           let obj = {
-              shopId:'144',
-              mobile:arr[ind].mobile
+            shopId:'144',
+            mobile:arr[ind].mobile
+          }
+          let _value='';
+          for(var key in obj) {
+            _value += key + '=' + obj[key] + '&';
+          }
+          _value = _value.substring(0, _value.length-1);
+          this.$axios.post('/api/app/user/deleteHxUser?'+_value)
+          .then((res) => {
+            if(res.data.code == '0'){
+              this.getWritelist(2)
             }
-            let _value='';
-            for(var key in obj) {
-              _value += key + '=' + obj[key] + '&';
-            }
-            _value = _value.substring(0, _value.length-1);
-            this.$axios.post('/api/app/user/deleteHxUser?'+_value)
-            .then((res) => {
-             if(res.data.code == '0'){
-                this.getWritelist(2)
-              }
-            })
+          })
         }
       },()=>{});
     },
