@@ -8,14 +8,15 @@
 			<form class="login_form">
 				<div class="login_form_tele">
 					<input type="text" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
-					<span id="securityCode" class="securityCode" @click="securityCode">获取验证码</span>
+					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
 				</div>
 				<div class="login_form_code">
-					<input type="text" class="login_form_inp" placeholder="请输入验证码">
+					<input type="text" class="login_form_inp" placeholder="请输入验证码" v-model="password">
 				</div>
 				<div class="login_form_btn">
-					<router-link to="Process">
-						<button type="button"></button>
+					<!-- <router-link to="Process"> -->
+					<router-link to="">
+						<button type="button" @click="verification"></button>
 					</router-link>
 				</div>
 			</form>
@@ -31,6 +32,7 @@
 
 <script>
 import GLOBAL from "../../../untils/config/config";
+import { Toast } from 'mint-ui';
 import axios from 'axios';
 import qs from 'qs';
 export default {
@@ -38,55 +40,106 @@ export default {
   data() {
     return {
       API: GLOBAL.GLOBAL_API_DOMAIN,
-      telephone: "",
-      movieArr:[]
+      movieArr:[],
+      veridyBtn: "获取验证码",     
+      telephone: "",     //手机号
+      password: "",      //验证码
+      veridyTime: "",    //获取验证码的时间
+      verifyCode: "",     //验证码
+      timeFlag: true
     };
   },
   methods: {
-    securityCode() {
-      console.log(this.telephone);
-       let _parms = {
-        shopMobile: this.telephone
-      };
-      // axios.post(this.API+'app/sms/sendForShopAppRegister', qs.stringify(_parms))
-      // .then(response => {
-      //   console.log("response:",response);
-      // })
-      // .catch(err => {
-      //   console.log("err:",err);
-      // })
-   
-      var that = new FormData(); 
-      // get('/api/1/picture?method=upload') 
-      this.$http.post('/api/app/user/findUserByMobile?mobile=13971489895',that)  
-        .then(function(sures) { console.log(sures);  
-            console.log("上产成功") })  
-        .catch(function(catchres) { console.log(catchres);  
-            console.log("上传失败") }) 
+    isNull(value) {     
+      if(value == 'null' || value == null || value == '' || value == undefined) {
+        return false;
+      }
+      return true;
+    },
+    securityCode() {      //获取验证码
+      let _this = this;
+      if(!this.timeFlag) { return false; }
+      if(this.isNull(this.telephone)) {
+        let _parms = {
+          shopMobile: this.telephone
+        };
+        this.$axios.post('/api/app/sms/sendForShopAppRegister', qs.stringify(_parms))
+        .then(res => {
+          let data = res.data;
+          if(data.code == 0) {
+            let minutes = "", senconds = "", countdown = 600;
+            _this.timeFlag = false;
+            _this.verifyCode = data.data.verifyId;
+            let timer = setInterval(() => {
+              countdown--;
+              if(countdown == 0) {
+                _this.veridyBtn = "获取验证码";
+                clearInterval(timer);
+                _this.timeFlag = true;
+                return false;
+              }
+              minutes = Math.floor(countdown / 60) >= 1 ? Math.floor(countdown / 60) + '分' : '';
+              senconds = countdown % 60 == 0 ? '' : countdown % 60 + '秒';
+              _this.veridyBtn = minutes + senconds + "后发送验证码";
+            }, 1000);
+          } else {
+            _this.timeFlag = false;
+            Toast("系统繁忙，请稍后再试");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        })
+      } else {
+        Toast('请填写手机号');
+      }
+    }, 
+    verification() {          //判断输入验证码是否正确 
+      let _parms = {
+        shopMobile: this.telephone,
+        smsContent: this.password
+      },
+      value = '', _this = this;
+      for(var key in _parms) {
+        value += key + '=' + _parms[key] + '&';
+      }
+      value = value.substring(0, value.length-1);
+      this.$axios.get('/api/app/sms/isVerifyForShopApp?' + value, qs.stringify(_parms))
+      .then(res => {
+        console.log(res.data.data);
+        if(res.data.data == 0) {
+          _this.signIn();
+        } else {
+          Toast('输入信息有误');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    signIn() {         //商家注册
+      this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
+      .then(res => {
+        console.log(res.data.code);
+        //新用户data为null
+        console.log(res.data.data);    
+        //个人用户
+        console.log(res.data.data.userType);         //1
+        console.log(res.data.data.openId)            //不为空
+        //商家用户
+        console.log(res.data.data.userType);         //2
+        console.log(res.data.data.openId)            //不为空
+        if(res.data.code == 0) {
+          if(res.data.data == null || res.data.data.userType) {
+            
+          }
+        }
+
+      })
+      .catch(err => {
+        console.log(err);
+      })
     }
-  },
-  created:function(){
-    let act = 33,vote=786;
-    let obj = {
-      page:1,
-      row:8,
-      actId:act,
-      voteUserId:vote
-    }
-    let parms='',value='';
-    for(var key in obj) {
-      value = key+'='+obj[key]+'&';
-      parms+=value;
-      value=''
-    }
-    console.log("parms:",parms)
-    // this.$axios.get('/api/actshop/list?'+parms)
-    let mobile = '18087088987';
-    this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
-    .then((response) => {
-       console.log(response)
-    })
-   
   }
 };
 </script>
@@ -152,6 +205,9 @@ export default {
           height: 90px;
           line-height: 90px;
           font-size: 24px;
+        }
+        .securityCode.active {
+          color: #b1b1b1;
         }
       }
       .login_form_btn {

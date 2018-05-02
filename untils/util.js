@@ -102,7 +102,16 @@ function timeDiffrence(current, updateTime, createTime) {      //文章发布时
 function million(num){    //数字过万处理
   return num > 9999 ? (Math.floor(num / 1000) / 10) + '万+' : num
 }
-module.exports = {
+
+//判断值是否为空
+function isNull(value) {
+  if(value == 'null' || value == null || value == '' || value == undefined) {
+    return false;
+  }
+  return true;
+}
+
+const methods = {
   calcDistance: calcDistance,
   transformLength: transformLength,
   utf16toEntities: utf16toEntities,
@@ -111,5 +120,8 @@ module.exports = {
   store: myStore,
   tools: tools,
   million: million,
-  getNowFormatDate: getNowFormatDate
+  getNowFormatDate: getNowFormatDate,
+  isNull: isNull
 }
+
+export default methods;
