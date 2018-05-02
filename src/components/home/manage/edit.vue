@@ -26,8 +26,7 @@ import { Toast } from 'mint-ui';
 import store from '@/vuex/store'
 import {mapState,mapMutations} from 'vuex';
 export default {
-   
-  name: "Name",
+  name: "Edit",
   data() {
     return {
       name:'',
@@ -112,30 +111,47 @@ export default {
   },
   store,
   computed:{
-    ...mapState(["count",'phone','userInfo']),
+    ...mapState(['userInfo']),
   },
   methods: {
-    ...mapMutations(['add','reduce','setphone']),
+    ...mapMutations(['setuserInfo']),
     clickback: function() {
       const ind = this.ind;
       if (ind == 0) {
         const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
+        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;  
         if (reg.test(this.data.phone)) {
-           this.$router.push({name: 'Manage',params:{ ind:this.ind,value:this.data.phone}});
-           this.setphone(this.data.phone)
+           let phone = this.data.phone +'/'+'phone'
+           this.setuserInfo(phone)
+           this.$router.push({name: 'Manage',params:{}});
         //    this.$router.go(-1) //返回上一页面
+        }else if(reg2.test(this.data.phone)){
+          let phone = this.data.phone +'/'+'mobile'
+          this.setuserInfo(phone)
+          this.$router.push({name: 'Manage',params:{}});
         }else{
-            Toast('手机号码输入有误，请重新输入');
+            Toast('联系方式输入有误，请重新输入');
             this.data.phone = '';
             return false
         }
-      }else if(ind == 1 || ind == 2){
+      }else if(ind == 1){
         let val = this.value.join(",");
-        this.$router.push({name: 'Manage',params:{ ind:this.ind,value:val}});
+        val +='1';
+        let businessCate = val +'/'+'businessCate';
+        this.setuserInfo(businessCate);
+        this.$router.push({name: 'Manage',params:{}});
+      }else if(ind == 2){
+        let val = this.value.join(",");
+        val +='2';
+        let businessCate = val +'/'+'businessCate';
+         this.setuserInfo(businessCate);
+        this.$router.push({name: 'Manage',params:{}});
       }else if(ind == 3){
         this.$router.push({name: 'Manage',params:{}});
       }else if(ind == 4){
-        this.$router.push({name: 'Manage',params:{ ind:this.ind,value:this.data.Introduction}});
+        let shopInfo = this.data.Introduction +'/'+'shopInfo';
+        this.setuserInfo(shopInfo)
+        this.$router.push({name: 'Manage',params:{}});
       }
     }
   },
@@ -154,12 +170,12 @@ export default {
     if(this.ind=='1'){
         this.options = this.option1;
         this._max = 3;
-        this.content = this.content.split(" ")
+        this.content = this.content.split(",")
         this.value = this.content;
     }else if(this.ind == '2'){
         this.options = this.option2;
         this._max = 1;
-        this.content = this.content.split(" ")
+        this.content = this.content.split(",")
         this.value = this.content;
     }else{
       this.data.Introduction = this.content;

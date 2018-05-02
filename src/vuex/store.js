@@ -4,16 +4,38 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 const state={
-    shopId:'',
     userInfo:{},
-    count:1,
-    phone:133000011111
 }
 
 const mutations={
     setuserInfo(state,data){
-        state.userInfo = data;
-        console.log('state:',state)
+        if(typeof data == "string" ){
+            let arr = data.split('/')
+            for(let key in state.userInfo){
+                if(arr[1] == key){
+                    if(state.userInfo[key].indexOf('/')>1){
+                        let ind = state.userInfo[key].indexOf("/");
+                        let val1 = state.userInfo[key].slice(0,ind);
+                        let val2 = state.userInfo[key].slice(ind+1,state.userInfo[key].length);
+                        let last = arr[0].substr(arr[0].length-1,1);
+                        if(last == 1){
+                            val1 = '';
+                            val1 = arr[0].slice(0,arr[0].length-1);
+                        }else if(last ==2){
+                            val2 = '';
+                            val2 = arr[0].slice(0,arr[0].length-1);
+                        }
+                        let val = val1+'/'+val2;
+                        state.userInfo[key]=val;
+                    }else{
+                        state.userInfo[key] = arr[0];
+                    } 
+                }
+            }
+        }else if(typeof data == "object"){
+            state.userInfo = data;
+        }
+        // console.log('state:',state)
     },
     add(state){
         state.count++;

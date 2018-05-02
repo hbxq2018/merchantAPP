@@ -25,6 +25,7 @@
     methods: {
       //创建扫描控件
       startRecognize() {
+        console.log('startRecognize')
         let that = this;
         if (!window.plus) return;
         scan = new plus.barcode.Barcode('bcid');
@@ -52,16 +53,19 @@
       },
       //开始扫描
       startScan() {
+        console.log('startScan')
         if (!window.plus) return;
         scan.start();
       },
       //关闭扫描
       cancelScan() {
+         console.log('cancelScan')
         if (!window.plus) return;
         scan.cancel();
       },
       //关闭条码识别控件
       closeScan() {
+        console.log('closeScan')
         if (!window.plus) return;
         scan.close();
       },

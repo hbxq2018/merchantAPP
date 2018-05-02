@@ -14,6 +14,8 @@
 <script>
 import Menu from './menu'
 import Mine from './mine'
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   name: "Home",
   data() {
@@ -25,16 +27,31 @@ export default {
     Menu,
     Mine
   },
+  store,
+  computed:{
+    ...mapState(['userInfo']),
+  },
   methods:{
-      gomenu:function(){
-          this.ismenu= true;
-      },
-      gomine:function(){
-          this.ismenu= false;
-          
-      }
+    ...mapMutations(['setuserInfo']),
+    gomenu:function(){
+      this.ismenu= true;
+    },
+    gomine:function(){
+        this.ismenu= false; 
+    },
+    getshopinfo:function(){ //获取商家信息
+      let shopId = '144'
+      this.$axios.get('/api/shop/get/'+shopId)
+      .then((res) => {
+        if(res.data.code ==  '0'){
+          let data = res.data.data;
+          this.setuserInfo(data)
+        }
+      })
+    }
   },
   created:function(){
+    this.getshopinfo();
     if(this.$route.query.ind == '2'){
       this.ismenu= false;
     }

@@ -8,9 +8,6 @@
       </mt-header>
 
       <div class="man_info">商户信息</div>
-{{count}}
-      <button @click="add">+</button>
-      <button @click="reduce">-</button>
 
       <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
       
@@ -32,7 +29,7 @@
 <script>
 import { MessageBox } from "mint-ui";
 import store from '@/vuex/store'
-import {mapState,mapMutations,mapGetters,mapActions} from 'vuex';
+import {mapState,mapMutations} from 'vuex';
 export default {
   name: "Manage",
   data() {
@@ -48,22 +45,22 @@ export default {
         {
           name: "经营品类",
           to: "/edit",
-          value: "火锅 川菜 自助餐"
+          value: ""
         },
         {
           name: "环境分类",
          to: "/edit",
-          value: "约会"
+          value: ""
         },
         {
           name: "详细地址",
           to: "/edit",
-          value: "详细地址详细地址详细地址详细地址详细地址详细地址"
+          value: ""
         },
         {
           name: "店铺简介",
          to: "/edit",
-          value: "店铺简介店铺简介店铺简介店铺简介"
+          value: ""
         }
       ],
       writedata:[]
@@ -71,11 +68,10 @@ export default {
   },
   store,
   computed:{
-    ...mapState(['count','phone','userInfo']),
-    ...mapGetters(['count','phone']),
+    ...mapState(['userInfo']),
   },
   methods: {
-    ...mapMutations(['add','reduce','setphone','setuserInfo']),
+    ...mapMutations(['setuserInfo']),
     set:function(val){
       if(val.nickName){
         return val.nickName
@@ -85,16 +81,46 @@ export default {
       }
     },
     save: function() {
-      console.log("formdata:",this.formdata)
+      let userdata = this.userInfo;
       MessageBox.confirm('确定进行保存?').then(action => {
-        MessageBox('提示', '保存成功');
+        let obj = {
+          id:userdata.id,
+          phone:userdata.phone,
+          mobile:userdata.mobile,
+          address:userdata.address,
+          shopInfo:userdata.shopInfo,
+          locationX:userdata.locationX,
+          locationY:userdata.locationY,
+          businessCate:userdata.businessCate
+        }
+        let _value='';
+        for(var key in obj) {
+          _value += key + '=' + obj[key] + '&';
+        }
+        _value = _value.substring(0, _value.length-1);
+        this.$axios.post('/api/app/shop/update?'+_value)
+        .then((res) => {
+          if(res.data.code == '0'){
+            MessageBox('提示', '保存成功');
+            this.getshopinfo();
+          }
+        })
       },() => {
         MessageBox('提示', '是否放弃保存修改内容？');
       });
     },
+    getshopinfo:function(){ //获取商家信息
+      let shopId = '144'
+      this.$axios.get('/api/shop/get/'+shopId)
+      .then((res) => {
+        if(res.data.code ==  '0'){
+          let data = res.data.data;
+          this.setuserInfo(data)
+        }
+      })
+    },
     clickformli:function(e){
       const ind = e.currentTarget.id;
-      console.log("ind:",ind);
       let obj={};
       for(let i=0;i<this.formdata.length;i++){
         if(ind == this.formdata[i].id){
@@ -128,7 +154,6 @@ export default {
             _value = _value.substring(0, _value.length-1);
             this.$axios.post('/api/app/user/addHxUser?'+_value)
             .then((res) => {
-              console.log(res)
               if(res.data.code == '0'){
                 this.getWritelist(1)
               }else{
@@ -186,26 +211,29 @@ export default {
         }
       })
     },
-    getshopinfo:function(){ //获取商家信息
-      let shopId = '144'
-      this.$axios.get('/api/shop/get/'+shopId)
-      .then((res) => {
-        if(res.data.code ==  '0'){
-          let data = res.data.data;
-          this.setuserInfo(data)
-          this.formdata[0].value=data.phone?data.phone:data.mobile;
-        }
-      })
+    setformdata:function(){
+      if(this.userInfo){
+        let userdata = this.userInfo;
+        let ind = userdata.businessCate.indexOf("/");
+        let val1 = userdata.businessCate.slice(0,ind);
+        let val2 = userdata.businessCate.slice(ind+1,userdata.businessCate.length);
+        this.formdata[0].value = userdata.phone?userdata.phone:userdata.mobile;
+        this.formdata[1].value = val1;
+        this.formdata[2].value = val2;
+        this.formdata[3].value = userdata.address;
+        this.formdata[4].value = userdata.shopInfo;
+      }
     }
   },
   created:function(){
-    if(this.phone){
-      this.formdata[0].value = this.phone
-    }
     if(this.writedata.length<1){
       this.getWritelist()
     }
-    this.getshopinfo();
+
+    if(!this.formdata[0].value){
+      this.setformdata();
+    }
+    
     // console.log("this.$route.params.name:",this.$route.params)
     if(this.$route.params.ind){
       let obj = this.$route.params
