@@ -14,10 +14,7 @@
 					<input type="text" class="login_form_inp" placeholder="请输入验证码" v-model="password">
 				</div>
 				<div class="login_form_btn">
-					<!-- <router-link to="Process"> -->
-					<router-link to="">
-						<button type="button" @click="verification"></button>
-					</router-link>
+					<button type="button" @click="verification"></button>
 				</div>
 			</form>
 			<div class="othor_login">
@@ -50,16 +47,17 @@ export default {
     };
   },
   methods: {
-    isNull(value) {     
-      if(value == 'null' || value == null || value == '' || value == undefined) {
-        return false;
+    isNull(value) {  
+      let flag = false;   
+      if(value == 'null' || value == null || value == '' || value == undefined || value == []) {
+        flag = true;
       }
-      return true;
+      return flag;
     },
     securityCode() {      //获取验证码
       let _this = this;
       if(!this.timeFlag) { return false; }
-      if(this.isNull(this.telephone)) {
+      if(!this.isNull(this.telephone)) {
         let _parms = {
           shopMobile: this.telephone
         };
@@ -118,20 +116,17 @@ export default {
       })
     },
     signIn() {         //商家注册
+    let _this = this;
       this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
       .then(res => {
-        console.log(res.data.code);
-        //新用户data为null
-        console.log(res.data.data);    
-        //个人用户
-        console.log(res.data.data.userType);         //1
-        console.log(res.data.data.openId)            //不为空
-        //商家用户
-        console.log(res.data.data.userType);         //2
-        console.log(res.data.data.openId)            //不为空
         if(res.data.code == 0) {
-          if(res.data.data == null || res.data.data.userType) {
-            
+          if(res.data.data == null || (res.data.data.userType == 1 && !_this.isNull(res.data.data.openId))) {
+            _this.$router.push({name: 'Process', params: {id: '1'}});
+            //13971489895    0745
+            //15072329516    4775
+            //18627825816    0781
+          } else if(res.data.data.userType == 2 && !_this.isNull(res.data.data.openId)) {     //商家
+            _this.$router.pash({name: 'Home', params: {id: '2'}});
           }
         }
 

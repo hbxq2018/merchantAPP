@@ -6,6 +6,8 @@ import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
 import Process from '@/components/login/process'
 import Settlein from '@/components/login/settlein'
+import ShopMap from '@/components/login/shopMap'
+import Category from '@/components/login/category'
 import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
@@ -55,6 +57,16 @@ export default new Router({
       path: '/settlein',
       name: 'Settlein',
       component: Settlein
+    },
+    {
+      path: '/shopMap',
+      name: 'ShopMap',
+      component: ShopMap
+    },
+    {
+      path: '/category',
+      name: 'Category',
+      component: Category
     },
     {
       path: '/agreement',

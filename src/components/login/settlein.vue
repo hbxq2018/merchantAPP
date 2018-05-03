@@ -13,11 +13,19 @@
     <div class="form">
         <mt-field label="申请人" placeholder="输入申请人姓名" v-model="username"></mt-field>
         <mt-field label="联系方式" placeholder="输入手机或电话号码" type="tel" v-model="phone"></mt-field>
-        <mt-field label="店铺名称" placeholder="输入店铺的全称" type="url" v-model="shopname"></mt-field>
-        <mt-field label="详细地址" placeholder="定位选择详细地址" type="number" v-model="address"></mt-field>
-        <!-- <mt-field label="经营品类" placeholder="选择经营品类" type="" v-model="type"></mt-field> -->
+        <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopname"></mt-field>
+        <!-- <mt-field label="详细地址" placeholder="定位选择详细地址" type="number" v-model="address"></mt-field> -->
         <div class="category clearfix">
-          <router-link to="#">
+          <router-link to="shopMap">
+            <div class="category_l">详细地址</div>
+            <div class="category_r">
+              <span class="category_text fl">定位选择详细地址</span>
+              <span class="category_arrow fr"></span>
+            </div>
+          </router-link>
+        </div>
+        <div class="category clearfix">
+          <router-link to="category">
             <div class="category_l">经营品类</div>
             <div class="category_r">
               <span class="category_text fl">选择经营品类</span>
@@ -25,20 +33,6 @@
             </div>
           </router-link>
         </div>
-        <!-- <mt-cell-swipe
-          title="经营品类"
-          :right="[
-            {
-              content: '火锅',
-              style: { background: 'red', color: '#fff' },
-              handler: () => this.$messagebox('火锅')
-            },
-            {
-              content: '川菜',
-              style: { background: 'red', color: '#fff' },
-              handler: () => this.$messagebox('川菜')
-            }
-          ]"></mt-cell-swipe> -->
     </div>
     <p class="form_title">提交资质</p>
     <div class="qualification">
@@ -131,7 +125,14 @@ export default {
     getFile: function(e) {
       console.log(e.target.files);
       // this.imgUrl = e.target.files[0].name
+    },
+    addMap() {
+      this.$router.push({name: 'ShopMap'});
     }
+  },
+  created() {
+    //获取到category的参数值
+    console.log(this.$route.params.category)
   }
 };
 </script>
