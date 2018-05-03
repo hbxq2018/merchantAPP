@@ -22,7 +22,7 @@
                 <span>满</span>
                 <input class="money" type="number" placeholder="输入金额" v-model="money">
                 <span>减</span>
-                <mt-picker :slots="slots" visibleItemCount='3' @change="onValuesChange"></mt-picker>
+                <mt-picker :slots="slots" :visibleItemCount='3' @change="onValuesChange"></mt-picker>
             </div>
             <div class="butclose" @click="butclose">取消</div>
             <div class="butcfim" @click="butcfim">确定</div>
@@ -77,9 +77,13 @@ export default {
       this.isadd = false;
     },
     butcfim: function() {
-      if (this.money && this.actvalue.id) {
+      if(!this.money){
+        Toast("请输入金额");
+      }else if(!this.actvalue.id){
+        Toast("请选择满减金额");
+      }else if(this.money && this.actvalue.id) {
         let shopId = "144";
-        let desc = "满" + this.money + "元减" + this.actvalue.inPrice + "元";
+        let desc = "满" + this.money + "减" + this.actvalue.inPrice + "元";
         let obj = {
           skuId: this.actvalue.id,
           skuCode: this.actvalue.skuCode,
@@ -95,6 +99,8 @@ export default {
         _value = _value.substring(0, _value.length - 1);
         this.$axios.post("/api/app/pnr/add?" + _value).then(res => {
           if (res.data.code == "0") {
+            this.money = '';
+            this.actvalue = {};
             Toast("添加成功");
             this.getticketlist();
           }
@@ -113,8 +119,7 @@ export default {
     },
     getticketlist: function() {
       let shopId = "144";
-      this.$axios
-        .get("/api/app/pnr/selectByShopId?shopId=" + shopId)
+      this.$axios.get("/api/app/pnr/selectByShopId?shopId=" + shopId)
         .then(res => {
           if (res.data.code == "0") {
             let data = res.data.data;
@@ -131,7 +136,6 @@ export default {
       this.$axios.get("/api/app/sku/list").then(res => {
         if (res.data.code == "0") {
           let data = res.data.data.list;
-
           let _arr = [];
           for (let i in data) {
             _arr.push(data[i].inPrice);
@@ -169,6 +173,9 @@ export default {
       width: 111px;
       text-align: center;
       font-size: 36px;
+      overflow: hidden;  
+          text-overflow: ellipsis; 
+          white-space: nowrap; 
     }
     .text {
       font-size: 30px;

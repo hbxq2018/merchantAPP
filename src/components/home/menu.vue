@@ -3,13 +3,13 @@
       <div class="menu_top">
            <img class="eaves" src="../../../static/images/eaves.png" alt="顶部图片">
             <div class="info">
-                <img class="avatar" :src='userdata.src' alt="用户头像">
+                <img class="avatar" :src='userdata.logoUrl' alt="用户头像">
                 <div class="username">
                     <p class="u_name">
-                        {{userdata.name}}
+                        {{userdata.shopName}}
                     </p>
                     <p class="u_heat">
-                        人气{{userdata.heat}}
+                        人气 {{userdata.popNum}}
                     </p>
                 </div>
                 <img src="../../../static/images/news.png" alt="消息" class="news">
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   name: "Menu",
   data() {
@@ -62,32 +64,36 @@ export default {
               href: '#'
           }
       ],
-      userdata: {
-        src: "../../../static/images/timg (2).jpg",
-        name: "恩施映像", 
-        heat: "1382"
-      }
+      userdata: {}
     };
   },
+  store,
+  computed:{
+    ...mapState(['userInfo']),
+  },
   methods:{
-      clickli:function(e){
-          const ind = e.currentTarget.id;
-          if(ind ==1){
-              this.$router.push({ path: '/scan'})
-          }else if(ind == 2){
-              console.log("bbb")
-          }else if(ind == 3){
-            //三种跳转方式
-            // 字符串
-              // this.$router.push('/manage')
-            // 对象
-            this.$router.push({ path: '/manage'})
-            // 命名的路由   (有待研究)
-            // this.$router.push({ name: '/home/manage', params: {}})
-          }else if(ind == 4){
-               this.$router.push({ path: '/ticket'})
-          }
-      }
+    ...mapMutations(['setuserInfo']),
+    clickli:function(e){
+        const ind = e.currentTarget.id;
+        if(ind ==1){
+            this.$router.push({ path: '/scan'})
+        }else if(ind == 2){
+            console.log("bbb")
+        }else if(ind == 3){
+          //三种跳转方式
+          // 字符串
+            // this.$router.push('/manage')
+          // 对象
+          this.$router.push({ path: '/manage'})
+          // 命名的路由   (有待研究)
+          // this.$router.push({ name: '/home/manage', params: {}})
+        }else if(ind == 4){
+              this.$router.push({ path: '/ticket'})
+        }
+    }
+  },
+  created:function(){
+    this.userdata = this.userInfo;
   }
 };
 </script>

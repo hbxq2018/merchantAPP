@@ -214,9 +214,11 @@ export default {
     setformdata:function(){
       if(this.userInfo){
         let userdata = this.userInfo;
+        console.log("userdata:",userdata)
         let ind = userdata.businessCate.indexOf("/");
         let val1 = userdata.businessCate.slice(0,ind);
         let val2 = userdata.businessCate.slice(ind+1,userdata.businessCate.length);
+        this.name = userdata.shopName;
         this.formdata[0].value = userdata.phone?userdata.phone:userdata.mobile;
         this.formdata[1].value = val1;
         this.formdata[2].value = val2;
