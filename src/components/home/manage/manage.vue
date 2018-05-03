@@ -68,7 +68,7 @@ export default {
   },
   store,
   computed:{
-    ...mapState(['userInfo']),
+    ...mapState(['userInfo','shopId']),
   },
   methods: {
     ...mapMutations(['setuserInfo']),
@@ -110,8 +110,8 @@ export default {
       });
     },
     getshopinfo:function(){ //获取商家信息
-      let shopId = '144'
-      this.$axios.get('/api/shop/get/'+shopId)
+      // let shopId = '144'
+      this.$axios.get('/api/shop/get/'+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){
           let data = res.data.data;
@@ -142,9 +142,9 @@ export default {
               MessageBox('提示', '手机号输入错误');  
               return false;  
             }
-            let shopId='144';
+            // let shopId='144';
             let obj = {
-              shopId:shopId,
+              shopId:this.shopId,
               mobile:value
             }
             let _value='';
@@ -172,7 +172,7 @@ export default {
         let [...arr] = this.writedata
         if(action == 'confirm'){
           let obj = {
-            shopId:'144',
+            shopId:this.shopId,
             mobile:arr[ind].mobile
           }
           let _value='';
@@ -198,8 +198,8 @@ export default {
       }
     },
     getWritelist:function(val){  //获取核销员列表
-      let shopId = '144'
-      this.$axios.post('/api/app/user/listForShopId?shopId='+shopId)
+      // let shopId = '144'
+      this.$axios.post('/api/app/user/listForShopId?shopId='+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){
           this.writedata = res.data.data;

@@ -32,8 +32,9 @@
 </template>
 
 <script>
-import { Picker } from "mint-ui";
-import { Toast } from "mint-ui";
+import { Picker,Toast } from "mint-ui";
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   name: "Ticket",
   data() {
@@ -57,7 +58,12 @@ export default {
       this.money = this.money.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3");
     }
   },
+  store,
+  computed:{
+    ...mapState(['userInfo','shopId']),
+  },
   methods: {
+     ...mapMutations(['setuserInfo']),
     onValuesChange(picker, values) {
       if (values[0] > values[1]) {
         picker.setSlotValue(1, values[0]);
@@ -82,7 +88,6 @@ export default {
       }else if(!this.actvalue.id){
         Toast("请选择满减金额");
       }else if(this.money && this.actvalue.id) {
-        let shopId = "144";
         let desc = "满" + this.money + "减" + this.actvalue.inPrice + "元";
         let obj = {
           skuId: this.actvalue.id,
@@ -90,7 +95,7 @@ export default {
           skuName: this.actvalue.skuName,
           ruleType: 1,
           ruleDesc: desc,
-          shopId: shopId
+          shopId: this.shopId
         };
         let _value = "";
         for (var key in obj) {
@@ -118,8 +123,7 @@ export default {
       });
     },
     getticketlist: function() {
-      let shopId = "144";
-      this.$axios.get("/api/app/pnr/selectByShopId?shopId=" + shopId)
+      this.$axios.get("/api/app/pnr/selectByShopId?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == "0") {
             let data = res.data.data;

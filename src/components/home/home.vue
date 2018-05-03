@@ -29,7 +29,7 @@ export default {
   },
   store,
   computed:{
-    ...mapState(['userInfo']),
+    ...mapState(['userInfo','shopId']),
   },
   methods:{
     ...mapMutations(['setuserInfo']),
@@ -40,8 +40,7 @@ export default {
         this.ismenu= false; 
     },
     getshopinfo:function(){ //获取商家信息
-      let shopId = '144'
-      this.$axios.get('/api/shop/get/'+shopId)
+      this.$axios.get('/api/shop/get/'+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){
           let data = res.data.data;
@@ -51,7 +50,8 @@ export default {
     }
   },
   created:function(){
-    this.getshopinfo();
+    // this.getshopinfo();
+    // console.log("userInfo:",this.userInfo)
     if(this.$route.query.ind == '2'){
       this.ismenu= false;
     }

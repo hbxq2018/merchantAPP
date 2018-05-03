@@ -94,6 +94,7 @@ export default {
   },
   created:function(){
     this.userdata = this.userInfo;
+    console.log("userdata123:",this.userdata)
   }
 };
 </script>

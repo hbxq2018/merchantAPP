@@ -33,6 +33,8 @@ import GLOBAL from "../../../untils/config/config";
 import { Toast } from 'mint-ui';
 import axios from 'axios';
 import qs from 'qs';
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   name: "Login",
   data() {
@@ -47,7 +49,12 @@ export default {
       timeFlag: true
     };
   },
+  store,
+  computed:{
+    ...mapState(['userInfo']),
+  },
   methods: {
+    ...mapMutations(['setuserInfo','setshopId']),
     isNull(value) {  
       let flag = false;   
       if(value == 'null' || value == null || value == '' || value == undefined || value == []) {
@@ -121,16 +128,28 @@ export default {
       this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
       .then(res => {
         if(res.data.code == 0) {
+          console.log("res:",res.data.data)
           if(res.data.data == null || (res.data.data.userType == 1 && !_this.isNull(res.data.data.openId))) {
             _this.$router.push({name: 'Process', params: {id: '1'}});
-          } else if(res.data.data.userType == 2 && !_this.isNull(res.data.data.openId)) {     //商家
-            _this.$router.pash({name: 'Home', params: {id: '2'}});
+          } else if(res.data.data.userType == 2 && res.data.data.openId) {//商家
+            console.log("res:",res.data.data) 
+            _this.setshopId(res.data.data.shopId)    
+            _this.getshopinfo(res.data.data.shopId)
+           _this.$router.push({name: 'Home', params: {id: '2'}});
           }
         }
-
       })
       .catch(err => {
         console.log(err);
+      })
+    },
+    getshopinfo:function(id){ //获取商家信息
+      this.$axios.get('/api/shop/get/'+id)
+      .then((res) => {
+        if(res.data.code ==  '0'){
+          let data = res.data.data;
+          this.setuserInfo(data)
+        }
       })
     }
   }
