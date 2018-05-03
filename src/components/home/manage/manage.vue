@@ -223,21 +223,6 @@ export default {
         this.formdata[2].value = val2;
         this.formdata[3].value = userdata.address;
         this.formdata[4].value = userdata.shopInfo;
-        let _data = this.$route.query;
-        if(_data.address){
-          let _address = _data.Province+_data.City+_data.county+_data.address;
-          let address = _address +'/'+'address'
-          this.setuserInfo(address)
-          this.formdata[3].value = _address;
-        }
-        if(_data.lat){
-          let locationY = _data.lat +'/'+'locationY'
-          this.setuserInfo(locationY)
-        }
-        if(_data.lng){
-          let locationX = _data.lng +'/'+'locationX'
-          this.setuserInfo(locationX)
-        }
       }
     }
   },

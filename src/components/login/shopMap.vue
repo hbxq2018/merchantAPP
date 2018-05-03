@@ -16,10 +16,12 @@
   </div>
 </template>
 <script>
-  import { Toast , Picker} from 'mint-ui';
+  import { Toast , Picker} from 'mint-ui'
   import AMap from 'AMap'
   var map
   import myaddress from '../../../static/address3.json' 
+  import store from '@/vuex/store'
+  import {mapState,mapMutations} from 'vuex'
   export default {
     data(){
       return {
@@ -67,7 +69,12 @@
     mounted: function () {
       this.init()
     },
+    store,
+    computed:{
+      ...mapState(['userInfo']),
+    },
     methods: {
+      ...mapMutations(['setuserInfo']),
       init: function () {
         map = new AMap.Map('container', {
           center: [114.367237,30.571349],
@@ -160,6 +167,20 @@
         }else if(!_obj.county){
           Toast('请选择所在省县市');
         }else{
+          if(_obj.address){
+            let _address = _obj.Province+_obj.City+_obj.county+_obj.address;
+            let address = _address +'/'+'address'
+            this.setuserInfo(address)
+            this.formdata[3].value = _address;
+          }
+          if(_obj.lat){
+            let locationY = _obj.lat +'/'+'locationY'
+            this.setuserInfo(locationY)
+          }
+          if(_obj.lng){
+            let locationX = _obj.lng +'/'+'locationX'
+            this.setuserInfo(locationX)
+          }
           this.$router.push({path: this.goback,query:_obj})
         }
       }
