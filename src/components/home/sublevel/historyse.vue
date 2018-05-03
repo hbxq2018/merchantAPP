@@ -9,21 +9,21 @@
     </mt-header>
 
     <div class="history_money">
-        <P><em>{{data.time}}</em>{{data.time1}}</P>
-        <span>&yen;{{data.theAmountOf}}</span>
+        <b><em>{{time | formatDate}}</em>月应供服务费</b>
+        <span>&yen;{{dataarr.totalService}}</span>
         <P>打款日:次月5号</P>
     </div>
     <div class="data_statistics">
-        <p><span>{{data1.time}}</span><span>月已核销</span><span>{{data1.time1}}</span>张代金券，总额度<span>{{data1.time2}}</span>元</p>
+        <p><span>4</span><span>月已核销</span><span>{{totalQuantity.length}}</span>张代金券，总额度<span>{{totle}}</span>元</p>
     </div>
-    <div class="order_history" v-for="(item,index) in data2" :key="index">
+    <div class="order_history" v-for="(item,index) in totalQuantity" :key="index">
         <div class="order_h_sublevel">
             <div class="roder_left">
-                <b>{{item.tiStockFaceValueme}}<span>元代金券</span></b>
-                <p>{{item.time}}<span>{{item.time1}}</span></p>
+                <b>{{item.couponAmount}}<span>元代金券</span></b>
+                <p><span>{{item.updateTime}}</span></p>
             </div>
             <div class="roder-right">
-                <span>&yen;{{item.money}}</span>
+                <span>&yen;{{practical(item.couponAmount)}}</span>
             </div>
         </div>
     </div>
@@ -31,52 +31,67 @@
 </template>
 
 <script>
+import {formatDate} from '../../../../untils/util';
+import GLOBAL from '../../../../untils/config/config';
 import { Header } from 'mint-ui';
 import { MessageBox } from "mint-ui";
+import axios from 'axios';
+import qs from 'qs';
+import config from '../../../../untils/config/config';
 export default {
     name:'Payment',
     data(){
         return{
+            totle:0,
             index:2,
             msg:'payment',
             name: "缴费服务",
-            data:{
-                time:'4',
-                time1:'月应供服务费',
-                theAmountOf:'244.05'
-            },
-            data1:{
-                time:'4',
-                time1:'13413',
-                time2:'24445.05'
-            },
-            data2:[
-                {
-                tiStockFaceValueme:'10',
-                time:'2018-4-24',
-                time1:'12:45:23',
-                money:'1.5',
-            },
-            {
-                tiStockFaceValueme:'10',
-                time:'2018-4-24',
-                time1:'12:45:23',
-                money:'1.5',
-            },
-            {
-                tiStockFaceValueme:'10',
-                time:'2018-4-24',
-                time1:'12:45:23',
-                money:'1.5',
-            },
-            ],
+            dataarr:[],
+            totalQuantity:[],
+            time:'',
         }
     },
+    filters: {
+        formatDate() {
+            var date = new Date();
+            let mon = date.getMonth() + 1
+            let _data = formatDate(date, 'yyyy-MM-dd hh:mm')
+            return mon;
+        },
+    },
     methods:{
+        practical:function(val){
+            return val/10
+        },
         billCheck:function(e){
             this.$router.push('/historyofthebill')
-        }
+        },
+    },
+    created:function(){
+    var date = new Date();
+    let _data = formatDate(date, 'yyyy/MM/dd')
+    let obj = {
+      shopId:75,
+      begainTime:"2018/3/1",
+      endTime:_data
     }
+    let parms='',value='';
+    for(var key in obj) {
+      value = key+'='+obj[key]+'&';
+      parms+=value;
+      value=''
+    }
+    this.$axios.get('/api/app/hx/list?'+parms)
+    .then((res) => {
+       this.dataarr= res.data.data.list[0];
+       this.totalQuantity = res.data.data.list;
+        this.totalQuantity =  this.totalQuantity.slice(1, this.totalQuantity.length)
+        // console.log("totalQuantity:",this.totalQuantity)
+       for(let i=0;i<this.totalQuantity.length;i++){
+           this.totle += (this.totalQuantity[i].couponAmount)*1;
+       }
+    })
+  }
 }
 </script>
 
@@ -98,9 +113,11 @@ export default {
             height: 224px;
             background: #fff;
             padding-top: 88px;
-            p:nth-child(1){
+            b:nth-child(1){
                 font-size: 30px;
                 padding: 39px 0px 14px 0px;
+                display: block;
+                color: #191919;
             }
             p:nth-child(3){
                 font-size: 24px;
@@ -109,6 +126,7 @@ export default {
             }
             span{
                 font-size: 56px;
+                color: #191919;
             }
             
         }

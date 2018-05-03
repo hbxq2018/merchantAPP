@@ -32,10 +32,9 @@ export default {
   name: "Manage",
   data() {
     return {
-      name: "2018年4月账单详情",
       data:{
           times:'本月已缴清',
-          money:'244.50'
+          money:'244.50',
       },
       writedata: [
         {
@@ -59,6 +58,30 @@ export default {
       ]
     };
   },
+  created:function(){
+        // if(this.$route.query.ind == '2'){
+        //     // this.ismenu= false;
+        // }
+        let obj = {
+            shopId:"1",
+            begainTime:"2018/4/27",
+            endTime:"2018/4/1"
+        }
+        let parms='',value='';
+            for(var key in obj) {
+            value = key+'='+obj[key]+'&';
+            parms+=value;
+            value=''
+        }
+        this.$axios.get('/api/app/hx/list?'+parms)
+        .then((response) => {
+        })
+    },
+    computed:{
+        name(){
+            return `2018年${ this.$route.params.month }月账单详情`
+        }
+    }
 }
 </script>
 

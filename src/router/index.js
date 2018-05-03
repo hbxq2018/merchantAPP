@@ -90,9 +90,9 @@ export default new Router({
       path: '/historyofthebill',
       name: 'Historyofthebill',
       component: Historyofthebill
-    },
+    },  
     { //我的页面-->历史账单详情
-      path: '/detailsSon',
+      path: '/detailsSon/:month',
       name: 'DetailsSon',
       component: DetailsSon
     },
