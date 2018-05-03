@@ -9,6 +9,7 @@
 </template>
 <script>
 import Vue from "vue";
+// import AMap from 'AMap';
 // import { Field, CellSwipe, Actionsheet } from "mint-ui";
 // Vue.component(Field.name, Field);
 // Vue.component(CellSwipe.name, CellSwipe);

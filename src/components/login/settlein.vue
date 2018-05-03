@@ -87,10 +87,8 @@
 </template>
 <script>
 import Vue from "vue";
-import { Field, CellSwipe, Actionsheet } from "mint-ui";
+import { Field } from "mint-ui";
 Vue.component(Field.name, Field);
-Vue.component(CellSwipe.name, CellSwipe);
-Vue.component(Actionsheet.name, Actionsheet);
 export default {
   name: "Settle",
   data() {
@@ -101,21 +99,6 @@ export default {
       address: "",
       type: "",
       imgUrl: "../../../static/images/add.png"
-      // actions: [
-      //   {
-      //     name: '拍照',
-      //     method: function() {
-      //       console.log('拍照');
-      //     }
-      //   },
-      //   {
-      //     name: '从相册中选择',
-      //     method: function() {
-      //       console.log('从相册中选择');
-      //     }
-      //   }
-      // ],
-      // sheetVisible: false
     };
   },
   methods: {

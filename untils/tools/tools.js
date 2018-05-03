@@ -1,7 +1,7 @@
 // 本文件为配置文件，保持现状，
 
 import { myStore } from '../tools/store';
-import Api from '../config/api';
+// import Api from '../config/api';
 var config = require('../config/config.js');
 
 class Tool {
