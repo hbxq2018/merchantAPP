@@ -1,5 +1,6 @@
 <template>
     <div class="login">
+
         <img class="login_background" src="../../../static/images/background.png" alt="" />
         <div class="login_Box">
 			<div class="login_icon">
@@ -122,9 +123,6 @@ export default {
         if(res.data.code == 0) {
           if(res.data.data == null || (res.data.data.userType == 1 && !_this.isNull(res.data.data.openId))) {
             _this.$router.push({name: 'Process', params: {id: '1'}});
-            //13971489895    0745
-            //15072329516    4775
-            //18627825816    0781
           } else if(res.data.data.userType == 2 && !_this.isNull(res.data.data.openId)) {     //商家
             _this.$router.pash({name: 'Home', params: {id: '2'}});
           }

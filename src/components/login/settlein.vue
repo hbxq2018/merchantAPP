@@ -16,7 +16,7 @@
         <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopname"></mt-field>
         <!-- <mt-field label="详细地址" placeholder="定位选择详细地址" type="number" v-model="address"></mt-field> -->
         <div class="category clearfix">
-          <router-link to="shopMap">
+          <router-link :to="{path:'shopMap',query:{'ind':'1'}}">
             <div class="category_l">详细地址</div>
             <div class="category_r">
               <span class="category_text fl">定位选择详细地址</span>
@@ -115,6 +115,7 @@ export default {
   },
   created() {
     //获取到category的参数值
+    console.log("this.$route.query:",this.$route.query)
     console.log(this.$route.params.category)
   }
 };

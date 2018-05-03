@@ -20,9 +20,7 @@
   </div>
 </template>
 <script>
-import { Field } from "mint-ui";
-import { Checklist } from "mint-ui";
-import { Toast } from 'mint-ui';
+import { Field,Checklist,Toast } from "mint-ui";
 import store from '@/vuex/store'
 import {mapState,mapMutations} from 'vuex';
 export default {
@@ -177,6 +175,8 @@ export default {
         this._max = 1;
         this.content = this.content.split(",")
         this.value = this.content;
+    }else if(this.ind == '3'){
+      this.$router.push({path: '/shopMap',query:{ind:'2'}});
     }else{
       this.data.Introduction = this.content;
     }

@@ -23,7 +23,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   externals: {
-    'AMap': 'AMap',
+    'AMap': 'AMap'
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],

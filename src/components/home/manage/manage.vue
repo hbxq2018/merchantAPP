@@ -27,7 +27,7 @@
   </div>
 </template>
 <script>
-import { MessageBox } from "mint-ui";
+import { MessageBox ,Toast} from "mint-ui";
 import store from '@/vuex/store'
 import {mapState,mapMutations} from 'vuex';
 export default {
@@ -204,9 +204,9 @@ export default {
         if(res.data.code ==  '0'){
           this.writedata = res.data.data;
           if(val == '1'){
-            MessageBox('提示', '添加成功')
+            Toast('添加成功');
           }else if(val == '2'){
-            MessageBox('提示', '删除成功')
+            Toast('删除成功');
           };
         }
       })
@@ -214,7 +214,6 @@ export default {
     setformdata:function(){
       if(this.userInfo){
         let userdata = this.userInfo;
-        console.log("userdata:",userdata)
         let ind = userdata.businessCate.indexOf("/");
         let val1 = userdata.businessCate.slice(0,ind);
         let val2 = userdata.businessCate.slice(ind+1,userdata.businessCate.length);
@@ -224,10 +223,26 @@ export default {
         this.formdata[2].value = val2;
         this.formdata[3].value = userdata.address;
         this.formdata[4].value = userdata.shopInfo;
+        let _data = this.$route.query;
+        if(_data.address){
+          let _address = _data.Province+_data.City+_data.county+_data.address;
+          let address = _address +'/'+'address'
+          this.setuserInfo(address)
+          this.formdata[3].value = _address;
+        }
+        if(_data.lat){
+          let locationY = _data.lat +'/'+'locationY'
+          this.setuserInfo(locationY)
+        }
+        if(_data.lng){
+          let locationX = _data.lng +'/'+'locationX'
+          this.setuserInfo(locationX)
+        }
       }
     }
   },
   created:function(){
+    
     if(this.writedata.length<1){
       this.getWritelist()
     }
@@ -235,7 +250,7 @@ export default {
     if(!this.formdata[0].value){
       this.setformdata();
     }
-    
+   
     // console.log("this.$route.params.name:",this.$route.params)
     if(this.$route.params.ind){
       let obj = this.$route.params
