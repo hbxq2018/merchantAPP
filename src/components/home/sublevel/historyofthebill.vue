@@ -4,9 +4,10 @@
         <mt-button icon="back"></mt-button></router-link></mt-header>
         <div class="top_distance" v-for="(item,index) in data" :key="index">
           <div class="check_top">
-            <div class="check_top_time"><span>{{item.time}}</span>年</div>
+            <div class="check_top_time"><span>{{time | formatDate}}</span>年</div>
           </div>
-          <div class="check_center" v-for="(itemes,index) in item.data1" :key="index" :id="index" @click="particularsDetails">
+          <!-- :to="{path:'detailsSon',query:{'ind':3}}" -->
+          <div class="check_center" v-for="(itemes,index) in item.data1" :key="index" :id="index" @click="particularsDetails(itemes)">
             <div class="checkCtSublevel">
               <div class="roder_left">
                   <b>{{itemes.time}}<span>月账单</span></b>
@@ -23,11 +24,13 @@
 </template>
 
 <script>
+import {formatDate} from '../../../../untils/util';
 import { InfiniteScroll } from 'mint-ui';
 export default {
   name: "billCheck",
   data() {
     return {
+      time:'',
       data: [
         {
           time: "2017",
@@ -35,22 +38,22 @@ export default {
             {
               time: "4",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             },
             {
               time: "5",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             },
             {
               time: "6",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             },
             {
               time: "7",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             }
           ]
         },
@@ -60,22 +63,22 @@ export default {
             {
               time: "4",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             },
             {
               time: "5",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             },
             {
               time: "6",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             },
             {
               time: "7",
               money: "224.50",
-              state: "待打款"
+              state: "详情"
             }
           ]
         },
@@ -85,33 +88,66 @@ export default {
             {
               time: "4",
               money: "224.50",
-              state: "待付款"
+              state: "详情"
             },
             {
               time: "5",
               money: "224.50",
-              state: "待付款"
+              state: "详情"
             },
             {
               time: "6",
               money: "224.50",
-              state: "待付款"
+              state: "详情"
             },
             {
               time: "7",
               money: "224.50",
-              state: "待付款"
+              state: "详情"
             }
           ]
         }
       ]
     };
   },
+  filters: {
+        formatDate() {
+            var date = new Date();
+            let mon = date.getFullYear();
+            let _data = formatDate(date, 'yyyy-MM-dd hh:mm')
+            return mon;
+        },
+    },
   methods: {
-    particularsDetails: function(e) {
-      const menstrualID = e.currentTarget.id;
-      this.$router.push("/detailsSon");
+    // router
+    particularsDetails: function( item ) {
+      console.log("this is item " , item)
+      // const menstrualID = e.currentTarget.id;
+      // this.$router.push("/detailsSon");
+      this.$router.push(`/detailsSon/${ item.time }`)
+      
+    },
+  },
+  created:function(){
+    var date = new Date();
+    let _data = formatDate(date, 'yyyy')
+    console.log("年份:",_data)
+    let obj = {
+      shopId:"1",
+      begainTime:"2018/1/1",
+      endTime:"2018/12/31"
     }
+    let parms='',value='';
+    for(var key in obj) {
+      value = key+'='+obj[key]+'&';
+      parms+=value;
+      value=''
+    }
+    this.$axios.get('/api/app/hx/list?'+parms)
+    .then((response) => {
+       console.log(response)
+    })
+   
   }
 };
 </script>
@@ -122,7 +158,7 @@ export default {
   height: 100%;
   background: #ebebeb;
   .top_distance:nth-child(2) {
-    margin-top: 88px;
+    margin-top: 80px;
   }
   .check_top {
     width: 100%;

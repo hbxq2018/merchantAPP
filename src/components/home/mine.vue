@@ -4,7 +4,7 @@
           <img class="u_img" :src="data.iconUrl" alt="用户头像">
           <p class="u_name">{{data.nickName}}</p>
       </div>
-       <div class="list_ontrol" v-for="(item,index) in data1" :id="index" :key='index' @click="WeIntroduce">
+       <div class="list_ontrol" v-for="(item,index) in dataOne" :id="index" :key='index' @click="WeIntroduce">
           <div class="list_left">
               <img :src="item.src" :alt="item.name">
               <span>{{item.name}}</span>
@@ -29,10 +29,10 @@ export default {
           API:GLOBAL.GLOBAL_API_DOMAIN,
           msg:'mine',
           data:{
-              iconUrl: "../../../static/images/timg (2).jpg",
-              nickName:'用户名称',
+              iconUrl: "../../../static/images/aboutMe.png",
+              nickName:'noname',
           },
-          data1:[
+          dataOne:[
             {
                 src: "../../../static/images/juan-piao.png",
                 name:'缴费服务',
@@ -65,7 +65,7 @@ export default {
           }else if(listBoxID ==0){
               this.$router.push('/historyse')
           }else if(listBoxID ==1){
-              window.location.href="tel:15827245422"
+              window.location.href="tel:027-59728120"
                 console.log("拨打:","拨打电话成功")
           }
       }
@@ -73,10 +73,9 @@ export default {
   created:function(){//请求接口
     console.log("GLOBAL_API_DOMAIN:",this.API)
     if(!this.data.id){  //如果有数据，则不用再次请求
-        let mobile = '18087088987';
+        let mobile = '15827245422';
         this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
         .then((res) => {
-        console.log(res)
             this.data= res.data.data
         })
     }
