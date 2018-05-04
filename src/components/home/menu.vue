@@ -3,13 +3,13 @@
       <div class="menu_top">
            <img class="eaves" src="../../../static/images/eaves.png" alt="顶部图片">
             <div class="info">
-                <img class="avatar" :src='userdata.logoUrl' alt="用户头像">
+                <img class="avatar" :src='userInfo.logoUrl' alt="用户头像">
                 <div class="username">
                     <p class="u_name">
-                        {{userdata.shopName}}
+                        {{userInfo.shopName}}
                     </p>
                     <p class="u_heat">
-                        人气 {{userdata.popNum}}
+                        人气 {{userInfo.popNum}}
                     </p>
                 </div>
                 <img src="../../../static/images/news.png" alt="消息" class="news">
@@ -63,8 +63,7 @@ export default {
               con:'自定义满减额度',
               href: '#'
           }
-      ],
-      userdata: {}
+      ]
     };
   },
   store,
@@ -91,10 +90,6 @@ export default {
               this.$router.push({ path: '/ticket'})
         }
     }
-  },
-  created:function(){
-    this.userdata = this.userInfo;
-    console.log("userdata123:",this.userdata)
   }
 };
 </script>

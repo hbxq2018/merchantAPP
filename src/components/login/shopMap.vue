@@ -104,7 +104,6 @@
           map.addControl(geolocation)
           geolocation.getCurrentPosition()
           AMap.event.addListener(geolocation, 'complete', (result) => {
-            console.log(result.position.getLng())
             _this.obj.lng = result.position.getLng();//定位成功返回的经度
             _this.obj.lat = result.position.getLat();//定位成功返回的纬度
             let arr =[];
@@ -173,7 +172,6 @@
             let _address = _obj.Province+_obj.City+_obj.county+_obj.address;
             let address = _address +'/'+'address'
             this.setuserInfo(address)
-            // this.formdata[3].value = _address;
           }
           if(_obj.lat){
             let locationY = _obj.lat +'/'+'locationY'
