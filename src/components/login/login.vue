@@ -1,6 +1,5 @@
 <template>
     <div class="login">
-
         <img class="login_background" src="../../../static/images/background.png" alt="" />
         <div class="login_Box">
 			<div class="login_icon">
@@ -128,11 +127,9 @@ export default {
       this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
       .then(res => {
         if(res.data.code == 0) {
-          console.log("res:",res.data.data)
-          if(res.data.data == null || (res.data.data.userType == 1 && !_this.isNull(res.data.data.openId))) {
+          if(res.data.data == null || (res.data.data.userType == 1 && !_this.isNull(res.data.data.mobile))) {
             _this.$router.push({name: 'Process', params: {id: '1'}});
-          } else if(res.data.data.userType == 2 && res.data.data.openId) {//商家
-            console.log("res:",res.data.data) 
+          } else if(res.data.data.userType == 2 && !_this.isNull(res.data.data.mobile)) {     //商家
             _this.setshopId(res.data.data.shopId)    
             _this.getshopinfo(res.data.data.shopId)
            _this.$router.push({name: 'Home', params: {id: '2'}});

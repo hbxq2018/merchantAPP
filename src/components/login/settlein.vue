@@ -24,14 +24,12 @@
             </div>
           </router-link>
         </div>
-        <div class="category clearfix">
-          <router-link to="category">
-            <div class="category_l">经营品类</div>
-            <div class="category_r">
-              <span class="category_text fl">选择经营品类</span>
-              <span class="category_arrow fr"></span>
-            </div>
-          </router-link>
+        <div class="category clearfix" @click="cateSlide">
+          <div class="category_l">经营品类</div>
+          <div class="category_r">
+            <span class="category_text fl">{{categoryTxt}}</span>
+            <span class="category_arrow fr"></span>
+          </div>
         </div>
     </div>
     <p class="form_title">提交资质</p>
@@ -41,8 +39,8 @@
         <div class="q_item_r fl">
           <p>上传营业执照</p>
           <div class="files">
-            <img src="../../../static/images/add.png" alt="">
-            <input type="file" v-on:change="getFile">
+            <img :src="licenseUrl" alt="">
+            <input type="file" @change="getFile(1)" ref="license">
           </div>
         </div>
       </div>
@@ -51,8 +49,8 @@
         <div class="q_item_r fl">
           <p>上传卫生许可证</p>
           <div class="files">
-            <img src="../../../static/images/add.png" alt="">
-            <input type="file" v-on:change="getFile">
+            <img :src="healthUrl" alt="">
+            <input type="file" @change="getFile(2)" ref="health">
           </div>
         </div>
       </div>
@@ -61,8 +59,8 @@
         <div class="q_item_r fl">
           <p>上传门头照(限1张)</p>
           <div class="files">
-            <img src="../../../static/images/add.png" alt="">
-            <input type="file" v-on:change="getFile">
+            <img :src="ShopPhotoUrl" alt="">
+            <input type="file" @change="getFile(3)" ref="ShopPhoto">
           </div>
         </div>
       </div>
@@ -82,11 +80,12 @@
       </div>
       <p>入驻过程如有问题可拨打400-100-111</p>
     </div>
-    <!-- <mt-actionsheet :actions="actions" v-model="sheetVisible"></mt-actionsheet> -->
   </div>
 </template>
 <script>
 import Vue from "vue";
+import axios from "axios";
+import qs from "qs";
 import { Field } from "mint-ui";
 Vue.component(Field.name, Field);
 export default {
@@ -98,25 +97,101 @@ export default {
       shopname: "",
       address: "",
       type: "",
-      imgUrl: "../../../static/images/add.png"
+      categoryTxt: "选择经营品类",
+      isSelected: false, //是否选择经营品类
+      licenseUrl: "../../../static/images/add.png",
+      healthUrl: "../../../static/images/add.png",
+      ShopPhotoUrl: "../../../static/images/add.png"
     };
   },
   methods: {
-    // add: function(){
-    //   this.sheetVisible = !this.sheetVisible;
-    // }
+    cateSlide() {
+      if (this.isSelected) {
+        this.$router.push({
+          name: "Category",
+          params: { txt: this.categoryTxt }
+        });
+      } else {
+        this.$router.push({ name: "Category" });
+      }
+    },
     getFile: function(e) {
-      console.log(e.target.files);
-      // this.imgUrl = e.target.files[0].name
+      let _this = this,
+        inputDOM = {};
+      console.log(e);
+      if (e == 1) {
+        inputDOM = this.$refs.license;
+      } else if (e == 2) {
+        inputDOM = this.$refs.health;
+      } else if (e == 3) {
+        inputDOM = this.$refs.ShopPhoto;
+      }
+      console.log(inputDOM);
+      // 通过DOM取文件数据
+      this.file = inputDOM.files[0];
+      this.errText = "";
+      // let size = Math.floor(this.file.size / 1024);
+      // if (size > '') {
+      //     // 这里可以加个文件大小控制
+      //     return false
+      // }
+      // 触发这个组件对象的input事件
+      this.$emit("input", this.file);
+      // 这里就可以获取到文件的名字了
+      this.fileName = this.file.name;
+      // 这里加个回调也是可以的
+      this.onChange && this.onChange(this.file, inputDOM.value);
+      // this.imgPreview(this.file);
+      let form = new FormData();
+      form.append("file", this.file, this.file.name);
+      form.append("userName", "test");
+      this.$axios
+        .post("/api/app/img/upload", form)
+        .then(res => {
+          if(res.data.code != 0) {
+            Toast('系统繁忙请稍后再试');
+            return false;
+          }
+          console.log(res.data.data.smallPicUrl);
+          if (e == 1) {
+            _this.licenseUrl = res.data.data.smallPicUrl;
+          } else if (e == 2) {
+            _this.healthUrl = res.data.data.smallPicUrl;
+          } else if (e == 3) {
+            _this.ShopPhotoUrl = res.data.data.smallPicUrl;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          Toast('系统繁忙请稍后再试');
+        });
+    },
+    imgPreview(file) {
+      let _this = this;
+      // 看支持不支持FileReader
+      if (!file || !window.FileReader) return;
+
+      if (/^image/.test(file.type)) {
+        // 创建一个reader
+        var reader = new FileReader();
+        // 将图片将转成 base64 格式
+        reader.readAsDataURL(file);
+        // 读取成功后的回调
+        reader.onloadend = function() {
+          _this.imgUrl = this.result;
+        };
+      }
     },
     addMap() {
-      this.$router.push({name: 'ShopMap'});
+      this.$router.push({ name: "ShopMap" });
     }
   },
   created() {
     //获取到category的参数值
-    console.log("this.$route.query:",this.$route.query)
-    console.log(this.$route.params.category)
+    if (this.$route.params.category) {
+      this.categoryTxt = this.$route.params.category;
+      this.isSelected = true;
+    }
   }
 };
 </script>

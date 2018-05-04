@@ -36,7 +36,6 @@ export default {
         { name: "烧烤", checked: false },
         { name: "江浙菜", checked: false },
         { name: "西餐", checked: false },
-        { name: "自助餐", checked: false },
         { name: "其它美食", checked: false }
       ],
       checkedArr: []    //选中的类目
@@ -70,6 +69,19 @@ export default {
       }
       txt = txt.substring(0, txt.length-1);
       this.$router.push({name: 'Settlein', params: {category: txt}});
+    }
+  },
+  created() {
+    if(this.$route.params.txt) {
+      let arr = this.$route.params.txt.split(',');
+      for(let i = 0; i < arr.length; i++) {
+        for(let k = 0; k < this.categoryArr.length; k++) {
+          if(arr[i] == this.categoryArr[k].name) {
+            this.categoryArr[k].checked = true;
+            this.checkedArr.push(this.categoryArr[k]);
+          }
+        }
+      }
     }
   }
 };
