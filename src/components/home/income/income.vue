@@ -1,5 +1,6 @@
 <template>
     <div class="income">
+
 		<mt-header title="营业数据" class="income_header">
             <router-link to="/home" slot="left">
                 <mt-button icon="back"></mt-button>
@@ -7,12 +8,6 @@
             <mt-button @click="turnmore(1)" slot="right" class="income_header_date">{{actday}}</mt-button>
 		</mt-header>
     
-   <mt-datetime-picker
-    ref="picker"
-    type="time"
-    v-model="pickerValue">
-  </mt-datetime-picker>
-
         <div class="mobox" @click="closemore" v-show="ismore">
             <div class="triangle" v-show="isselectday"></div>
             <ul class="moreday" v-show="isselectday">
@@ -20,19 +15,17 @@
             </ul>
             <div class="select" v-show="isselecttime">
                 <div class="select_top">
-                    <span class="stleft">选择时间</span>
-                    <span :class="isday ? 'actsel stright' : 'stright' " @click="byday">按日</span>
-                    <span :class="isday ? 'stright' : 'stright actsel' " @click="bymonth">按月</span>
+                    <span class="stleft">选择起始时间</span>
                 </div>
                 <div class="date">
-                    
+                    <div @click.stop="openPicker(1)">开始时间：{{setdate(start)}}</div>
+                    <div @click.stop="openPicker(2)">结束时间：{{setdate(end)}}</div>
                 </div>
                 <div class="selbut">
                     <div class="close" @click="close">取消</div>
                     <div class="cfrm" @click="cfrm">确定</div>
                 </div>
             </div>
-            
         </div>
         <div class="income_banner">
             <div class="income_banner_data">
@@ -74,22 +67,35 @@
                 </li>
             </ul>
         </div>
+
+        <mt-datetime-picker
+            ref="picker"
+            type="date"
+            year-format="{value} 年"
+            month-format="{value} 月"
+            date-format="{value} 日"
+            v-model="pickerValue"
+            @confirm="handleConfirm"
+        >
+    </mt-datetime-picker>
     </div>
 </template>
 
 <script>
 import Vue from "vue"
-import { DatetimePicker } from 'mint-ui';
+import { DatetimePicker,Toast } from 'mint-ui';
 Vue.component(DatetimePicker.name, DatetimePicker);
 export default {
   name: "Income",
   data() {
     return {
+        start:'',
+        end:'',
+        actval:'',
         pickerValue:'',
         Visible:true,
         ismore:false,
         actday:'',
-        isday:true,
         isselectday:false,
         isselecttime:false,
         days:[
@@ -107,23 +113,48 @@ export default {
     this.actday = this.days[0].title;
   },
   methods: {
-      openPicker() {
+      openPicker(val) {
+          console.log("val:",val)
+        this.actval = val;
         this.$refs.picker.open();
       },
-      byday:function(){
-          this.isday = true;
-          console.log("byday")
-      },    
-      bymonth:function(){
-          this.isday = false;
-          console.log("bymonth")
+      handleConfirm(){
+          let data = this.pickerValue
+          let year = data.getFullYear();
+          let month = data.getMonth()+1;
+          let day = data.getDate();
+          let _time = year+'/'+month+'/'+day;
+          if(this.actval == 1){
+            this.start = _time
+          }else if(this.actval ==2){
+            this.end = _time
+          }
+      },
+      setdate:function(val){
+          if(val){
+            let arr = val.split('/');
+            console.log('arr:',arr)
+            return arr[0]+'年'+arr[1]+'月'+arr[2]+'日'
+          }
       },
       close:function(){
           console.log("close")
       },  
       cfrm:function(){
-          console.log("cfrm")
-      },  
+          if(this.start && this.end){
+            let _start = new Date(this.start);
+            let _end = new Date(this.end);
+            _start = _start.getTime();
+            _end = _end.getTime();
+            if(_end>_start){
+                console.log(this.start,this.end)
+            }else{
+                Toast('结束时间不能小于开始时间');
+            }
+          }else if(!this.start || !this.end){
+             Toast('请选择开始时间或结束时间');
+          }
+      },   
       turnmore:function(val){
           this.ismore = true;
           if(val == 1){
@@ -315,7 +346,7 @@ export default {
   }
   .select{
       width: 672px;
-      height: 550px;
+      height: 350px;
       background: #fff;
       position: absolute;
       top: 50%;
@@ -324,25 +355,21 @@ export default {
       margin-left: -336px;
       margin-top: -275px;
       .select_top{
-          width: 90%;
+          width: 100%;
           height: 100px;
           line-height: 100px;
-          margin-left: 5%;
-          .stleft{
-              float: left;
-          }
-          .stright{
-              float: right;
-              margin: 0 10px;
-          }
-          .actsel{
-              color: #FC5E2D;
-          }
+          text-align: center;
       }
       .date{
           width: 100%;
-          height: 344px;
-          border: 1px solid red;
+          height: 144px;
+          div{
+              height: 70px;
+              line-height: 70px;
+              text-align: left;
+              width: 80%;
+              margin-left: 10%;
+          }
       }
       .selbut{
           width: 100%;
