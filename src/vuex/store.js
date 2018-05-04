@@ -4,8 +4,9 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 const state={
-    shopId:'',
-    userInfo:{},
+    shopId: '',
+    userInfo: {},
+    newUserInfo: {}
 }
 
 const mutations={
@@ -40,6 +41,9 @@ const mutations={
     },
     setshopId(state,id){
         state.shopId = id;
+    },
+    setNewUserInfo(state, obj) {
+        state.newUserInfo = obj;
     },
     reduce(state){
         state.count--;

@@ -14,14 +14,12 @@
         <mt-field label="申请人" placeholder="输入申请人姓名" v-model="userName"></mt-field>
         <mt-field label="联系方式" placeholder="输入手机或电话号码" type="tel" v-model="phone"></mt-field>
         <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopName"></mt-field>
-        <div class="category clearfix">
-          <router-link :to="{path:'shopMap',query:{'ind':'1'}}">
-            <div class="category_l">详细地址</div>
-            <div class="category_r">
-              <span class="category_text fl">定位选择详细地址</span>
-              <span class="category_arrow fr"></span>
-            </div>
-          </router-link>
+        <div class="category clearfix" @click="addrSlide">
+          <div class="category_l">详细地址</div>
+          <div class="category_r">
+            <span class="category_text fl">{{address}}</span>
+            <span class="category_arrow fr"></span>
+          </div>
         </div>
         <div class="category clearfix" @click="cateSlide">
           <div class="category_l">经营品类</div>
@@ -83,6 +81,8 @@ import Vue from "vue";
 import axios from "axios";
 import qs from "qs";
 import { Field, Toast } from "mint-ui";
+import store from '@/vuex/store'
+import {mapState, mapMutations} from 'vuex';
 Vue.component(Field.name, Field);
 export default {
   name: "Settle",
@@ -92,7 +92,8 @@ export default {
       userName: "",
       phone: "",
       shopName: "",
-      address: "",
+      address: "定位选择详细地址",
+      isSeleAdd: false, //是否选择地址
       locationX: "",
       locationY: "",
       city: "",
@@ -103,8 +104,27 @@ export default {
       ShopPhotoUrl: "../../../static/images/add.png"
     };
   },
+  store,
+  computed:{
+    ...mapState(['newUserInfo']),
+  },
   methods: {
+    ...mapMutations(['setNewUserInfo']),
     cateSlide() {     //跳转选择经营品类
+      this.setNewUserInfo({
+        id: this.id,
+        userName: this.userName,
+        phone: this.phone,
+        shopName: this.shopName,
+        address: this.address,
+        isSeleAdd: this.isSeleAdd, //是否选择地址
+        locationX: this.locationX,
+        locationY: this.locationY,
+        city: this.city,
+        licenseUrl: this.licenseUrl,
+        healthUrl: this.healthUrl,
+        ShopPhotoUrl: this.ShopPhotoUrl
+      });
       if (this.isSelected) {
         this.$router.push({
           name: "Category",
@@ -113,6 +133,20 @@ export default {
       } else {
         this.$router.push({ name: "Category" });
       }
+    },
+    addrSlide() {      //跳转选择位置
+      this.setNewUserInfo({
+        id: this.id,
+        userName: this.userName,
+        phone: this.phone,
+        shopName: this.shopName,
+        categoryTxt: this.categoryTxt,
+        isSelected: this.isSelected, //是否选择经营品类
+        licenseUrl: this.licenseUrl,
+        healthUrl: this.healthUrl,
+        ShopPhotoUrl: this.ShopPhotoUrl
+      });
+      this.$router.push({path:'shopMap', query: {'ind': '1'}})
     },
     getFile: function(e) {      //上传图片
       let _this = this,
@@ -194,14 +228,14 @@ export default {
         Toast('请输入店铺名称');
         return false;
       }
-      // if(this.isNull(this.address)) {
-      //   Toast('请输入详细地址');
-      //   return false;
-      // }
-      if(this.isNull(this.categoryTxt)) {
-        Toast('请输入经营品类');
+      if(this.isNull(this.address)) {
+        Toast('请输入详细地址');
         return false;
       }
+      // if(this.isNull(this.categoryTxt)) {
+      //   Toast('请输入经营品类');
+      //   return false;
+      // }
       if(this.isNull(this.licenseUrl)) {
         Toast('请上传营业执照');
         return false;
@@ -220,6 +254,7 @@ export default {
         shopName: this.shopName,
         address: this.address,
         businessCate: this.categoryTxt,
+        businessCate: "咖啡厅,其他美食",
         licensePic: this.licenseUrl,
         healthPic: this.healthUrl,
         doorPic: this.ShopPhotoUrl,
@@ -229,18 +264,22 @@ export default {
         userId: this.id
       }
       console.log(_parms);
-      // this.$axios.post("/api/app/shopEnter/add", qs.stringify(_parms))
-      // .then(res => {
-      //   if(res.data.code != 0) {
-      //     Toast('系统繁忙请稍后再试');
-      //     return false;
-      //   }
-      //   console.log(res);
-      // })
-      // .catch(err => {
-      //   console.log(err);
-      //   Toast('系统繁忙请稍后再试');
-      // });
+      this.$axios.post("/api/app/shopEnter/add", qs.stringify(_parms))
+      .then(res => {
+        if(res.data.code != 0) {
+          Toast(res.data.message);
+          return false;
+        }
+        console.log(res);
+        if(res.data.code == 0) {
+          Toast('提交成功，请等待审核');
+          console.log(res.data.data);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        Toast('系统繁忙请稍后再试');
+      });
     },
     isNull(value) {  
       let flag = false;   
@@ -251,12 +290,22 @@ export default {
     }
   },
   created() {
+    for(var key in this.newUserInfo) {
+      this[key] = this.newUserInfo[key]
+    }
+    if(this.$route.query.address) {
+      let adr = this.$route.query;
+      this.address = adr.Province + adr.City + adr.county + adr.address;
+      this.locationX = adr.lng,
+      this.locationY = adr.lat,
+      this.city = adr.City;
+      this.isSeleAdd = true;
+    }
     //获取到category的参数值
     if (this.$route.params.category) {
       this.categoryTxt = this.$route.params.category;
       this.isSelected = true;
     }
-    console.log(this.$route.params.id)
     if(this.$route.params.id) {
       this.id = this.$route.params.id;
     }
@@ -321,16 +370,22 @@ export default {
       .category_l {
         float: left;
         height: 100%;
-        width: 25%;
+        width: 23%;
         text-align: left;
       }
       .category_r {
         float: right;
         height: 100%;
-        width: 75%;
+        width: 77%;
         .category_text {
+          height: 100%;
+          width: 100%;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
           font-size: 28px;
           color: #b1b1b1;
+          text-align: left;
         }
         .category_arrow {
           width: 40px;

@@ -125,15 +125,17 @@ export default {
       let _this = this;
       this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
       .then(res => {
+        console.log(res.data);
         if(res.data.code == 0) {
-          if(res.data.data == null) {
-             _this.addShop();
+          if(res.data.data == null) {     //新用户为null
+            console.log('添加新用户');
+            _this.addShop();
           } else if(res.data.data.userType == 1 && !_this.isNull(res.data.data.mobile)) {
-            _this.$router.push({name: 'Process', params: {id: res.data.data.id}});
+            _this.searchByUserId(res.data.data.id);
           } else if(res.data.data.userType == 2 && !_this.isNull(res.data.data.mobile)) {     //商家
             _this.setshopId(res.data.data.shopId)    
             _this.getshopinfo(res.data.data.shopId)
-           _this.$router.push({name: 'Home'});
+            _this.$router.push({name: 'Home'});
           }
         }
       })
@@ -164,12 +166,20 @@ export default {
       })
     },
     searchByUserId(id) {     //判断商家是否在审核中
-      //url:'shopEnter/searchByUserId'
+      let _this = this;
       this.$axios.get('/api/app/shopEnter/searchByUserId?userId=' + id)
       .then((res) => {
         console.log(res);
         if(res.data.code == 0){
-          
+          //0待审核  1审核通过  2审核不通过
+          let status = res.data.data.status;
+          if(status == 0) {
+            _this.$router.push({name: 'Examine', params: {status: status}});
+          } else if(status == 1) {
+            _this.$router.push({name: 'Examine', params: {status: status}});
+          } else if(status == 2) {
+            _this.$router.push({name: 'Examine', params: {status: status}});
+          }
         }
       })
     }
