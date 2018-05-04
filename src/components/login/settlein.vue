@@ -11,10 +11,9 @@
     </div>
     <p class="form_title">商户信息</p>
     <div class="form">
-        <mt-field label="申请人" placeholder="输入申请人姓名" v-model="username"></mt-field>
+        <mt-field label="申请人" placeholder="输入申请人姓名" v-model="userName"></mt-field>
         <mt-field label="联系方式" placeholder="输入手机或电话号码" type="tel" v-model="phone"></mt-field>
-        <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopname"></mt-field>
-        <!-- <mt-field label="详细地址" placeholder="定位选择详细地址" type="number" v-model="address"></mt-field> -->
+        <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopName"></mt-field>
         <div class="category clearfix">
           <router-link :to="{path:'shopMap',query:{'ind':'1'}}">
             <div class="category_l">详细地址</div>
@@ -72,11 +71,8 @@
           <mt-button type="default">《享7商家服务协议》</mt-button>
         </router-link>
       </div>
-      <div class="submit_btn">
-        <!-- <span>提交申请</span> -->
-        <router-link to="examine">
-            <mt-button type="default">提交申请</mt-button>
-        </router-link>
+      <div class="submit_btn" @click="submitForm">
+        <mt-button type="default">提交申请</mt-button>
       </div>
       <p>入驻过程如有问题可拨打400-100-111</p>
     </div>
@@ -86,17 +82,20 @@
 import Vue from "vue";
 import axios from "axios";
 import qs from "qs";
-import { Field } from "mint-ui";
+import { Field, Toast } from "mint-ui";
 Vue.component(Field.name, Field);
 export default {
   name: "Settle",
   data() {
     return {
-      username: "",
+      id: "",
+      userName: "",
       phone: "",
-      shopname: "",
+      shopName: "",
       address: "",
-      type: "",
+      locationX: "",
+      locationY: "",
+      city: "",
       categoryTxt: "选择经营品类",
       isSelected: false, //是否选择经营品类
       licenseUrl: "../../../static/images/add.png",
@@ -105,7 +104,7 @@ export default {
     };
   },
   methods: {
-    cateSlide() {
+    cateSlide() {     //跳转选择经营品类
       if (this.isSelected) {
         this.$router.push({
           name: "Category",
@@ -115,7 +114,7 @@ export default {
         this.$router.push({ name: "Category" });
       }
     },
-    getFile: function(e) {
+    getFile: function(e) {      //上传图片
       let _this = this,
         inputDOM = {};
       console.log(e);
@@ -145,14 +144,12 @@ export default {
       let form = new FormData();
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
-      this.$axios
-        .post("/api/app/img/upload", form)
+      this.$axios.post("/api/app/img/upload", form)
         .then(res => {
           if(res.data.code != 0) {
             Toast('系统繁忙请稍后再试');
             return false;
           }
-          console.log(res.data.data.smallPicUrl);
           if (e == 1) {
             _this.licenseUrl = res.data.data.smallPicUrl;
           } else if (e == 2) {
@@ -162,11 +159,10 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
           Toast('系统繁忙请稍后再试');
         });
     },
-    imgPreview(file) {
+    imgPreview(file) {       //图片预览
       let _this = this;
       // 看支持不支持FileReader
       if (!file || !window.FileReader) return;
@@ -182,8 +178,76 @@ export default {
         };
       }
     },
-    addMap() {
+    addMap() {     //跳转至地图定位页面
       this.$router.push({ name: "ShopMap" });
+    },
+    submitForm() {    //提交表单
+      if(this.isNull(this.userName)) {
+        Toast('请输入姓名');
+        return false;
+      }
+      if(this.isNull(this.phone)) {
+        Toast('请输入联系方式');
+        return false;
+      }
+      if(this.isNull(this.shopName)) {
+        Toast('请输入店铺名称');
+        return false;
+      }
+      // if(this.isNull(this.address)) {
+      //   Toast('请输入详细地址');
+      //   return false;
+      // }
+      if(this.isNull(this.categoryTxt)) {
+        Toast('请输入经营品类');
+        return false;
+      }
+      if(this.isNull(this.licenseUrl)) {
+        Toast('请上传营业执照');
+        return false;
+      }
+      if(this.isNull(this.healthUrl)) {
+        Toast('请上传卫生许可证');
+        return false;
+      }
+      if(this.isNull(this.ShopPhotoUrl)) {
+        Toast('请上传门头照');
+        return false;
+      }
+      let _parms = {
+        userName: this.userName,
+        mobile: this.phone,
+        shopName: this.shopName,
+        address: this.address,
+        businessCate: this.categoryTxt,
+        licensePic: this.licenseUrl,
+        healthPic: this.healthUrl,
+        doorPic: this.ShopPhotoUrl,
+        locationX: this.locationX,
+        locationY: this.locationY,
+        city: this.city,
+        userId: this.id
+      }
+      console.log(_parms);
+      // this.$axios.post("/api/app/shopEnter/add", qs.stringify(_parms))
+      // .then(res => {
+      //   if(res.data.code != 0) {
+      //     Toast('系统繁忙请稍后再试');
+      //     return false;
+      //   }
+      //   console.log(res);
+      // })
+      // .catch(err => {
+      //   console.log(err);
+      //   Toast('系统繁忙请稍后再试');
+      // });
+    },
+    isNull(value) {  
+      let flag = false;   
+      if(value == 'null' || value == null || value == '' || value == undefined || value == []) {
+        flag = true;
+      }
+      return flag;
     }
   },
   created() {
@@ -191,6 +255,10 @@ export default {
     if (this.$route.params.category) {
       this.categoryTxt = this.$route.params.category;
       this.isSelected = true;
+    }
+    console.log(this.$route.params.id)
+    if(this.$route.params.id) {
+      this.id = this.$route.params.id;
     }
   }
 };

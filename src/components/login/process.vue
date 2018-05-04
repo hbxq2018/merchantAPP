@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="enterBox">
-                <router-link to="settlein">
+                <router-link :to="{name: 'Settlein', params: {id: id}}">
                     <span>立即入驻</span>
                 </router-link>
             </div>
@@ -32,11 +32,15 @@ export default {
   data(){
       return {
         global: this.GLOBAL,
-        msg:'process'
+        id: ""
       }
   },
-  created:function(){
-      console.log("global:",this.global)
+  created(){
+    //获取到id的参数值
+    console.log(this.$route.params.id)
+    if(this.$route.params.id) {
+      this.id = this.$route.params.id;
+    }
   }
 }
 </script>

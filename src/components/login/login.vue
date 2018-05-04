@@ -111,7 +111,6 @@ export default {
       value = value.substring(0, value.length-1);
       this.$axios.get('/api/app/sms/isVerifyForShopApp?' + value, qs.stringify(_parms))
       .then(res => {
-        console.log(res.data.data);
         if(res.data.data == 0) {
           _this.signIn();
         } else {
@@ -123,17 +122,31 @@ export default {
       })
     },
     signIn() {         //商家注册
-    let _this = this;
+      let _this = this;
       this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
       .then(res => {
         if(res.data.code == 0) {
-          if(res.data.data == null || (res.data.data.userType == 1 && !_this.isNull(res.data.data.mobile))) {
-            _this.$router.push({name: 'Process', params: {id: '1'}});
+          if(res.data.data == null) {
+             _this.addShop();
+          } else if(res.data.data.userType == 1 && !_this.isNull(res.data.data.mobile)) {
+            _this.$router.push({name: 'Process', params: {id: res.data.data.id}});
           } else if(res.data.data.userType == 2 && !_this.isNull(res.data.data.mobile)) {     //商家
             _this.setshopId(res.data.data.shopId)    
             _this.getshopinfo(res.data.data.shopId)
-           _this.$router.push({name: 'Home', params: {id: '2'}});
+           _this.$router.push({name: 'Home'});
           }
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    addShop() {      //添加商户
+      let _this = this, _parms = {mobile: this.telephone};
+      this.$axios.post('/api/app/user/addShopAppUser', qs.stringify(_parms))
+      .then(res => {
+        if(res.data.code == 0) {
+          _this.$router.push({name: 'Process', params: {id: res.data.data}});
         }
       })
       .catch(err => {
@@ -146,6 +159,16 @@ export default {
         if(res.data.code ==  '0'){
           let data = res.data.data;
           this.setuserInfo(data)
+        }
+      })
+    },
+    searchByUserId(id) {     //判断商家是否在审核中
+      //url:'shopEnter/searchByUserId'
+      this.$axios.get('/api/app/shopEnter/searchByUserId?userId=' + id)
+      .then((res) => {
+        console.log(res);
+        if(res.data.code == 0){
+          
         }
       })
     }

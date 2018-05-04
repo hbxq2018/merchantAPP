@@ -76,6 +76,7 @@
     methods: {
       ...mapMutations(['setuserInfo']),
       init: function () {
+        let _this = this;
         map = new AMap.Map('container', {
           center: [114.367237,30.571349],
           resizeEnable: true,
@@ -103,8 +104,9 @@
           map.addControl(geolocation)
           geolocation.getCurrentPosition()
           AMap.event.addListener(geolocation, 'complete', (result) => {
-            this.obj.lng = result.position.getLng();//定位成功返回的经度
-            this.obj.lat = result.position.getLat();//定位成功返回的纬度
+            console.log(result.position.getLng())
+            _this.obj.lng = result.position.getLng();//定位成功返回的经度
+            _this.obj.lat = result.position.getLat();//定位成功返回的纬度
             let arr =[];
             arr.push(result.position.getLng())
             arr.push( result.position.getLat())
@@ -125,11 +127,11 @@
           })  //  返回定位出错信息
         })
         AMap.event.addListener(map, 'click', (result) => {
-            this.obj.lng = result.lnglat.lng;
-            this.obj.lat = result.lnglat.lat;
+            _this.obj.lng = result.lnglat.lng;
+            _this.obj.lat = result.lnglat.lat;
             let arr =[];
-            arr.push(this.obj.lng )
-            arr.push(this.obj.lat)
+            arr.push(_this.obj.lng )
+            arr.push(_this.obj.lat)
              if (marker) {
                 marker.setMap(null);
                 marker = null;
@@ -171,7 +173,7 @@
             let _address = _obj.Province+_obj.City+_obj.county+_obj.address;
             let address = _address +'/'+'address'
             this.setuserInfo(address)
-            this.formdata[3].value = _address;
+            // this.formdata[3].value = _address;
           }
           if(_obj.lat){
             let locationY = _obj.lat +'/'+'locationY'
