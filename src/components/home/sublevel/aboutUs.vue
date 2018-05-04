@@ -8,7 +8,7 @@
         </div>
         <div class="Our_information" v-for="(item,index) in data1" :key='index'>
             <div class="Information_details">
-                <b>{{item.name}}</b>
+                <p>{{item.name}}</p>
                 <span>{{item.heEntityName}}</span>
             </div>
         </div>
@@ -34,10 +34,10 @@ export default {
                 heEntityName:'享7美食'
             },{
                 name:'商务合作',
-                heEntityName:'xiangqi2018boss@163.com'
+                heEntityName:'xiangqikeji2018@163.com'
             },{
                 name:'官方网站',
-                heEntityName:'xxx.xiangqi.com'
+                heEntityName:'http://www.xiang7.net'
             },{
                 name:'检查更新',
                 heEntityName:'当前最新版本'
@@ -75,6 +75,8 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                font-size: 30px;
+                color: #191919;
                 b{
                     font-size: 36px;
                     font-weight: 550;

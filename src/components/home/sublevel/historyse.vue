@@ -9,12 +9,12 @@
     </mt-header>
 
     <div class="history_money">
-        <b><em>{{time | formatDate}}</em>月应供服务费</b>
+        <b><em>{{time | formatDate}}</em>月应缴服务费</b>
         <span>&yen;{{dataarr.totalService}}</span>
         <P>打款日:次月5号</P>
     </div>
     <div class="data_statistics">
-        <p><span>4</span><span>月已核销</span><span>{{totalQuantity.length}}</span>张代金券，总额度<span>{{totle}}</span>元</p>
+        <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{totalQuantity.length}}</span>张代金券，总额度<span>{{totle}}</span>元</p>
     </div>
     <div class="order_history" v-for="(item,index) in totalQuantity" :key="index">
         <div class="order_h_sublevel">
@@ -83,10 +83,11 @@ export default {
     }
     this.$axios.get('/api/app/hx/list?'+parms)
     .then((res) => {
+        console.log("res:",res)
        this.dataarr= res.data.data.list[0];
        this.totalQuantity = res.data.data.list;
         this.totalQuantity =  this.totalQuantity.slice(1, this.totalQuantity.length)
-        // console.log("totalQuantity:",this.totalQuantity)
+        console.log("totalQuantity:",this.totalQuantity)
        for(let i=0;i<this.totalQuantity.length;i++){
            this.totle += (this.totalQuantity[i].couponAmount)*1;
        }

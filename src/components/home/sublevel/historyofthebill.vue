@@ -6,7 +6,6 @@
           <div class="check_top">
             <div class="check_top_time"><span>{{time | formatDate}}</span>年</div>
           </div>
-          <!-- :to="{path:'detailsSon',query:{'ind':3}}" -->
           <div class="check_center" v-for="(itemes,index) in item.data1" :key="index" :id="index" @click="particularsDetails(itemes)">
             <div class="checkCtSublevel">
               <div class="roder_left">
@@ -122,10 +121,7 @@ export default {
     // router
     particularsDetails: function( item ) {
       console.log("this is item " , item)
-      // const menstrualID = e.currentTarget.id;
-      // this.$router.push("/detailsSon");
       this.$router.push(`/detailsSon/${ item.time }`)
-      
     },
   },
   created:function(){
