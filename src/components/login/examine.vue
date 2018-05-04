@@ -3,7 +3,7 @@
     <img class="examine_img" :src="examineImg" alt="">
     <p class="examine_state">{{msg}}</p>
     <p :hidden="status != 0">审核时间：预计2-3个工作日内</p>
-    <div class="examine_btn" :class="colorBtn" :hidden="status == 2">
+    <div class="examine_btn" :class="colorBtn" :hidden="status == 0">
         <router-link :to="toHref">
             <mt-button type="default">{{btnTxt}}</mt-button>
         </router-link>
@@ -27,7 +27,7 @@ export default {
   created() {
       this.status = this.$route.params.status;
       console.log(this.status)
-      if(this.status == 2) {
+      if(this.status == 0) {
           this.msg = "入驻审核中";
           this.examineImg = "../../../static/images/wait.png";
           this.colorSit = "";
@@ -39,7 +39,7 @@ export default {
           this.colorBtn = "pass";
           this.toHref = "home";
           this.btnTxt = "进入店铺";
-      } else if(this.status == 0) {
+      } else if(this.status == 2) {
           this.msg = "审核没有通过";
           this.examineImg = "../../../static/images/noPass.png";
           this.colorSit = "nopass";
