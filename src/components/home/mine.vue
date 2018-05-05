@@ -1,8 +1,8 @@
 <template>
   <div class="mine">
       <div class="mine_top">
-          <img class="u_img" :src="data.iconUrl" alt="用户头像">
-          <p class="u_name">{{data.nickName}}</p>
+          <img class="u_img" :src="userInfo.logoUrl" alt="用户头像">
+          <p class="u_name">{{userInfo.shopName}}</p>
       </div>
        <div class="list_ontrol" v-for="(item,index) in dataOne" :id="index" :key='index' @click="WeIntroduce">
           <div class="list_left">
@@ -21,6 +21,8 @@
 <script>
 import GLOBAL from '../../../untils/config/config';
 import { MessageBox } from 'mint-ui';
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   name:'Mine',
   data(){
@@ -49,7 +51,12 @@ export default {
           ]
       }
   },
+  store,
+  computed:{
+     ...mapState(['userInfo','shopId']),
+  },
   methods:{
+      ...mapMutations(['setuserInfo']),
       close:function(){
         MessageBox({
         title: '提示',
@@ -65,12 +72,10 @@ export default {
               this.$router.push('/historyse')
           }else if(listBoxID ==1){
               window.location.href="tel:027-59728120"
-                console.log("拨打:","拨打电话成功")
           }
       }
   },
   created:function(){ //请求接口
-    console.log("GLOBAL_API_DOMAIN:",this.API)
     if(!this.data.id){  //如果有数据，则不用再次请求
         let mobile = '15827245422';
         this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)

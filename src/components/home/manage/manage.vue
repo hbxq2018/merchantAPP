@@ -198,7 +198,6 @@ export default {
       }
     },
     getWritelist:function(val){  //获取核销员列表
-      // let shopId = '144'
       this.$axios.post('/api/app/user/listForShopId?shopId='+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){

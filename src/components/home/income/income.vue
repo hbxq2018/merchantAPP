@@ -29,20 +29,20 @@
         </div>
         <div class="income_banner">
             <div class="income_banner_data">
-                <p class="income_data_num">￥909</p>
+                <p class="income_data_num">￥{{totalPrice}}</p>
                 <p>营业额</p>
             </div>
             <div class="income_banner_data">
-                <p class="income_data_num">9</p>
+                <p class="income_data_num">{{total}}</p>
                 <p>核销券数</p>
             </div>
         </div>
         <div class="income_operate">
             <div class="income_operate_result">
-                <p>2018-04</p>
+                <p>{{start}} -- {{end}}</p>
                 <p>
-                    <span>营业额：￥30215.50</span>
-                    <span>核销券数：286张</span>
+                    <span>营业额：￥{{totalPrice}}元</span>
+                    <span>核销券数：{{total}}张</span>
                 </p>
             </div>
             <div class="income_operate_time" @click="turnmore(2)">
@@ -51,18 +51,18 @@
         </div>
         <div class="income_list">
             <ul>
-                <li class="income_li">
+                <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
                     <div class="income_li_l">
                         <div class="face_value">
-                            10元
+                            {{item.couponAmount}}元
                         </div>
                     </div>
                     <div class="income_li_r">
                         <div class="income_amount">
                             <p>消费金额</p>
-                            <p>￥122</p>
+                            <p>￥{{item.paidAmount}}</p>
                         </div>
-                        <div class="income_date">2018-04-18 12:45:23</div>
+                        <div class="income_date">{{item.updateTime}}</div>
                     </div>
                 </li>
             </ul>
@@ -85,6 +85,8 @@
 import Vue from "vue"
 import { DatetimePicker,Toast } from 'mint-ui';
 Vue.component(DatetimePicker.name, DatetimePicker);
+import store from '@/vuex/store'
+import {mapState,mapMutations} from 'vuex';
 export default {
   name: "Income",
   data() {
@@ -92,6 +94,7 @@ export default {
         start:'',
         end:'',
         actval:'',
+        total:'',
         pickerValue:'',
         Visible:true,
         ismore:false,
@@ -106,15 +109,29 @@ export default {
             },{
                 title:'15日'
             }
-        ]
+        ],
+        votes:[],
+        totalPrice:''
     }
   },
   created: function() {
+    let _data = new Date();
+    let year = _data.getFullYear();
+    let month = _data.getMonth()+1;
+    let day = _data.getDate();
+    let _start = year+'/'+month+'/'+1;
+    let _end = year+'/'+month+'/'+day;
+    this.start=_start;
+    this.end=_end;
+    this.getdata('val',_start,_end)
     this.actday = this.days[0].title;
+  },
+  store,
+  computed:{
+    ...mapState(['shopId']),
   },
   methods: {
       openPicker(val) {
-          console.log("val:",val)
         this.actval = val;
         this.$refs.picker.open();
       },
@@ -133,12 +150,12 @@ export default {
       setdate:function(val){
           if(val){
             let arr = val.split('/');
-            console.log('arr:',arr)
             return arr[0]+'年'+arr[1]+'月'+arr[2]+'日'
           }
       },
       close:function(){
-          console.log("close")
+          this.start='';
+          this.end='';
       },  
       cfrm:function(){
           if(this.start && this.end){
@@ -147,7 +164,7 @@ export default {
             _start = _start.getTime();
             _end = _end.getTime();
             if(_end>_start){
-                console.log(this.start,this.end)
+                this.getdata('val',this.start,this.end)
             }else{
                 Toast('结束时间不能小于开始时间');
             }
@@ -160,7 +177,6 @@ export default {
           if(val == 1){
               this.isselectday = true;
           }else if(val ==2){
-              console.log('ww22')
               this.isselecttime = true;
               this.pickerVisible = true;
           }
@@ -170,8 +186,71 @@ export default {
           this.isselectday = false;
           this.isselecttime = false;
       },
+      getliid:function(e){
+          let id =  e.currentTarget.id;
+          this.$router.push({name: 'Writeoff',params:{id:id}});
+      },
       selectday:function(e){
           this.actday = e.currentTarget.id;
+          let _date = new Date();
+          _date = _date.getTime();
+          let _deff = 60*60*24*1000;
+          if(this.actday == '今日'){
+            _date -= _deff*1;
+            _date = new Date(_date);
+            this.getdata(_date);
+          }else if(this.actday == '7日'){
+            _date -= _deff*7;
+            _date = new Date(_date);
+            this.getdata(_date);
+          }else if(this.actday == '15日'){
+            _date -= _deff*15;
+            _date = new Date(_date);
+            this.getdata(_date);
+          }
+      },
+      getdata:function(val,start,end){
+        let _begainTime = '',_endTime='';
+        if(start && end){
+            _begainTime = start;
+            _endTime = end;
+        }else{
+            let year = val.getFullYear();
+            let month = val.getMonth()+1;
+            let day = val.getDate();
+             _begainTime = year+'/'+month+'/'+day;
+            let endTime = new Date();
+            let endyear = endTime.getFullYear();
+            let endmonth = endTime.getMonth()+1;
+            let endday = endTime.getDate();
+            _endTime = endyear+'/'+endmonth+'/'+endday;
+            this.start=_begainTime;
+            this.end=_endTime;
+        }
+        
+        let obj = {
+          shopId:this.shopId,
+          begainTime:_begainTime,
+          endTime:_endTime
+        }
+        let _value='';
+        for(var key in obj) {
+          _value += key + '=' + obj[key] + '&';
+        }
+        _value = _value.substring(0, _value.length-1);
+        this.$axios.get('/api/app/hx/list?'+_value)
+        .then((res) => {
+            if(res.data.code ==  '0'){
+                let _data = res.data.data;
+                this.total = _data.total;
+                if(_data.list){
+                    this.totalPrice=_data.list[0].totalPrice
+                    let data = _data.list;
+                    let arr= data.splice(0,1);
+                    this.votes = data;  
+                }
+            }
+        })
       }
   }
 };

@@ -5,67 +5,67 @@
             <mt-button icon="back"></mt-button>
         </router-link>
       </mt-header>
-      <div class="detailsSon_top">
-          <p>{{data.times}}</p>
-          <span>本月服务费：<em>&yen;{{data.money}}</em></span>
-          <img src="../../../../static/images/murcielagoimg.png" alt="赞图标">
-      </div>
-      <div class="murcielago">
-          <p>本月已核销<span>342432</span>张代金券，总额度<span>244.50</span>元</p>
-      </div>
-      <div class="order_history" v-for="(item,index) in writedata" :key="index">
-        <div class="order_h_sublevel">
-            <div class="roder_left">
-                <b>{{item.mianzhi}}<span>元代金券</span></b>
-                <p>{{item.time}}<span>{{item.time1}}</span></p>
-            </div>
-            <div class="roder-right">
-                <span>&yen;{{item.renminbi}}</span>
+      <div v-if="!first.totalService" class="nodata">本月没有产生服务费</div>
+      <div v-else>
+        <div class="detailsSon_top">
+            <p>{{payment}}</p>
+            <span>本月服务费：<em>&yen;{{first.totalService}}</em></span>
+            <img src="../../../../static/images/murcielagoimg.png" alt="赞图标">
+        </div>
+        <div class="murcielago">
+            <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
+        </div>
+        <div class="order_history" v-for="(item,index) in writedata" :key="index">
+            <div class="order_h_sublevel">
+                <div class="roder_left">
+                    <b>{{item.couponAmount}}<span>元代金券</span></b>
+                    <p>{{item.updateTime}}</p>
+                </div>
+                <div class="roder-right">
+                    <span>&yen;{{item.couponAmount/10}}</span>
+                </div>
             </div>
         </div>
-    </div>
+     </div>
   </div>
 </template>
 
 <script>
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
-  name: "Manage",
   data() {
-    return {
-      data:{
-          times:'本月已缴清',
-          money:'244.50',
-      },
-      writedata: [
-        {
-          mianzhi:'10',
-          time:'2018-4-22',
-          time1:'13:14:02',
-          renminbi:'1.00'
-        },
-        {
-          mianzhi:'10',
-          time:'2018-4-22',
-          time1:'13:14:02',
-          renminbi:'1.00'
-        },
-        {
-          mianzhi:'10',
-          time:'2018-4-22',
-          time1:'13:14:02',
-          renminbi:'1.00'
-        },
-      ]
-    };
-  },
-  created:function(){
-        // if(this.$route.query.ind == '2'){
-        //     // this.ismenu= false;
-        // }
+        return {
+            payment:'',
+            total:'',
+            first:{},
+            writedata: []
+        }
+    },
+    store,
+    computed:{
+        ...mapState(['shopId']),
+        name(){
+            return `${ this.$route.params.year }年${ this.$route.params.time }月账单详情`
+        }
+    },
+    comments:{
+        
+    },
+    created:function(){
+        let _data = this.$route.params;
+        let year = _data.year;
+        let mon =_data.time;
+        let begain = year+'/'+mon+'/'+1;
+        let end = year+'/'+(mon*1+1)+'/'+1;
+        if(_data.time == 12){
+            begain = year+'/'+mon+'/'+1;
+            end = (year*1+1)+'/'+1+'/'+1;
+        }
         let obj = {
-            shopId:"1",
-            begainTime:"2018/4/27",
-            endTime:"2018/4/1"
+            shopId:this.shopId,
+            begainTime:begain,
+            endTime:end
         }
         let parms='',value='';
             for(var key in obj) {
@@ -74,14 +74,18 @@ export default {
             value=''
         }
         this.$axios.get('/api/app/hx/list?'+parms)
-        .then((response) => {
+        .then((res) => {
+            if(res.data.code == 0){
+                this.total = res.data.data.total;
+                if(res.data.data.list){
+                  let _data = res.data.data.list;
+                  this.first = _data[0];
+                  _data = _data.slice(1,_data.length);
+                  this.writedata = _data;  
+                }
+            }
         })
     },
-    computed:{
-        name(){
-            return `2018年${ this.$route.params.month }月账单详情`
-        }
-    }
 }
 </script>
 
@@ -90,6 +94,12 @@ export default {
         width: 100%;
         height: 100%;
         background: #EBEBEB;
+        .nodata{
+            margin-top: 80px;
+            text-align: center;
+            color: red;
+            font-size: 35px;
+        }
         .detailsSon_top{
             width: 100%;
             height: 224px;

@@ -8,13 +8,13 @@
 			<form class="login_form">
 				<div class="login_form_tele">
 					<input type="text" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
-					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
+					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click.stop="securityCode">{{veridyBtn}}</button>
 				</div>
 				<div class="login_form_code">
 					<input type="text" class="login_form_inp" placeholder="请输入验证码" v-model="password">
 				</div>
 				<div class="login_form_btn">
-					<button type="button" @click="verification"></button>
+					<button type="button" @click="verification">提交</button>
 				</div>
 			</form>
 			<div class="othor_login">
@@ -75,6 +75,7 @@ export default {
             let minutes = "", senconds = "", countdown = 600;
             _this.timeFlag = false;
             _this.verifyCode = data.data.verifyId;
+            console.log(data.data.verifyId)
             let timer = setInterval(() => {
               countdown--;
               if(countdown == 0) {
@@ -248,6 +249,9 @@ export default {
           height: 90px;
           line-height: 90px;
           font-size: 24px;
+          z-index: 5;
+          background:none;
+          border: none;
         }
         .securityCode.active {
           color: #b1b1b1;

@@ -4,16 +4,16 @@
         <mt-button icon="back"></mt-button></router-link></mt-header>
         <div class="top_distance" v-for="(item,index) in data" :key="index">
           <div class="check_top">
-            <div class="check_top_time"><span>{{time | formatDate}}</span>年</div>
+            <div class="check_top_time"><span>{{item.time}}</span>年</div>
           </div>
-          <div class="check_center" v-for="(itemes,index) in item.data1" :key="index" :id="index" @click="particularsDetails(itemes)">
+          <div class="check_center" v-for="(item,index) in item.data1" :key="index" @click="particularsDetails(item)">
             <div class="checkCtSublevel">
               <div class="roder_left">
-                  <b>{{itemes.time}}<span>月账单</span></b>
-                  <p>&yen;{{itemes.money}}</p>
+                  <b>{{item.time}}<span>月账单</span></b>
+                  <p>&yen;{{item.money}}</p>
               </div>
               <div class="roder-right">
-                  <span>{{itemes.state}}</span>
+                  <span>{{item.state}}</span>
                   <img src="../../../../static/images/home_arrow.png" alt="账单详情图标">
               </div>
             </div>
@@ -25,6 +25,8 @@
 <script>
 import {formatDate} from '../../../../untils/util';
 import { InfiniteScroll } from 'mint-ui';
+import store from '@/vuex/store'
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   name: "billCheck",
   data() {
@@ -32,24 +34,28 @@ export default {
       time:'',
       data: [
         {
-          time: "2017",
+          time: "2018",
           data1: [
             {
+              year:'2018',
               time: "4",
               money: "224.50",
               state: "详情"
             },
             {
+              year:'2018',
               time: "5",
               money: "224.50",
               state: "详情"
             },
             {
+              year:'2018',
               time: "6",
               money: "224.50",
               state: "详情"
             },
             {
+              year:'2018',
               time: "7",
               money: "224.50",
               state: "详情"
@@ -117,21 +123,25 @@ export default {
             return mon;
         },
     },
+    store,
+  computed:{
+    ...mapState(['userInfo','shopId']),
+  },
   methods: {
-    // router
-    particularsDetails: function( item ) {
+    particularsDetails: function(item) {
       console.log("this is item " , item)
-      this.$router.push(`/detailsSon/${ item.time }`)
+      this.$router.push({name: 'DetailsSon',params:item});
     },
   },
   created:function(){
     var date = new Date();
-    let _data = formatDate(date, 'yyyy')
-    console.log("年份:",_data)
+    let _data = formatDate(date, 'yyyy/mm/dd')
+    let arr = this.userInfo.createTime.split(' ');
+    let _begain = arr[0];
     let obj = {
-      shopId:"1",
-      begainTime:"2018/1/1",
-      endTime:"2018/12/31"
+      shopId:this.shopId,
+      begainTime:_begain,
+      endTime:_data
     }
     let parms='',value='';
     for(var key in obj) {
@@ -140,8 +150,8 @@ export default {
       value=''
     }
     this.$axios.get('/api/app/hx/list?'+parms)
-    .then((response) => {
-       console.log(response)
+    .then((res) => {
+       console.log(res)
     })
    
   }

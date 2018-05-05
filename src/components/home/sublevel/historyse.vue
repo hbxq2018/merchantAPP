@@ -1,8 +1,7 @@
 <template>
   <div class="payment">
-    <mt-header fixed :title="name">
+    <mt-header fixed title="缴费服务">
         <router-link slot="left" :to="{path:'home',query:{'ind':index}}">
-             
             <mt-button icon="back"></mt-button>
         </router-link>
         <mt-button slot="right" @click="billCheck">历史账单</mt-button>
@@ -14,7 +13,7 @@
         <P>打款日:次月5号</P>
     </div>
     <div class="data_statistics">
-        <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{totalQuantity.length}}</span>张代金券，总额度<span>{{totle}}</span>元</p>
+        <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
     </div>
     <div class="order_history" v-for="(item,index) in totalQuantity" :key="index">
         <div class="order_h_sublevel">
@@ -38,15 +37,15 @@ import { MessageBox } from "mint-ui";
 import axios from 'axios';
 import qs from 'qs';
 import config from '../../../../untils/config/config';
+import store from '@/vuex/store';
+import {mapState,mapMutations,mapGetters} from 'vuex';
 export default {
     name:'Payment',
     data(){
         return{
-            totle:0,
             index:2,
-            msg:'payment',
-            name: "缴费服务",
-            dataarr:[],
+            dataarr:{},
+            total:'',
             totalQuantity:[],
             time:'',
         }
@@ -59,6 +58,10 @@ export default {
             return mon;
         },
     },
+    store,
+    computed:{
+        ...mapState(['userInfo','shopId']),
+    },
     methods:{
         practical:function(val){
             return val/10
@@ -68,12 +71,16 @@ export default {
         },
     },
     created:function(){
-    var date = new Date();
-    let _data = formatDate(date, 'yyyy/MM/dd')
+    let date = new Date();
+    let _endTime = formatDate(date, 'yyyy/MM/dd')
+    let begain = formatDate(date, 'yyyy/MM/dd')
+    let _arr = begain.split('/')
+    _arr[2]='1'
+    let _begainTime = _arr.join("/");
     let obj = {
-      shopId:75,
-      begainTime:"2018/3/1",
-      endTime:_data
+      shopId:this.shopId,
+      begainTime:_begainTime,
+      endTime:_endTime
     }
     let parms='',value='';
     for(var key in obj) {
@@ -83,14 +90,13 @@ export default {
     }
     this.$axios.get('/api/app/hx/list?'+parms)
     .then((res) => {
-        console.log("res:",res)
-       this.dataarr= res.data.data.list[0];
-       this.totalQuantity = res.data.data.list;
-        this.totalQuantity =  this.totalQuantity.slice(1, this.totalQuantity.length)
-        console.log("totalQuantity:",this.totalQuantity)
-       for(let i=0;i<this.totalQuantity.length;i++){
-           this.totle += (this.totalQuantity[i].couponAmount)*1;
-       }
+        let _data = res.data.data;
+        if(_data.list){
+            this.dataarr= _data.list[0];
+            this.total = _data.total;
+            this.totalQuantity = _data.list;
+            this.totalQuantity =  _data.list.slice(1, _data.list.length);
+        }
     })
   }
 }

@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/login/login'
 import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
+import Writeoff from '@/components/home/income/writeoff'
 import Process from '@/components/login/process'
 import Settlein from '@/components/login/settlein'
 import ShopMap from '@/components/login/shopMap'
@@ -88,6 +89,11 @@ export default new Router({
       name: 'Income',
       component: Income
     },
+    {
+      path: '/writeoff',
+      name: 'Writeoff',
+      component: Writeoff
+    },
     { //我的页面-->关于我们
       path: '/aboutUs',
       name: 'AboutUs',
@@ -104,7 +110,7 @@ export default new Router({
       component: Historyofthebill
     },  
     { //我的页面-->历史账单详情
-      path: '/detailsSon/:month',
+      path: '/detailsSon',
       name: 'DetailsSon',
       component: DetailsSon
     },
