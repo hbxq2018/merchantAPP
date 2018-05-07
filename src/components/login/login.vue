@@ -14,7 +14,7 @@
 					<input type="text" class="login_form_inp" placeholder="请输入验证码" v-model="password">
 				</div>
 				<div class="login_form_btn">
-					<button type="button" @click="verification">提交</button>
+					<button type="button" @click="verification"></button>
 				</div>
 			</form>
 			<div class="othor_login">
@@ -68,6 +68,7 @@ export default {
         let _parms = {
           shopMobile: this.telephone
         };
+        // this.$GLOBAL.API  <==>  /api/
         this.$axios.post('/api/app/sms/sendForShopAppRegister', qs.stringify(_parms))
         .then(res => {
           let data = res.data;

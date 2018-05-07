@@ -31,6 +31,9 @@
         scan = new plus.barcode.Barcode('bcid');
         scan.onmarked = onmarked;
         function onmarked(type, result, file) {
+          console.log(type)
+          console.log(result)
+          console.log(file)
           switch (type) {
             case plus.barcode.QR:
               type = 'QR';
@@ -96,3 +99,4 @@
     }
   }
 </style>
+
