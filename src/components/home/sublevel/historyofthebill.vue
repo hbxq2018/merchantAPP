@@ -136,7 +136,9 @@ export default {
   created:function(){
     var date = new Date();
     let _data = formatDate(date, 'yyyy/mm/dd')
+    console.log('_data:',_data)
     let arr = this.userInfo.createTime.split(' ');
+    
     let _begain = arr[0];
     let obj = {
       shopId:this.shopId,
@@ -149,7 +151,7 @@ export default {
       parms+=value;
       value=''
     }
-    this.$axios.get('/api/app/hx/list?'+parms)
+    this.$axios.get('/api/hx/listAmount?'+parms)
     .then((res) => {
        console.log(res)
     })

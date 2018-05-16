@@ -5,98 +5,132 @@
       <p class="tip">...载入中...</p>
     </div>
     <footer>
-      <button @click="startRecognize">1.创建控件</button>
-      <button @click="startScan">2.开始扫描</button>
-      <button @click="cancelScan">3.结束扫描</button>
-      <button @click="closeScan">4.关闭控件</button>
+      <div class="footerleft" @click="gowrite">
+        <img src="../../../../static/images/witter.png">券码核销
+      </div>
+      <div @click="backhome"> 
+        <img src="../../../../static/images/close.png">关闭
+      </div>
     </footer>
   </div>
 </template>
 
 <script type='text/ecmascript-6'>
-  let scan = null;
-  export default {
-    name:'Scan',
-    data() {
-      return {
-        codeUrl: '',
+let scan = null;
+export default {
+  name: "Scan",
+  data() {
+    return {
+      codeUrl: "",
+      codenum: ""
+    };
+  },
+  created: function() {},
+  mounted: function() {
+    this.startRecognize();
+  },
+  methods: {
+    //创建扫描控件
+    startRecognize() {
+      let that = this;
+      if (!window.plus) return;
+      scan = new plus.barcode.Barcode("bcid");
+      scan.onmarked = onmarked;
+      that.startScan();
+      function onmarked(type, result, file) {
+        if (type == 0) {
+          let arr = result.split("/");
+          console.log("arr:", arr);
+          console.log("arr.length-1:", arr[arr.length - 1]);
+          console.log(typeof arr[arr.length - 1]);
+          if (typeof (arr[arr.length - 1] * 1) == "number") {
+            that.codenum = arr[arr.length - 1]; //获取券码
+            that.gowrite();
+          } else {
+            console.log("不是正确的券码");
+          }
+        } else {
+          console.log("请扫描二维码");
+        }
       }
     },
-    methods: {
-      //创建扫描控件
-      startRecognize() {
-        console.log('startRecognize')
-        let that = this;
-        if (!window.plus) return;
-        scan = new plus.barcode.Barcode('bcid');
-        scan.onmarked = onmarked;
-        function onmarked(type, result, file) {
-          console.log(type)
-          console.log(result)
-          console.log(file)
-          switch (type) {
-            case plus.barcode.QR:
-              type = 'QR';
-              break;
-            case plus.barcode.EAN13:
-              type = 'EAN13';
-              break;
-            case plus.barcode.EAN8:
-              type = 'EAN8';
-              break;
-            default:
-              type = '其它' + type;
-              break;
-          }
-          result = result.replace(/\n/g, '');
-          that.codeUrl = result;
-          alert(result);
-          that.closeScan();
-        }
-      },
-      //开始扫描
-      startScan() {
-        console.log('startScan')
-        if (!window.plus) return;
-        scan.start();
-      },
-      //关闭扫描
-      cancelScan() {
-         console.log('cancelScan')
-        if (!window.plus) return;
-        scan.cancel();
-      },
-      //关闭条码识别控件
-      closeScan() {
-        console.log('closeScan')
-        if (!window.plus) return;
-        scan.close();
-      },
+    
+    startScan() {//开始扫描
+      if (!window.plus) return;
+      scan.start();
+    },
+    
+    cancelScan() {//关闭扫描
+      if (!window.plus) return;
+      scan.cancel();
+      this.closeScan();
+    },
+   
+    closeScan() { //关闭条码识别控件
+      if (!window.plus) return;
+      scan.close();
+    },
+    
+    backhome() {//返回home页面
+      this.cancelScan();
+      this.$router.push({ name: "Home", params: {} });
+    },
+   
+    gowrite(){ //去核销页面
+      this.cancelScan();
+      let _parms = {}
+      if(this.codenum){
+        _parms.code=this.codenum
+      }
+      console.log('_parms:',_parms)
+      this.$router.push({ name: "Write", params:_parms });
     }
   }
+};
 </script>
 <style lang="less">
-  .scan {
-    height: 100%;
-    #bcid {
-      width: 100%;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom:3rem;
-      text-align: center;
-      color: #fff;
-      background: #ccc;
-    }
-    footer {
-      position: absolute;
-      left: 0;
-      bottom: 1rem;
-      height: 2rem;
-      line-height: 2rem;
-      z-index: 2;
-    }
+.scan {
+  height: 100%;
+  color: #fff;
+  #bcid {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 80px;
+    text-align: center;
+    color: #fff;
+    background: #ccc;
   }
+  footer {
+    position: absolute;
+    background: #242628;
+    width: 100%;
+    height: 100px;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+  }
+  footer div {
+    margin-top: 37px;
+    float: left;
+    width: 49%;
+    text-align: center;
+    height: 30px;
+    line-break: 20px;
+  }
+
+  footer img {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    top: 5px;
+  }
+  .footerleft {
+    border-right: 1px solid #fff;
+  }
+}
 </style>
 

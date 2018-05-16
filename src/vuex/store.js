@@ -5,7 +5,8 @@ Vue.use(Vuex);
 
 const state={
     shopId: '',
-    userInfo: {},
+    userInfo: {},  //此为商户信息
+    shopInfo:{},       //此为用户信息
     newUserInfo: {}
 }
 
@@ -50,6 +51,9 @@ const mutations={
     },
     setphone(state,phone){
         state.phone = phone
+    },
+    setshopInfo(state,data){
+        state.shopInfo = data
     }
 }
 

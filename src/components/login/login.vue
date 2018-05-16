@@ -7,11 +7,11 @@
 			</div>
 			<form class="login_form">
 				<div class="login_form_tele">
-					<input type="text" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
+					<input type="number" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
 					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click.stop="securityCode">{{veridyBtn}}</button>
 				</div>
 				<div class="login_form_code">
-					<input type="text" class="login_form_inp" placeholder="请输入验证码" v-model="password">
+					<input type="number" class="login_form_inp" placeholder="请输入验证码" v-model="password">
 				</div>
 				<div class="login_form_btn">
 					<button type="button" @click="verification"></button>
@@ -50,10 +50,10 @@ export default {
   },
   store,
   computed:{
-    ...mapState(['userInfo']),
+    ...mapState(['userInfo','shopInfo']),
   },
   methods: {
-    ...mapMutations(['setuserInfo','setshopId']),
+    ...mapMutations(['setuserInfo','setshopId','setshopInfo']),
     isNull(value) {  
       let flag = false;   
       if(value == 'null' || value == null || value == '' || value == undefined || value == []) {
@@ -127,8 +127,10 @@ export default {
       let _this = this;
       this.$axios.get('/api/app/user/findUserByMobile?mobile=' + this.telephone)
       .then(res => {
-        console.log(res.data);
+        console.log('res11：',res.data);
+        this.setshopInfo(res.data.data)
         if(res.data.code == 0) {
+          console.log('loginres:',res)
           if(res.data.data == null) {     //新用户为null
             console.log('添加新用户');
             _this.addShop();

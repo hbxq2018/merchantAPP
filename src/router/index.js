@@ -14,6 +14,7 @@ import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
 import Manage from '@/components/home/manage/manage'
 import Scan from '@/components/home/scan/scan'
+import Write from '@/components/home/scan/writeoff'
 import AboutUs from '@/components/home/sublevel/aboutUs'
 import Historyse from '@/components/home/sublevel/historyse'
 import Historyofthebill from '@/components/home/sublevel/historyofthebill'
@@ -43,6 +44,11 @@ export default new Router({
       path: '/scan',
       name: 'Scan',
       component: Scan
+    },
+    {
+      path: '/write',
+      name: 'Write',
+      component: Write
     },
     {
       path: '/edit',
