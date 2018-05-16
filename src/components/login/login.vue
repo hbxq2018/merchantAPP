@@ -79,7 +79,7 @@ export default {
         };
         // this.$GLOBAL.API  <==>  /api/
         this.$axios
-          .post("/api/app/sms/sendForShopAppRegister", qs.stringify(_parms))
+          .post(this.$GLOBAL.API+"/app/sms/sendForShopAppRegister", qs.stringify(_parms))
           .then(res => {
             let data = res.data;
             if (data.code == 0) {
@@ -129,7 +129,7 @@ export default {
       }
       value = value.substring(0, value.length - 1);
       this.$axios
-        .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+        .get(this.$GLOBAL.API+"/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
         .then(res => {
           if (res.data.data == 0) {
             _this.signIn();
@@ -145,7 +145,7 @@ export default {
       //商家注册
       let _this = this;
       this.$axios
-        .get("/api/app/user/findUserByMobile?mobile=" + this.telephone)
+        .get(this.$GLOBAL.API+"/app/user/findUserByMobile?mobile=" + this.telephone)
         .then(res => {
           this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -178,7 +178,7 @@ export default {
       let _this = this,
         _parms = { mobile: this.telephone };
       this.$axios
-        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
+        .post(this.$GLOBAL.API+"/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -193,7 +193,7 @@ export default {
     },
     getshopinfo: function(id) {
       //获取商家信息
-      this.$axios.get("/api/shop/get/" + id).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           console.log(data);
@@ -205,7 +205,7 @@ export default {
       //判断商家是否在审核中
       let _this = this;
       this.$axios
-        .get("/api/app/shopEnter/searchByUserId?userId=" + id)
+        .get(this.$GLOBAL.API+"/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           console.log(res);
           if (res.data.code == 0) {

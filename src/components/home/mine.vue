@@ -30,23 +30,30 @@ export default {
           API:GLOBAL.GLOBAL_API_DOMAIN,
           msg:'mine',
           data:{
-              iconUrl: "../../../static/images/aboutMe.png",
+            //   iconUrl: "../../../static/images/aboutMe.png",
+              iconUrl: require("../../../static/images/aboutMe.png"),
               nickName:'noname',
           },
           dataOne:[
             {
-                src: "../../../static/images/juan-piao.png",
+                // src: "../../../static/images/juan-piao.png",
+                src: require("../../../static/images/juan-piao.png"),
                 name:'缴费服务',
-                arrowDiagrams:"../../../static/images/home_arrow.png",
+                // arrowDiagrams:"../../../static/images/home_arrow.png",
+                arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },{
-                src: "../../../static/images/customer_service.png",
+                // src: "../../../static/images/customer_service.png",
+                src: require("../../../static/images/customer_service.png"),
                 name:'联系客服',
-                arrowDiagrams:"../../../static/images/home_arrow.png",
+                // arrowDiagrams:"../../../static/images/home_arrow.png",
+                arrowDiagrams:require("../../../static/images/home_arrow.png"),
                 tell:'027-59728176'
             },{
-                src: "../../../static/images/guanyu-wm.png",
+                // src: "../../../static/images/guanyu-wm.png",
+                src: require("../../../static/images/guanyu-wm.png"),
                 name:'关于我们',
-                arrowDiagrams:"../../../static/images/home_arrow.png",
+                // arrowDiagrams:"../../../static/images/home_arrow.png",
+                arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },
           ]
       }

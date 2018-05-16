@@ -26,10 +26,13 @@ module.exports = {
     'AMap': 'AMap'
   },
   resolve: {
+    // modules: [path.join(_dirname,'../node_modules')],
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      // 'assets': resolve('src/assets'),
+      // 'img': resolve('static/images')
     }
   },
   module: {

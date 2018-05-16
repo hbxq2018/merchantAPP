@@ -39,25 +39,29 @@ export default {
       msg: "menu",
       lidata:[
           {
-              src:'../../../static/images/scan.png',
+              // src:'../../../static/images/scan.png',
+              src:require('../../../static/images/scan.png'),
               id:'1',
               name:'扫码验证',
               con:'核销券票',
               href: '#'
           },{
-              src:'../../../static/images/orders.png',
+              // src:'../../../static/images/orders.png',
+              src:require('../../../static/images/orders.png'),
               id:'2',
               name:'营业数据',
               con:'核销记录、数据统计',
               href: 'income'
           },{
-              src:'../../../static/images/stores.png',
+              // src:'../../../static/images/stores.png',
+              src:require('../../../static/images/stores.png'),
               id:'3',
               name:'店铺管理',
               con:'更改店铺信息、员工管理',
               href: '#'
           },{
-              src:'../../../static/images/voucher.png',
+              // src:'../../../static/images/voucher.png',
+              src:require('../../../static/images/voucher.png'),
               id:'4',
               name:'享7券',
               con:'自定义满减额度',
