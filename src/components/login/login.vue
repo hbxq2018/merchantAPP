@@ -5,7 +5,7 @@
 			<div class="login_icon">
 				<img class="" src="../../../static/images/aboutMe.png" alt="" />
 			</div>
-			<form class="login_form">
+			<form class="login_form" @click="setScroll">
 				<div class="login_form_tele">
 					<input type="number" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
 					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click.stop="securityCode">{{veridyBtn}}</button>
@@ -39,6 +39,7 @@ export default {
   data() {
     return {
       API: GLOBAL.GLOBAL_API_DOMAIN,
+      screenHeight: document.body.clientHeight,
       movieArr: [],
       veridyBtn: "获取验证码",
       telephone: "", //手机号
@@ -52,6 +53,9 @@ export default {
   computed: {
     ...mapState(["userInfo", "shopInfo"])
   },
+  // created() {
+  //     var screenHeight = document.body.clientHeight;
+  // },
   methods: {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
     isNull(value) {
@@ -235,6 +239,10 @@ export default {
         name: "Author",
         params: {}
       });
+    },
+    setScroll() {
+      document.documentElement.style.height = this.screenHeight + 'px';
+      document.body.style.height = this.screenHeight + 'px';
     }
   }
 };
@@ -322,7 +330,7 @@ export default {
     }
     .othor_login {
       width: 100%;
-      position: fixed;
+      position: absolute;
       bottom: 0;
       left: 0;
       .othor_login_text {
