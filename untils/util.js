@@ -111,6 +111,17 @@ function isNull(value) {
   return true;
 }
 
+//时间间隔
+function dateConv(dateStr) {
+  console.log('dateStr:',dateStr)
+  let year = dateStr.getFullYear(),
+    month = dateStr.getMonth() + 1,
+    today = dateStr.getDate();
+  month = month > 9 ? month : "0" + month;
+  today = today > 9 ? today : "0" + today;
+  return year + "-" + month + "-" + today;
+}
+
 const methods = {
   calcDistance: calcDistance,
   transformLength: transformLength,
@@ -121,7 +132,8 @@ const methods = {
   tools: tools,
   million: million,
   getNowFormatDate: getNowFormatDate,
-  isNull: isNull
+  isNull: isNull,
+  dateConv:dateConv
 }
 
 export function formatDate (date, fmt) {

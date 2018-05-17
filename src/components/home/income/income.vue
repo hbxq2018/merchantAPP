@@ -18,8 +18,8 @@
                     <span class="stleft">选择起始时间</span>
                 </div>
                 <div class="date">
-                    <div @click.stop="openPicker(1)">开始时间：{{setdate(start)}}</div>
-                    <div @click.stop="openPicker(2)">结束时间：{{setdate(end)}}</div>
+                    <div @click.stop="openPicker(1)">开始时间：{{start}}</div>
+                    <div @click.stop="openPicker(2)">结束时间：{{end}}</div>
                 </div>
                 <div class="selbut">
                     <div class="close" @click="close">取消</div>
@@ -115,15 +115,17 @@ export default {
     }
   },
   created: function() {
-    let _data = new Date();
-    let year = _data.getFullYear();
-    let month = _data.getMonth()+1;
-    let day = _data.getDate();
-    let _start = year+'/'+month+'/'+1;
-    let _end = year+'/'+month+'/'+day;
+    let _this = this;
+    let _date = new Date();
+    
+    let _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000;
+    _start = _this.$UTILS.dateConv(new Date(_start));
+    let _end = _this.$UTILS.dateConv(_date);
+  
     this.start=_start;
     this.end=_end;
-    this.getdata('val',_start,_end)
+
+    this.getdata(_start,_end)
     this.actday = this.days[0].title;
   },
   store,
@@ -136,15 +138,13 @@ export default {
         this.$refs.picker.open();
       },
       handleConfirm(){
-          let data = this.pickerValue
-          let year = data.getFullYear();
-          let month = data.getMonth()+1;
-          let day = data.getDate();
-          let _time = year+'/'+month+'/'+day;
+          console.log('pickerValue:',this.pickerValue)
+          let _this = this;
+          let date = _this.$UTILS.dateConv(this.pickerValue);
           if(this.actval == 1){
-            this.start = _time
+            this.start = date
           }else if(this.actval ==2){
-            this.end = _time
+            this.end = date
           }
       },
       setdate:function(val){
@@ -164,7 +164,7 @@ export default {
             _start = _start.getTime();
             _end = _end.getTime();
             if(_end>_start){
-                this.getdata('val',this.start,this.end)
+                this.getdata(this.start,this.end)
             }else{
                 Toast('结束时间不能小于开始时间');
             }
@@ -191,47 +191,30 @@ export default {
           this.$router.push({name: 'Writeoff',params:{id:id}});
       },
       selectday:function(e){
+          let _this = this;
           this.actday = e.currentTarget.id;
           let _date = new Date();
-          _date = _date.getTime();
-          let _deff = 60*60*24*1000;
+          let _end = _this.$UTILS.dateConv(_date);
+          let _start='', _deff = 60*60*24*1000;
           if(this.actday == '今日'){
-            _date -= _deff*1;
-            _date = new Date(_date);
-            this.getdata(_date);
+            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*1;
+            _start = _this.$UTILS.dateConv(new Date(_start));
+            this.getdata(_start,_end);
           }else if(this.actday == '7日'){
-            _date -= _deff*7;
-            _date = new Date(_date);
-            this.getdata(_date);
+            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*7;
+            _start = _this.$UTILS.dateConv(new Date(_start));
+            this.getdata(_start,_end);
           }else if(this.actday == '15日'){
-            _date -= _deff*15;
-            _date = new Date(_date);
-            this.getdata(_date);
+            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*15;
+            _start = _this.$UTILS.dateConv(new Date(_start));
+            this.getdata(_start,_end);
           }
       },
-      getdata:function(val,start,end){
-        let _begainTime = '',_endTime='';
-        if(start && end){
-            _begainTime = start;
-            _endTime = end;
-        }else{
-            let year = val.getFullYear();
-            let month = val.getMonth()+1;
-            let day = val.getDate();
-             _begainTime = year+'/'+month+'/'+day;
-            let endTime = new Date();
-            let endyear = endTime.getFullYear();
-            let endmonth = endTime.getMonth()+1;
-            let endday = endTime.getDate();
-            _endTime = endyear+'/'+endmonth+'/'+endday;
-            this.start=_begainTime;
-            this.end=_endTime;
-        }
-        
+      getdata:function(start,end){        
         let obj = {
           shopId:this.shopId,
-          begainTime:_begainTime,
-          endTime:_endTime
+          begainTime:start,
+          endTime:end
         }
         let _value='';
         for(var key in obj) {
@@ -243,6 +226,8 @@ export default {
             if(res.data.code ==  '0'){
                 let _data = res.data.data;
                 this.total = _data.total;
+                this.votes = [];
+                this.totalPrice=0; 
                 if(_data.list){
                     this.totalPrice=_data.list[0].totalPrice
                     let data = _data.list;

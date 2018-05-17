@@ -46,26 +46,23 @@ export default {
     computed:{
         ...mapState(['shopId']),
         name(){
-            return `${ this.$route.params.year }年${ this.$route.params.time }月账单详情`
+            return `${ this.$route.params.ind }月账单详情`
         }
     },
-    comments:{
-        
-    },
     created:function(){
-        let _data = this.$route.params;
-        let year = _data.year;
-        let mon =_data.time;
-        let begain = year+'/'+mon+'/'+1;
-        let end = year+'/'+(mon*1+1)+'/'+1;
-        if(_data.time == 12){
-            begain = year+'/'+mon+'/'+1;
-            end = (year*1+1)+'/'+1+'/'+1;
+        let ind = this.$route.params.ind;
+        let _start = '2018/'+ind+'/01';
+        let _end = '';
+        let _ind = ind*1+1;
+        if(_ind<13){
+            _end = '2018/'+_ind+'/01';
+        }else{
+            _end = '2018/01/01';
         }
         let obj = {
             shopId:this.shopId,
-            begainTime:begain,
-            endTime:end
+            begainTime:_start,
+            endTime:_end
         }
         let parms='',value='';
             for(var key in obj) {

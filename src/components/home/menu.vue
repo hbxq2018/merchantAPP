@@ -77,7 +77,7 @@ export default {
         if(ind ==1){
             this.$router.push({ path: '/scan'})
         }else if(ind == 2){
-            console.log("bbb")
+            // console.log("bbb")
         }else if(ind == 3){
           //三种跳转方式
           // 字符串

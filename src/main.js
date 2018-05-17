@@ -9,9 +9,11 @@ import './assets/css/my-mint.css'; //全局修改mint-UI样式
 import 'lib-flexible'
 import axios from 'axios';
 import GLOBAL from '../untils/config/config'
-require('./assets/util/vconsole.js');
+import UTILS from '../untils/util'
+// require('./assets/util/vconsole.js');
 Vue.prototype.$axios = axios;
 Vue.prototype.$GLOBAL = GLOBAL;
+Vue.prototype.$UTILS = UTILS;
 Vue.use(MintUI);
 new Vue({
   el: '#app',
