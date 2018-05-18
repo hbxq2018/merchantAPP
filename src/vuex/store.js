@@ -16,7 +16,7 @@ const mutations={
             let arr = data.split('/')
             for(let key in state.userInfo){
                 if(arr[1] == key){
-                    if(state.userInfo[key].indexOf('/')>1){
+                    if((state.userInfo[key]+'').indexOf('/') != -1){
                         let ind = state.userInfo[key].indexOf("/");
                         let val1 = state.userInfo[key].slice(0,ind);
                         let val2 = state.userInfo[key].slice(ind+1,state.userInfo[key].length);

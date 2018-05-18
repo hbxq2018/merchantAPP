@@ -17,12 +17,19 @@
 </template>
 <script>
 import Vue from "vue";
-import { Toast } from 'mint-ui';
+import { Toast } from "mint-ui";
 export default {
   name: "Category",
   data() {
     return {
-      categoryArr: [
+      categoryArr: [],
+      ismin: false,
+      milieu: [
+        { name: "商务", checked: false },
+        { name: "聚会", checked: false },
+        { name: "约会", checked: false }
+      ],
+      Category: [
         { name: "日本菜", checked: false },
         { name: "自助餐", checked: false },
         { name: "湖北菜", checked: false },
@@ -38,45 +45,67 @@ export default {
         { name: "西餐", checked: false },
         { name: "其它美食", checked: false }
       ],
-      checkedArr: []    //选中的类目
+      checkedArr: [] //选中的类目
     };
   },
   methods: {
-    ischecked(idx) {    //是否勾选
-      if(this.categoryArr[idx].checked == false && this.checkedArr.length >= 3) {
-        Toast("最多选择三项");
-        return false;
+    ischecked(idx) {
+      //是否勾选
+      if (this.ismin) {
+        if (
+          this.categoryArr[idx].checked == false &&
+          this.checkedArr.length >= 1
+        ) {
+          Toast("最多选择一项");
+          return false;
+        }
+      } else {
+        if (
+          this.categoryArr[idx].checked == false &&
+          this.checkedArr.length >= 3
+        ) {
+          Toast("最多选择三项");
+          return false;
+        }
       }
+
       this.categoryArr[idx].checked = !this.categoryArr[idx].checked;
-      if(this.categoryArr[idx].checked == true) {
+      if (this.categoryArr[idx].checked == true) {
         this.checkedArr.push(this.categoryArr[idx]);
-      } else if(this.categoryArr[idx].checked == false) {
-        for(let i = 0; i < this.checkedArr.length; i++) {
-          if(this.categoryArr[idx].name == this.checkedArr[i].name) {
+      } else if (this.categoryArr[idx].checked == false) {
+        for (let i = 0; i < this.checkedArr.length; i++) {
+          if (this.categoryArr[idx].name == this.checkedArr[i].name) {
             this.checkedArr.splice(i, 1);
           }
         }
       }
     },
     categoryTxt() {
-      if(this.checkedArr.length == 0) {
+      if (this.checkedArr.length == 0) {
         Toast("请至少勾选一项");
         return false;
-      };
-      let txt = "";
-      for(var i = 0; i < this.checkedArr.length; i++) {
-        txt += this.checkedArr[i].name + ","
       }
-      txt = txt.substring(0, txt.length-1);
-      this.$router.push({name: 'Settlein', params: {category: txt}});
+      let txt = "";
+      for (var i = 0; i < this.checkedArr.length; i++) {
+        txt += this.checkedArr[i].name + ",";
+      }
+      txt = txt.substring(0, txt.length - 1);
+      this.$router.push({ name: "Settlein", params: { category: txt,ismin:this.ismin } });
     }
   },
   created() {
-    if(this.$route.params.txt) {
-      let arr = this.$route.params.txt.split(',');
-      for(let i = 0; i < arr.length; i++) {
-        for(let k = 0; k < this.categoryArr.length; k++) {
-          if(arr[i] == this.categoryArr[k].name) {
+    if (this.$route.params.id == 1) {
+      this.categoryArr = this.Category;
+      this.ismin = false;
+    } else if (this.$route.params.id == 2) {
+      this.categoryArr = this.milieu;
+      this.ismin = true;
+    }
+    if (this.$route.params.txt) {
+      let arr = this.$route.params.txt.split(",");
+      for (let i = 0; i < arr.length; i++) {
+        for (let k = 0; k < this.categoryArr.length; k++) {
+          if (arr[i] == this.categoryArr[k].name) {
             this.categoryArr[k].checked = true;
             this.checkedArr.push(this.categoryArr[k]);
           }
@@ -103,11 +132,13 @@ export default {
         width: 42px;
         height: 42px;
         margin-top: 30px;
-        background: #fff url(../../../static/images/check.png) center center no-repeat;
+        background: #fff url(../../../static/images/check.png) center center
+          no-repeat;
         background-size: 42px 42px;
       }
       i.checked {
-        background: #fff url(../../../static/images/checked.png) center center no-repeat;
+        background: #fff url(../../../static/images/checked.png) center center
+          no-repeat;
         background-size: 42px 42px;
       }
     }

@@ -170,18 +170,21 @@
         }else{
           if(_obj.address){
             let _address = _obj.Province+_obj.City+_obj.county+_obj.address;
-            let address = _address +'/'+'address'
-            this.setuserInfo(address)
+            let address = _address +'/'+'address';
+            this.setuserInfo(address);
           }
           if(_obj.lat){
-            let locationY = _obj.lat +'/'+'locationY'
-            this.setuserInfo(locationY)
+              let locationY = _obj.lat +'/'+'locationY';
+              this.setuserInfo(locationY);
           }
           if(_obj.lng){
-            let locationX = _obj.lng +'/'+'locationX'
-            this.setuserInfo(locationX)
+              let locationX = _obj.lng +'/'+'locationX';
+              this.setuserInfo(locationX);
           }
-          this.$router.push({path: this.goback,query:_obj})
+          
+          setTimeout(() => {
+            this.$router.push({path: this.goback,query:_obj})
+          }, 1000);
         }
       }
     },

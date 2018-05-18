@@ -117,20 +117,19 @@ export default {
       const ind = this.ind;
       if (ind == 0) {
         const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
-        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;  
+        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
         if (reg.test(this.data.phone)) {
-           let phone = this.data.phone +'/'+'phone'
-           this.setuserInfo(phone)
+           let mobile = this.data.phone +'/'+'mobile'
+           this.setuserInfo(mobile)
            this.$router.push({name: 'Manage',params:{}});
         //    this.$router.go(-1) //返回上一页面
         }else if(reg2.test(this.data.phone)){
-          let phone = this.data.phone +'/'+'mobile'
+          let phone = this.data.phone +'/'+'phone'
           this.setuserInfo(phone)
           this.$router.push({name: 'Manage',params:{}});
         }else{
             Toast('联系方式输入有误，请重新输入');
             this.data.phone = '';
-            return false
         }
       }else if(ind == 1){
         let val = this.value.join(",");

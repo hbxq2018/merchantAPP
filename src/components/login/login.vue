@@ -214,22 +214,27 @@ export default {
           console.log(res);
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
-            let status = res.data.data.status;
-            if (status == 0) {
-              _this.$router.push({
-                name: "Examine",
-                params: { status: status }
-              });
-            } else if (status == 1) {
-              _this.$router.push({
-                name: "Examine",
-                params: { status: status }
-              });
-            } else if (status == 2) {
-              _this.$router.push({
-                name: "Examine",
-                params: { status: status }
-              });
+
+            if (res.data.data && res.data.data.status) {
+              let status = res.data.data.status;
+              if (status == 0) {
+                _this.$router.push({
+                  name: "Examine",
+                  params: { status: status }
+                });
+              } else if (status == 1) {
+                _this.$router.push({
+                  name: "Examine",
+                  params: { status: status }
+                });
+              } else if (status == 2) {
+                _this.$router.push({
+                  name: "Examine",
+                  params: { status: status }
+                });
+              }
+            } else {
+              this.$router.push({name: 'Process',params:{}});
             }
           }
         });
@@ -242,10 +247,10 @@ export default {
     },
     setScroll() {
       var u = navigator.userAgent;
-      var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
-      if(isAndroid) {
-        document.documentElement.style.height = this.screenHeight + 'px';
-        document.body.style.height = this.screenHeight + 'px';
+      var isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1; //android终端
+      if (isAndroid) {
+        document.documentElement.style.height = this.screenHeight + "px";
+        document.body.style.height = this.screenHeight + "px";
       }
     }
   }

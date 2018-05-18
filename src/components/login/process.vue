@@ -37,7 +37,7 @@ export default {
   },
   created(){
     //获取到id的参数值
-    console.log(this.$route.params.id)
+    // console.log(this.$route.params.id)
     if(this.$route.params.id) {
       this.id = this.$route.params.id;
     }

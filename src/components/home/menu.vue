@@ -103,7 +103,7 @@ export default {
   .menu_top {
     width: 100%;
     height: 80%;
-    background: red;
+    background: #fc5e2d;
     & > .eaves {
       position: absolute;
       top: 0;

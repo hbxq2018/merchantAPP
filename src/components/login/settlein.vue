@@ -21,6 +21,13 @@
             <span class="category_arrow fr"></span>
           </div>
         </div>
+        <div class="category clearfix" @click="clidkmilieu">
+          <div class="category_l">环境分类</div>
+          <div class="category_r">
+            <span class="category_text fl">{{milieuTxt}}</span>
+            <span class="category_arrow fr"></span>
+          </div>
+        </div>
         <div class="category clearfix" @click="cateSlide">
           <div class="category_l">经营品类</div>
           <div class="category_r">
@@ -81,8 +88,8 @@ import Vue from "vue";
 import axios from "axios";
 import qs from "qs";
 import { Field, Toast } from "mint-ui";
-import store from '@/vuex/store'
-import {mapState, mapMutations} from 'vuex';
+import store from "@/vuex/store";
+import { mapState, mapMutations } from "vuex";
 Vue.component(Field.name, Field);
 export default {
   name: "Settle",
@@ -98,6 +105,7 @@ export default {
       locationY: "",
       city: "",
       categoryTxt: "选择经营品类",
+      milieuTxt: "选择环境分类",
       isSelected: false, //是否选择经营品类
       licenseUrl: "../../../static/images/add.png",
       healthUrl: "../../../static/images/add.png",
@@ -105,19 +113,37 @@ export default {
     };
   },
   store,
-  computed:{
-    ...mapState(['newUserInfo']),
+  computed: {
+    ...mapState(["newUserInfo",'shopInfo'])
   },
   methods: {
-    ...mapMutations(['setNewUserInfo']),
-    cateSlide() {     //跳转选择经营品类
+    ...mapMutations(["setNewUserInfo"]),
+    cateSlide() {
+      //跳转选择经营品类
+      this.setdata();
+      if (this.isSelected) {
+        this.$router.push({
+          name: "Category",
+          params: { id: "1", txt: this.categoryTxt }
+        });
+      } else {
+        this.$router.push({ name: "Category", params: { id: "1" } });
+      }
+    },
+    clidkmilieu() {
+      this.$router.push({
+        name: "Category",
+        params: { id: "2", txt: this.milieuTxt }
+      });
+    },
+    setdata(){
       this.setNewUserInfo({
-        id: this.id,
         userName: this.userName,
         phone: this.phone,
         shopName: this.shopName,
         address: this.address,
         isSeleAdd: this.isSeleAdd, //是否选择地址
+        milieuTxt: this.milieuTxt,
         locationX: this.locationX,
         locationY: this.locationY,
         city: this.city,
@@ -125,30 +151,14 @@ export default {
         healthUrl: this.healthUrl,
         ShopPhotoUrl: this.ShopPhotoUrl
       });
-      if (this.isSelected) {
-        this.$router.push({
-          name: "Category",
-          params: { txt: this.categoryTxt }
-        });
-      } else {
-        this.$router.push({ name: "Category" });
-      }
     },
-    addrSlide() {      //跳转选择位置
-      this.setNewUserInfo({
-        id: this.id,
-        userName: this.userName,
-        phone: this.phone,
-        shopName: this.shopName,
-        categoryTxt: this.categoryTxt,
-        isSelected: this.isSelected, //是否选择经营品类
-        licenseUrl: this.licenseUrl,
-        healthUrl: this.healthUrl,
-        ShopPhotoUrl: this.ShopPhotoUrl
-      });
-      this.$router.push({path:'shopMap', query: {'ind': '1'}})
+    addrSlide() {
+      //跳转选择位置
+      this.setdata();
+      this.$router.push({ path: "shopMap", query: { ind: "1" } });
     },
-    getFile: function(e) {      //上传图片
+    getFile: function(e) {
+      //上传图片
       let _this = this,
         inputDOM = {};
       console.log(e);
@@ -178,10 +188,11 @@ export default {
       let form = new FormData();
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
-      this.$axios.post("/api/app/img/upload", form)
+      this.$axios
+        .post("/api/app/img/upload", form)
         .then(res => {
-          if(res.data.code != 0) {
-            Toast('系统繁忙请稍后再试');
+          if (res.data.code != 0) {
+            Toast("系统繁忙请稍后再试");
             return false;
           }
           if (e == 1) {
@@ -193,10 +204,11 @@ export default {
           }
         })
         .catch(err => {
-          Toast('系统繁忙请稍后再试');
+          Toast("系统繁忙请稍后再试");
         });
     },
-    imgPreview(file) {       //图片预览
+    imgPreview(file) {
+      //图片预览
       let _this = this;
       // 看支持不支持FileReader
       if (!file || !window.FileReader) return;
@@ -212,40 +224,47 @@ export default {
         };
       }
     },
-    addMap() {     //跳转至地图定位页面
+    addMap() {
+       this.setdata();
+      //跳转至地图定位页面
       this.$router.push({ name: "ShopMap" });
     },
-    submitForm() {    //提交表单
-      if(this.isNull(this.userName)) {
-        Toast('请输入姓名');
+    submitForm() {
+      //提交表单
+      if (this.isNull(this.userName)) {
+        Toast("请输入姓名");
         return false;
       }
-      if(this.isNull(this.phone)) {
-        Toast('请输入联系方式');
+      if (this.isNull(this.phone)) {
+        Toast("请输入联系方式");
         return false;
       }
-      if(this.isNull(this.shopName)) {
-        Toast('请输入店铺名称');
+      if (this.isNull(this.shopName)) {
+        Toast("请输入店铺名称");
         return false;
       }
-      if(this.isNull(this.address)) {
-        Toast('请输入详细地址');
+      if (this.isNull(this.address)) {
+        Toast("请输入详细地址");
         return false;
       }
-      // if(this.isNull(this.categoryTxt)) {
-      //   Toast('请输入经营品类');
-      //   return false;
-      // }
-      if(this.isNull(this.licenseUrl)) {
-        Toast('请上传营业执照');
+      if(this.isNull(this.categoryTxt) || this.categoryTxt=='选择经营品类') {
+        Toast('请输入经营品类');
+        return false;
+      } 
+      if(this.isNull(this.milieuTxt) || this.milieuTxt=='选择环境分类') {
+        Toast('请输入环境分类');
         return false;
       }
-      if(this.isNull(this.healthUrl)) {
-        Toast('请上传卫生许可证');
+      if (this.isNull(this.licenseUrl)) {
+        Toast("请上传营业执照");
         return false;
       }
-      if(this.isNull(this.ShopPhotoUrl)) {
-        Toast('请上传门头照');
+      if (this.isNull(this.healthUrl)) {
+        Toast("请上传卫生许可证");
+        return false;
+      }
+      if (this.isNull(this.ShopPhotoUrl)) {
+        Toast("请上传门头照");
         return false;
       }
       let _parms = {
@@ -253,60 +272,72 @@ export default {
         mobile: this.phone,
         shopName: this.shopName,
         address: this.address,
-        businessCate: this.categoryTxt,
-        businessCate: "咖啡厅,其他美食",
+        businessCate: this.categoryTxt + "/" + this.milieuTxt,
         licensePic: this.licenseUrl,
         healthPic: this.healthUrl,
         doorPic: this.ShopPhotoUrl,
         locationX: this.locationX,
         locationY: this.locationY,
         city: this.city,
-        userId: this.id
-      }
+        userId: this.shopInfo.id
+      };
       console.log(_parms);
-      this.$axios.post("/api/app/shopEnter/add", qs.stringify(_parms))
-      .then(res => {
-        if(res.data.code != 0) {
-          Toast(res.data.message);
-          return false;
-        }
-        console.log(res);
-        if(res.data.code == 0) {
-          Toast('提交成功，请等待审核');
-          console.log(res.data.data);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        Toast('系统繁忙请稍后再试');
-      });
+      this.$axios
+        .post("/api/app/shopEnter/add", qs.stringify(_parms))
+        .then(res => {
+          if (res.data.code != 0) {
+            Toast(res.data.message);
+            return false;
+          }
+          console.log(res);
+          if (res.data.code == 0) {
+            Toast("提交成功，请等待审核");
+            console.log(res.data.data);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          Toast("系统繁忙请稍后再试");
+        });
     },
-    isNull(value) {  
-      let flag = false;   
-      if(value == 'null' || value == null || value == '' || value == undefined || value == []) {
+    isNull(value) {
+      let flag = false;
+      if (
+        value == "null" ||
+        value == null ||
+        value == "" ||
+        value == undefined ||
+        value == []
+      ) {
         flag = true;
       }
       return flag;
     }
   },
   created() {
-    for(var key in this.newUserInfo) {
-      this[key] = this.newUserInfo[key]
+    console.log('shopInfo:',this.shopInfo)
+    for (var key in this.newUserInfo) {
+      this[key] = this.newUserInfo[key];
     }
-    if(this.$route.query.address) {
+    if (this.$route.query.address) {
       let adr = this.$route.query;
       this.address = adr.Province + adr.City + adr.county + adr.address;
-      this.locationX = adr.lng,
-      this.locationY = adr.lat,
-      this.city = adr.City;
+      (this.locationX = adr.lng),
+        (this.locationY = adr.lat),
+        (this.city = adr.City);
       this.isSeleAdd = true;
     }
     //获取到category的参数值
+
     if (this.$route.params.category) {
-      this.categoryTxt = this.$route.params.category;
-      this.isSelected = true;
+      if (this.$route.params.ismin) {
+        this.milieuTxt = this.$route.params.category;
+      } else {
+        this.categoryTxt = this.$route.params.category;
+        this.isSelected = true;
+      }
     }
-    if(this.$route.params.id) {
+    if (this.$route.params.id) {
       this.id = this.$route.params.id;
     }
   }
@@ -381,7 +412,7 @@ export default {
           height: 100%;
           width: 100%;
           overflow: hidden;
-          text-overflow:ellipsis;
+          text-overflow: ellipsis;
           white-space: nowrap;
           font-size: 28px;
           color: #b1b1b1;
