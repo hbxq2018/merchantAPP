@@ -8,7 +8,7 @@
 			<form class="login_form">
 				<div class="login_form_tele">
 					<input type="number" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
-					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</button>
+					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
 				</div>
 				<div class="login_form_code">
 					<input type="number" class="login_form_inp" placeholder="请输入验证码" v-model="password">
@@ -76,6 +76,7 @@ export default {
       let RegExp = /^(1[3584]\d{9})$/;
       if ( RegExp.test(this.telephone)) {
         // this.$GLOBAL.API  <==> /api/   上线时所有替换
+        console.log("this.telephone:",this.telephone)
         this.$axios
           .post("/api/app/sms/sendForShopAppRegister?shopMobile="+this.telephone)
           .then(res => {
@@ -242,6 +243,7 @@ export default {
     },
   },
   created(){
+    console.log("this.telephone")
     this.setScroll();
   }
   
