@@ -5,11 +5,11 @@
             <mt-button icon="back"></mt-button>
           </router-link>
         </mt-header>
-        <div class="top_distance">
+        <div class="top_distance" v-if="data.length>0">
           <div class="check_top">
-            <div class="check_top_time"><span>2018</span>年</div>
+            <div class="check_top_time" ><span>2018</span>年</div>
             <div class="income_operate_time" @click="moreyear">
-                <img src="../../../../static/images/calendar.png" alt="">
+                <!-- <img src="../../../../static/images/calendar.png" alt=""> -->
             </div>
           </div>
           <div class="check_center" v-for="(item,index) in data" :key="index"  v-if="item" @click="particularsDetails(index)">
@@ -25,6 +25,7 @@
             </div>
           </div>
         </div>
+        <div class="top_distance" v-else>暂无数据</div>
   </div>
 </template>
 
@@ -70,7 +71,8 @@ export default {
     arr[1] = "01";
     arr[2] = "01";
     _start = arr.join("-");
-    let _end = _this.$UTILS.dateConv(_date);
+    let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
+    _end = _this.$UTILS.dateConv(new Date(_end));
     let obj = {
       shopId: this.shopId,
       begainTime: _start,
@@ -79,11 +81,10 @@ export default {
     let parms = "",
       value = "";
     for (var key in obj) {
-      value = key + "=" + obj[key] + "&";
-      parms += value;
-      value = "";
+      value += key + '=' + obj[key] + '&';
     }
-    this.$axios.get("/api/hx/listAmount?" + parms).then(res => {
+    value = value.substring(0, value.length-1);
+    this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
       if (res.data.code == 0) {
         this.data = res.data.data;
       }
@@ -98,7 +99,7 @@ export default {
   height: 100%;
   background: #ebebeb;
   .top_distance:nth-child(2) {
-    margin-top: 80px;
+    margin-top: 90px;
   }
   .check_top {
     width: 100%;
@@ -109,10 +110,11 @@ export default {
     align-items: center;
     letter-spacing: 2px;
     .check_top_time {
-      text-align: left;
-      line-height: 80px;
-      width: 90%;
+       width: 90%;
       height: 80px;
+      text-align: left;
+      margin-left:5%;
+      line-height: 80px;
       font-size: 30px;
       color: #808080;
     }

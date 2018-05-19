@@ -110,7 +110,6 @@ export default {
       });
     },
     getshopinfo:function(){ //获取商家信息
-      // let shopId = '144'
       this.$axios.get('/api/shop/get/'+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){
@@ -142,7 +141,6 @@ export default {
               MessageBox('提示', '手机号输入错误');  
               return false;  
             }
-            // let shopId='144';
             let obj = {
               shopId:this.shopId,
               mobile:value
@@ -212,16 +210,16 @@ export default {
     },
     setformdata:function(){
       if(this.userInfo){
-        let userdata = this.userInfo;
-        let ind = userdata.businessCate.indexOf("/");
-        let val1 = userdata.businessCate.slice(0,ind);
-        let val2 = userdata.businessCate.slice(ind+1,userdata.businessCate.length);
-        this.name = userdata.shopName;
-        this.formdata[0].value = userdata.phone?userdata.phone:userdata.mobile;
+        let shopdata = this.userInfo;
+        let ind = shopdata.businessCate.indexOf("/");
+        let val1 = shopdata.businessCate.slice(0,ind);
+        let val2 = shopdata.businessCate.slice(ind+1,shopdata.businessCate.length);
+        this.name = shopdata.shopName;
+        this.formdata[0].value = shopdata.phone?shopdata.phone:shopdata.mobile;
         this.formdata[1].value = val1;
         this.formdata[2].value = val2;
-        this.formdata[3].value = userdata.address;
-        this.formdata[4].value = userdata.shopInfo;
+        this.formdata[3].value = shopdata.address;
+        this.formdata[4].value = shopdata.shopInfo;
       }
     }
   },
@@ -234,8 +232,13 @@ export default {
     if(!this.formdata[0].value){
       this.setformdata();
     }
-   
-    // console.log("this.$route.params.name:",this.$route.params)
+   if (this.$route.query.address) {
+      let adr = this.$route.query;
+      this.address = adr.Province + adr.City + adr.county + adr.address;
+      (this.locationX = adr.lng),
+        (this.locationY = adr.lat),
+        (this.city = adr.City);
+    }
     if(this.$route.params.ind){
       let obj = this.$route.params
       this.formdata[obj.ind].value = obj.value

@@ -111,16 +111,22 @@ export default {
           let data = res.data;
           console.log('res:',res)
           if (data.code == 0) {
+            if(data.data.isUsed == 1){
+              Toast("券不存在或者已经被使用");
+               setTimeout(function(){
+                _this.$router.push({ name: "Scan", params: {} });
+              },2000)
+              return false
+            }
             let Dis = "折扣";
             if (data.data.skuName.indexOf(Dis) > 0) {
               this.label1 = "输入折后金额";
               this.plac = "折后金额(元)";
               this.searchShopId();
             }
-            this.ticket = data.data;
-
+            this.ticket = data.data
           } else {
-            Toast("系统繁忙，请稍后再试");
+            Toast(data.message);
           }
         })
         .catch(err => {

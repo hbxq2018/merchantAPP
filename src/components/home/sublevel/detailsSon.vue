@@ -64,13 +64,12 @@ export default {
             begainTime:_start,
             endTime:_end
         }
-        let parms='',value='';
-            for(var key in obj) {
-            value = key+'='+obj[key]+'&';
-            parms+=value;
-            value=''
+        let parms='',_value='';
+        for(var key in obj) {
+         _value += key + '=' + obj[key] + '&';
         }
-        this.$axios.get('/api/app/hx/list?'+parms)
+        _value = _value.substring(0, _value.length-1);
+        this.$axios.get('/api/app/hx/list?'+_value)
         .then((res) => {
             if(res.data.code == 0){
                 this.total = res.data.data.total;

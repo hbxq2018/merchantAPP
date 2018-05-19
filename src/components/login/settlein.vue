@@ -11,8 +11,8 @@
     </div>
     <p class="form_title">商户信息</p>
     <div class="form">
-        <mt-field label="申请人" placeholder="输入申请人姓名" v-model="userName"></mt-field>
-        <mt-field label="联系方式" placeholder="输入手机或电话号码" type="tel" v-model="phone"></mt-field>
+        <mt-field label="申请人" placeholder="输入申请人姓名" type="text" v-model="userName"></mt-field>
+        <mt-field label="联系方式" placeholder="输入手机或电话号码" type="number" v-model="phone"></mt-field>
         <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopName"></mt-field>
         <div class="category clearfix" @click="addrSlide">
           <div class="category_l">详细地址</div>
@@ -98,6 +98,7 @@ export default {
       id: "",
       userName: "",
       phone: "",
+      ismobile:true, //联系方式是否是手机号 
       shopName: "",
       address: "定位选择详细地址",
       isSeleAdd: false, //是否选择地址
@@ -149,7 +150,8 @@ export default {
         city: this.city,
         licenseUrl: this.licenseUrl,
         healthUrl: this.healthUrl,
-        ShopPhotoUrl: this.ShopPhotoUrl
+        ShopPhotoUrl: this.ShopPhotoUrl,
+        id:this.id
       });
     },
     addrSlide() {
@@ -161,7 +163,7 @@ export default {
       //上传图片
       let _this = this,
         inputDOM = {};
-      console.log(e);
+      // console.log(e);
       if (e == 1) {
         inputDOM = this.$refs.license;
       } else if (e == 2) {
@@ -169,7 +171,7 @@ export default {
       } else if (e == 3) {
         inputDOM = this.$refs.ShopPhoto;
       }
-      console.log(inputDOM);
+      // console.log(inputDOM);
       // 通过DOM取文件数据
       this.file = inputDOM.files[0];
       this.errText = "";
@@ -229,8 +231,8 @@ export default {
       //跳转至地图定位页面
       this.$router.push({ name: "ShopMap" });
     },
-    submitForm() {
-      //提交表单
+    submitForm() {//提交表单
+  
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");
         return false;
@@ -239,37 +241,47 @@ export default {
         Toast("请输入联系方式");
         return false;
       }
+      let RegExp = /^((0\d{2,3}\d{7,8})|(1[3584]\d{9}))$/;
+      let Reg1 = /^(0\d{2,3}\d{7,8})$/;
+      let Reg2 = /^(1[3584]\d{9})$/;
+      if (Reg1.test(this.phone)) {
+        this.ismobile = false;
+      }else if(Reg2.test(this.phone)){
+        this.ismobile = true;
+      }else{
+         Toast("请输入联系方式");
+         return false
+      }
       if (this.isNull(this.shopName)) {
         Toast("请输入店铺名称");
         return false;
       }
-      if (this.isNull(this.address)) {
+      if (this.isNull(this.address) || this.address == '"定位选择详细地址"') {
         Toast("请输入详细地址");
         return false;
       }
-      if(this.isNull(this.categoryTxt) || this.categoryTxt=='选择经营品类') {
+      if(this.isNull(this.categoryTxt) || this.categoryTxt =='选择经营品类') {
         Toast('请输入经营品类');
         return false;
       } 
-      if(this.isNull(this.milieuTxt) || this.milieuTxt=='选择环境分类') {
+      if(this.isNull(this.milieuTxt) || this.milieuTxt =='选择环境分类') {
         Toast('请输入环境分类');
         return false;
       }
-      if (this.isNull(this.licenseUrl)) {
+      if (this.isNull(this.licenseUrl) || this.licenseUrl == '../../../static/images/add.png') {
         Toast("请上传营业执照");
         return false;
       }
-      if (this.isNull(this.healthUrl)) {
+      if (this.isNull(this.healthUrl) || this.healthUrl == '../../../static/images/add.png') {
         Toast("请上传卫生许可证");
         return false;
       }
-      if (this.isNull(this.ShopPhotoUrl)) {
+      if (this.isNull(this.ShopPhotoUrl) || this.ShopPhotoUrl == '../../../static/images/add.png') {
         Toast("请上传门头照");
         return false;
       }
       let _parms = {
         userName: this.userName,
-        mobile: this.phone,
         shopName: this.shopName,
         address: this.address,
         businessCate: this.categoryTxt + "/" + this.milieuTxt,
@@ -279,9 +291,14 @@ export default {
         locationX: this.locationX,
         locationY: this.locationY,
         city: this.city,
-        userId: this.shopInfo.id
+        userId: this.id?this.id:this.shopInfo.id
       };
-      console.log(_parms);
+      if(this.ismobile){
+        _parms.mobile = this.phone;
+      }else{
+        _parms.phone = this.phone;
+      }
+    
       this.$axios
         .post("/api/app/shopEnter/add", qs.stringify(_parms))
         .then(res => {
@@ -289,14 +306,11 @@ export default {
             Toast(res.data.message);
             return false;
           }
-          console.log(res);
           if (res.data.code == 0) {
             Toast("提交成功，请等待审核");
-            console.log(res.data.data);
           }
         })
         .catch(err => {
-          console.log(err);
           Toast("系统繁忙请稍后再试");
         });
     },
@@ -315,7 +329,6 @@ export default {
     }
   },
   created() {
-    console.log('shopInfo:',this.shopInfo)
     for (var key in this.newUserInfo) {
       this[key] = this.newUserInfo[key];
     }

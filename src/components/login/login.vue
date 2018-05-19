@@ -8,7 +8,7 @@
 			<form class="login_form" @click="setScroll">
 				<div class="login_form_tele">
 					<input type="number" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
-					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click.stop="securityCode">{{veridyBtn}}</button>
+					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</button>
 				</div>
 				<div class="login_form_code">
 					<input type="number" class="login_form_inp" placeholder="请输入验证码" v-model="password">
@@ -30,7 +30,6 @@
 <script>
 import GLOBAL from "../../../untils/config/config";
 import { Toast } from "mint-ui";
-import axios from "axios";
 import qs from "qs";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
@@ -46,16 +45,14 @@ export default {
       password: "", //验证码
       veridyTime: "", //获取验证码的时间
       verifyCode: "", //验证码
-      timeFlag: true
+      timeFlag: true,
+      _type:'2' //来源   1小程序 2H5 3安卓 4IOS 
     };
   },
   store,
   computed: {
     ...mapState(["userInfo", "shopInfo"])
   },
-  // created() {
-  //     var screenHeight = document.body.clientHeight;
-  // },
   methods: {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
     isNull(value) {
@@ -71,19 +68,16 @@ export default {
       }
       return flag;
     },
-    securityCode() {
-      //获取验证码
+    securityCode() { //获取验证码
       let _this = this;
       if (!this.timeFlag) {
         return false;
       }
-      if (!this.isNull(this.telephone)) {
-        let _parms = {
-          shopMobile: this.telephone
-        };
-        // this.$GLOBAL.API  <==>  /api/
+      let RegExp = /^(1[3584]\d{9})$/;
+      if ( RegExp.test(this.telephone)) {
+        // this.$GLOBAL.API  <==>  /api/  上线时所有替换
         this.$axios
-          .post("/api/app/sms/sendForShopAppRegister", qs.stringify(_parms))
+          .post("/api/app/sms/sendForShopAppRegister?shopMobile="+this.telephone)
           .then(res => {
             let data = res.data;
             if (data.code == 0) {
@@ -117,11 +111,11 @@ export default {
             console.log(err);
           });
       } else {
-        Toast("请填写手机号");
+        this.telephone='';
+        Toast("请填写正确的手机号");
       }
     },
-    verification() {
-      //判断输入验证码是否正确
+    verification() {//判断输入验证码是否正确
       let _parms = {
           shopMobile: this.telephone,
           smsContent: this.password
@@ -145,12 +139,12 @@ export default {
           console.log(err);
         });
     },
-    signIn() {
-      //商家注册
+    signIn() {//商家注册
       let _this = this;
       this.$axios
         .get("/api/app/user/findUserByMobile?mobile=" + this.telephone)
         .then(res => {
+          console.log(res.data.data)
           this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
             if (res.data.data == null) {
@@ -177,13 +171,13 @@ export default {
           console.log(err);
         });
     },
-    addShop() {
-      //添加商户
-      let _this = this,
-        _parms = { mobile: this.telephone };
+    addShop() { //添加商户 
+      let _this = this;
+      let _parms = { mobile: this.telephone,sourceType:this._type };
       this.$axios
         .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
+          console.log('res.data.data:',res.data.data)
           if (res.data.code == 0) {
             _this.$router.push({
               name: "Process",
@@ -195,26 +189,21 @@ export default {
           console.log(err);
         });
     },
-    getshopinfo: function(id) {
-      //获取商家信息
+    getshopinfo: function(id) { //获取商家信息
       this.$axios.get("/api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
-          console.log(data);
           this.setuserInfo(data);
         }
       });
     },
-    searchByUserId(id) {
-      //判断商家是否在审核中
+    searchByUserId(id) {//判断商家是否在审核中
       let _this = this;
       this.$axios
         .get("/api/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           console.log(res);
-          if (res.data.code == 0) {
-            //0待审核  1审核通过  2审核不通过
-
+          if (res.data.code == 0) {//0待审核  1审核通过  2审核不通过
             if (res.data.data && res.data.data.status) {
               let status = res.data.data.status;
               if (status == 0) {
@@ -246,12 +235,16 @@ export default {
       });
     },
     setScroll() {
-      var u = navigator.userAgent;
-      var isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1; //android终端
-      if (isAndroid) {
-        document.documentElement.style.height = this.screenHeight + "px";
-        document.body.style.height = this.screenHeight + "px";
-      }
+      const ua = navigator.userAgent.toLowerCase(); 
+        if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+          this._type = 4;
+        } else if (/(Android)/i.test(ua)) {
+          this._type = 3;
+          document.documentElement.style.height = this.screenHeight + "px";
+          document.body.style.height = this.screenHeight + "px";
+        } else {
+        	this._type = 2;
+        }
     }
   }
 };
@@ -265,7 +258,7 @@ export default {
   height: 100%;
   background-color: #fc5e2d;
   font-family: "微软雅黑";
-  position: relative;
+  position: absolute;
   font-size: 30px;
   .login_background {
     position: absolute;

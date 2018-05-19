@@ -15,7 +15,8 @@
   </div>
 </template>
 
-<script type='text/ecmascript-6'>
+<script>
+import { Toast } from "mint-ui";
 let scan = null;
 export default {
   name: "Scan",
@@ -45,7 +46,7 @@ export default {
           console.log(typeof arr[arr.length - 1]);
           if (typeof (arr[arr.length - 1] * 1) == "number") {
             that.codenum = arr[arr.length - 1]; //获取券码
-            that.gowrite();
+            that.getbycode(that.codenum);
           } else {
             console.log("不是正确的券码");
           }
@@ -54,7 +55,26 @@ export default {
         }
       }
     },
-    
+    getbycode: function(val) { //获取票券信息
+      this.$axios
+        .get("/api/app/cp/getByCode/" + val)
+        .then(res => {
+          let data = res.data;
+          console.log('res:',res)
+          if (data.code == 0) {
+            if(data.data.isUsed == 1){
+              Toast("券不存在或者已经被使用");
+            }else{
+              this.gowrite();
+            }
+          } else {
+            Toast(data.message);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     startScan() {//开始扫描
       if (!window.plus) return;
       scan.start();

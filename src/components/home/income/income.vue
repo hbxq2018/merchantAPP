@@ -75,6 +75,8 @@
             month-format="{value} 月"
             date-format="{value} 日"
             v-model="pickerValue"
+            :startDate = 'mindata'
+            :endDate = 'maxdata'
             @confirm="handleConfirm"
         >
     </mt-datetime-picker>
@@ -101,6 +103,8 @@ export default {
         actday:'',
         isselectday:false,
         isselecttime:false,
+        maxdata:'',
+        mindata:'',
         days:[
             {
                 title:'今日'
@@ -117,10 +121,15 @@ export default {
   created: function() {
     let _this = this;
     let _date = new Date();
-    
+    let _mindata  = new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000*365;
+    this.mindata = new Date(_mindata)
+    let _maxdata  = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000*365*3;
+    this.maxdata = new Date(_maxdata)
+
     let _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000;
     _start = _this.$UTILS.dateConv(new Date(_start));
-    let _end = _this.$UTILS.dateConv(_date);
+    let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
+    _end = _this.$UTILS.dateConv(new Date(_end));
   
     this.start=_start;
     this.end=_end;
@@ -194,8 +203,11 @@ export default {
           let _this = this;
           this.actday = e.currentTarget.id;
           let _date = new Date();
-          let _end = _this.$UTILS.dateConv(_date);
           let _start='', _deff = 60*60*24*1000;
+        //   let _end = _this.$UTILS.dateConv(_date);
+          let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + deff*1;
+          _end = _this.$UTILS.dateConv(new Date(_end));
+          console.log("_end:",_end)
           if(this.actday == '今日'){
             _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*1;
             _start = _this.$UTILS.dateConv(new Date(_start));
@@ -210,7 +222,7 @@ export default {
             this.getdata(_start,_end);
           }
       },
-      getdata:function(start,end){        
+      getdata:function(start,end){       
         let obj = {
           shopId:this.shopId,
           begainTime:start,
@@ -442,17 +454,14 @@ export default {
           div{
             float: left;
             height: 100%;
+             width: 49.8%;
             line-height: 103px;
             text-align:center;
           }
           .close{
-            width: 49.8%;
+           
             border-right: 1px solid #E0E0E0;
           } 
-          .cfrm{
-              width: 50%;
-          }
-
       }
   }
 }

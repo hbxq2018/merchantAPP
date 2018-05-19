@@ -154,3 +154,29 @@ ol {
 .mint-cell-value span {
     color: #808080;
 }
+
+/* 公共样式 非mint-ui样式 */
+.category .category_item{
+    height: 100px;
+    line-height: 100px;
+    padding: 0 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+.category .category_item span {
+    font-size: 28px;
+}
+.category_item i {
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    margin-top: 30px;
+    background: #fff url(../../../static/images/check.png) center center
+    no-repeat;
+    background-size: 42px 42px;
+}
+.category_item i.checked {
+    background: #fff url(../../../static/images/checked.png) center center
+    no-repeat;
+    background-size: 42px 42px;
+}
+ 

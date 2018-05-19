@@ -60,16 +60,21 @@ export default {
   },
   store,
   computed:{
-     ...mapState(['userInfo','shopId']),
+     ...mapState(['userInfo','shopId','newUserInfo','shopInfo']),
   },
   methods:{
-      ...mapMutations(['setuserInfo']),
+      ...mapMutations(['setuserInfo','setshopId','setNewUserInfo','setshopInfo']),
       close:function(){
-        MessageBox({
-        title: '提示',
-        message: '确定要退出登录吗?',
-        showCancelButton: true
-        });
+        MessageBox.confirm('确定要退出登录吗?').then(action => {
+        if(action == 'confirm'){
+            let obj={},id='';
+            this.setuserInfo(obj)
+            this.setshopId(id)
+            this.setNewUserInfo(obj)
+            this.setshopInfo(obj)
+            this.$router.push('/')
+        }
+      },()=>{});
       },
       WeIntroduce:function(e){
           const listBoxID = e.currentTarget.id
@@ -82,8 +87,8 @@ export default {
           }
       }
   },
-  created:function(){ //请求接口
-    if(!this.data.id){  //如果有数据，则不用再次请求
+  created:function(){
+    if(!this.data.id){  
         let mobile = '15827245422';
         this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
         .then((res) => {

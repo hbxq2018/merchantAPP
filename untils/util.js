@@ -113,7 +113,6 @@ function isNull(value) {
 
 //时间间隔
 function dateConv(dateStr) {
-  console.log('dateStr:',dateStr)
   let year = dateStr.getFullYear(),
     month = dateStr.getMonth() + 1,
     today = dateStr.getDate();

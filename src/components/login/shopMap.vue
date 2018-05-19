@@ -230,8 +230,11 @@
       overflow:auto;
       background:rgba(0,0,0,0.44)!important;
       .picker{
-        margin-top: 1175px;
+        width:100%;
         background: #fff;
+        position:absolute;
+        left:0;
+        bottom:0;
       }
     }
   }

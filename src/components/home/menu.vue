@@ -12,7 +12,7 @@
                         人气 {{userInfo.popNum}}
                     </p>
                 </div>
-                <img src="../../../static/images/news.png" alt="消息" class="news">
+                <!-- <img src="../../../static/images/news.png" alt="消息" class="news"> -->
             </div>
       </div>
       <div class="menu_content">
@@ -63,7 +63,7 @@ export default {
               // src:'../../../static/images/voucher.png',
               src:require('../../../static/images/voucher.png'),
               id:'4',
-              name:'享7券',
+              name:'优化推广',
               con:'自定义满减额度',
               href: '#'
           }
@@ -95,6 +95,7 @@ export default {
         }
     }
   }
+  
 };
 </script>
 
@@ -176,12 +177,12 @@ export default {
           margin-top: 40px;
         }
 
-        & > .con_name {
-          margin: 18px 0;
+        .con_name {
+          // margin: 18px 0;
           font-size: 30px;
           color: #555;
         }
-        & > .con_con {
+        .con_con {
           margin: 0;
           color: #b1b1b1;
           font-size: 20px;
@@ -212,8 +213,6 @@ export default {
       text-decoration: none;
       text-align: center;
       line-height: 98px;
-      font-size: 22px;
-      color: rgba(252, 94, 45, 1);
     }
   }
 }

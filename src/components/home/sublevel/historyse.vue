@@ -72,23 +72,25 @@ export default {
     },
     created:function(){
     let date = new Date();
-    let _endTime = formatDate(date, 'yyyy/MM/dd')
+    // let _endTime = formatDate(date, 'yyyy/MM/dd')
     let begain = formatDate(date, 'yyyy/MM/dd')
     let _arr = begain.split('/')
     _arr[2]='1'
     let _begainTime = _arr.join("/");
+
+    let _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
+    _end = this.$UTILS.dateConv(new Date(_end));
     let obj = {
       shopId:this.shopId,
       begainTime:_begainTime,
-      endTime:_endTime
+      endTime:_end
     }
-    let parms='',value='';
+    let parms='',_value='';
     for(var key in obj) {
-      value = key+'='+obj[key]+'&';
-      parms+=value;
-      value=''
+     _value += key + '=' + obj[key] + '&';
     }
-    this.$axios.get('/api/app/hx/list?'+parms)
+    _value = _value.substring(0, _value.length-1);
+    this.$axios.get('/api/app/hx/list?'+_value)
     .then((res) => {
         let _data = res.data.data;
         if(_data.list){

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mt-header title="经营品类">
+    <mt-header :title="title">
         <div slot="left" @click="categoryTxt">
             <mt-button icon="back"></mt-button>
         </div>
@@ -24,6 +24,7 @@ export default {
     return {
       categoryArr: [],
       ismin: false,
+      title:'',
       milieu: [
         { name: "商务", checked: false },
         { name: "聚会", checked: false },
@@ -49,8 +50,7 @@ export default {
     };
   },
   methods: {
-    ischecked(idx) {
-      //是否勾选
+    ischecked(idx) { //是否勾选
       if (this.ismin) {
         if (
           this.categoryArr[idx].checked == false &&
@@ -97,9 +97,11 @@ export default {
     if (this.$route.params.id == 1) {
       this.categoryArr = this.Category;
       this.ismin = false;
+      this.title = '经营品类'
     } else if (this.$route.params.id == 2) {
       this.categoryArr = this.milieu;
       this.ismin = true;
+      this.title = '环境分类'
     }
     if (this.$route.params.txt) {
       let arr = this.$route.params.txt.split(",");
