@@ -12,7 +12,7 @@ export default {
 </script>
 
 <style lang='less'>
-@import 'mint-ui/lib/style.css';
+// @import 'mint-ui/lib/style.css';
 @import url(common/css/common.css);
 html,
 body {

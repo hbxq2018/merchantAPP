@@ -388,8 +388,7 @@ export default {
     left: 0;
     top: 0;
     overflow: auto;
-    height: 90%;
-    margin-top: 10%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.44);
     font-size: 30px;
     .triangle

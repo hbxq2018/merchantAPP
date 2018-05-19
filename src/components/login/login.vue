@@ -5,7 +5,7 @@
 			<div class="login_icon">
 				<img class="" src="../../../static/images/aboutMe.png" alt="" />
 			</div>
-			<form class="login_form" @click="setScroll">
+			<form class="login_form">
 				<div class="login_form_tele">
 					<input type="number" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
 					<button id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</button>
@@ -75,7 +75,7 @@ export default {
       }
       let RegExp = /^(1[3584]\d{9})$/;
       if ( RegExp.test(this.telephone)) {
-        // this.$GLOBAL.API  <==>  /api/  上线时所有替换
+        // this.$GLOBAL.API  <==> /api/   上线时所有替换
         this.$axios
           .post("/api/app/sms/sendForShopAppRegister?shopMobile="+this.telephone)
           .then(res => {
@@ -86,7 +86,6 @@ export default {
                 countdown = 600;
               _this.timeFlag = false;
               _this.verifyCode = data.data.verifyId;
-              console.log(data.data.verifyId);
               let timer = setInterval(() => {
                 countdown--;
                 if (countdown == 0) {
@@ -144,12 +143,9 @@ export default {
       this.$axios
         .get("/api/app/user/findUserByMobile?mobile=" + this.telephone)
         .then(res => {
-          console.log(res.data.data)
           this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
-            if (res.data.data == null) {
-              //新用户为null
-              console.log("添加新用户");
+            if (res.data.data == null) {//新用户为null
               _this.addShop();
             } else if (
               res.data.data.userType == 1 &&
@@ -177,7 +173,6 @@ export default {
       this.$axios
         .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
-          console.log('res.data.data:',res.data.data)
           if (res.data.code == 0) {
             _this.$router.push({
               name: "Process",
@@ -202,7 +197,6 @@ export default {
       this.$axios
         .get("/api/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
-          console.log(res);
           if (res.data.code == 0) {//0待审核  1审核通过  2审核不通过
             if (res.data.data && res.data.data.status) {
               let status = res.data.data.status;
@@ -235,7 +229,7 @@ export default {
       });
     },
     setScroll() {
-      const ua = navigator.userAgent.toLowerCase(); 
+      const ua = navigator.userAgent.toLowerCase();
         if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
           this._type = 4;
         } else if (/(Android)/i.test(ua)) {
@@ -245,20 +239,25 @@ export default {
         } else {
         	this._type = 2;
         }
-    }
+    },
+  },
+  created(){
+    this.setScroll();
   }
+  
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
+@import 'mint-ui/lib/style.css';
 @import url(../../common/css/common.css);
 .login {
   width: 100%;
   height: 100%;
   background-color: #fc5e2d;
   font-family: "微软雅黑";
-  position: absolute;
+  position: relative;
   font-size: 30px;
   .login_background {
     position: absolute;
