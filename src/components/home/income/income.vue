@@ -1,74 +1,79 @@
 <template>
     <div class="income">
 		<div class="income_top">
-            <mt-header title="营业数据" class="income_header">
-                <router-link to="/home" slot="left">
-                    <mt-button icon="back"></mt-button>
-                </router-link>
-                <mt-button @click="turnmore(1)" slot="right" class="income_header_date">{{actday}}</mt-button>
-            </mt-header>
-            <div class="income_banner">
-                <div class="income_banner_data">
-                    <p class="income_data_num">￥{{totalPrice}}</p>
-                    <p>营业额</p>
-                </div>
-                <div class="income_banner_data">
-                    <p class="income_data_num">{{total}}</p>
-                    <p>核销券数</p>
-                </div>
+        <mt-header title="营业数据" class="income_header">
+            <router-link to="/home" slot="left">
+                <mt-button icon="back"></mt-button>
+            </router-link>
+            <mt-button @click="turnmore(1)" slot="right" class="income_header_date">{{actday}}</mt-button>
+        </mt-header>
+        <div class="income_banner">
+            <div class="income_banner_data">
+                <p class="income_data_num">￥{{totalPrice}}</p>
+                <p>营业额</p>
             </div>
-            <div class="income_operate">
-                <div class="income_operate_result">
-                    <p>{{start}} -- {{end}}</p>
-                    <p>
-                        <span>营业额：￥{{totalPrice}}元</span>
-                        <span>核销券数：{{total}}张</span>
-                    </p>
-                </div>
-                <div class="income_operate_time" @click="turnmore(2)">
-                    <img src="../../../../static/images/calendar.png" alt="">
-                </div>
+            <div class="income_banner_data">
+                <p class="income_data_num">{{total}}</p>
+                <p>核销券数</p>
             </div>
         </div>
-        <div class="mobox" @click="closemore" v-show="ismore">
-            <div class="triangle" v-show="isselectday"></div>
-            <ul class="moreday" v-show="isselectday">
-                <li class="adays" v-for="(item,index) in days" :key='index' :id='item.title' @click="selectday">{{item.title}}</li>
-            </ul>
-            <div class="select" v-show="isselecttime">
-                <div class="select_top">
-                    <span class="stleft">选择起始时间</span>
-                </div>
-                <div class="date">
-                    <div @click.stop="openPicker(1)">开始时间：{{start}}</div>
-                    <div @click.stop="openPicker(2)">结束时间：{{end}}</div>
-                </div>
-                <div class="selbut">
-                    <div class="close" @click="close">取消</div>
-                    <div class="cfrm" @click="cfrm">确定</div>
-                </div>
+        <div class="income_operate">
+            <div class="income_operate_result">
+                <p>{{start}} -- {{end}}</p>
+                <p>
+                    <span>营业额：￥{{totalPrice}}元</span>
+                    <span>核销券数：{{total}}张</span>
+                </p>
+            </div>
+            <div class="income_operate_time" @click="turnmore(2)">
+                <img src="../../../../static/images/calendar.png" alt="">
             </div>
         </div>
+    </div>
+    <div class="mobox" @click="closemore" v-show="ismore">
+        <div class="triangle" v-show="isselectday"></div>
+        <ul class="moreday" v-show="isselectday">
+            <li class="adays" v-for="(item,index) in days" :key='index' :id='item.title' @click="selectday">{{item.title}}</li>
+        </ul>
+        <div class="select" v-show="isselecttime">
+            <div class="select_top">
+                <span class="stleft">选择起始时间</span>
+            </div>
+            <div class="date">
+                <div @click.stop="openPicker(1)">开始时间：{{start}}</div>
+                <div @click.stop="openPicker(2)">结束时间：{{end}}</div>
+            </div>
+            <div class="selbut">
+                <div class="close" @click="close">取消</div>
+                <div class="cfrm" @click="cfrm">确定</div>
+            </div>
+        </div>
+    </div>
+    <div class="filling"></div>
+    <div class="loadBottom" :style="{'-webkit-overflow-scrolling': scrollMode}">
+      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmore">
         <div class="income_list">
-            <ul>
-                <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
-                    <div class="income_li_l">
-                        <div class="face_value">
-                            {{item.couponAmount}}元
-                        </div>
-                    </div>
-                    <div class="income_li_r">
-                        <div class="income_amount">
-                            <p>消费金额</p>
-                            <p>￥{{item.paidAmount}}</p>
-                        </div>
-                        <div class="income_date">{{item.updateTime}}</div>
-                    </div>
-                </li>
-            </ul>
+          <ul>
+              <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
+                  <div class="income_li_l">
+                      <div class="face_value">
+                          {{item.couponAmount}}元
+                      </div>
+                  </div>
+                  <div class="income_li_r">
+                      <div class="income_amount">
+                          <p>消费金额</p>
+                          <p>￥{{item.paidAmount}}</p>
+                      </div>
+                      <div class="income_date">{{item.updateTime}}</div>
+                  </div>
+              </li>
+          </ul>
         </div>
+      </mt-loadmore>
+    </div>
 
-        <mt-datetime-picker
+    <mt-datetime-picker
             ref="picker"
             type="date"
             year-format="{value} 年"
@@ -85,8 +90,9 @@
 
 <script>
 import Vue from "vue";
-import { DatetimePicker, Toast } from "mint-ui";
+import { DatetimePicker, Toast,Loadmore } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker);
+Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 export default {
@@ -117,7 +123,10 @@ export default {
         }
       ],
       votes: [],
-      totalPrice: ""
+      totalPrice: "",
+      pag:1,
+      allLoaded: false,
+      scrollMode: "auto"
     };
   },
   created: function() {
@@ -130,15 +139,17 @@ export default {
       new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000 * 365 * 3;
     this.maxdata = new Date(_maxdata);
 
-    let _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000;
+    let _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
     _start = _this.$UTILS.dateConv(new Date(_start));
     let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
     _end = _this.$UTILS.dateConv(new Date(_end));
 
     this.start = _start;
     this.end = _end;
-
-    this.getdata(_start, _end);
+    this.oldstart = _start;
+    this.oldend = _end;
+    this.pag = 1;
+    this.getdata(_start, _end,this.pag);
     this.actday = this.days[0].title;
   },
   store,
@@ -151,9 +162,8 @@ export default {
       this.$refs.picker.open();
     },
     handleConfirm() {
-      console.log("pickerValue:", this.pickerValue);
-      let _this = this;
-      let date = _this.$UTILS.dateConv(this.pickerValue);
+      this.allLoaded = false;
+      let _this = this,date = _this.$UTILS.dateConv(this.pickerValue);
       if (this.actval == 1) {
         this.start = date;
       } else if (this.actval == 2) {
@@ -174,10 +184,13 @@ export default {
       if (this.start && this.end) {
         let _start = new Date(this.start);
         let _end = new Date(this.end);
+        let pag = 1;
         _start = _start.getTime();
         _end = _end.getTime();
+        this.oldstart = this.start;
+        this.oldend =this.end;
         if (_end > _start) {
-          this.getdata(this.start, this.end);
+          this.getdata(this.start, this.end,this.pag);
         } else {
           Toast("结束时间不能小于开始时间");
         }
@@ -207,32 +220,52 @@ export default {
       let _this = this;
       this.actday = e.currentTarget.id;
       let _date = new Date();
-      let _start = "",
-        _deff = 60 * 60 * 24 * 1000;
-      //   let _end = _this.$UTILS.dateConv(_date);
+      let _start = "",_deff = 60 * 60 * 24 * 1000;
       let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + _deff * 1;
       _end = _this.$UTILS.dateConv(new Date(_end));
-      console.log("_end:", _end);
+      this.end = _end; 
+      this.pag=1;
+      this.allLoaded = false;
+      this.oldend = _end;
       if (this.actday == "今日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
         _start = _this.$UTILS.dateConv(new Date(_start));
-        this.getdata(_start, _end);
+        this.start = _start;
+        this.oldstart = _start;
+        this.getdata(_start, _end,this.pag);
       } else if (this.actday == "7日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 7;
         _start = _this.$UTILS.dateConv(new Date(_start));
-        this.getdata(_start, _end);
+        this.start = _start;
+        this.oldstart = _start;
+        this.getdata(_start, _end,this.pag);
       } else if (this.actday == "15日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 15;
         _start = _this.$UTILS.dateConv(new Date(_start));
-        this.getdata(_start, _end);
+        this.start = _start;
+        this.oldstart = _start;
+        this.getdata(_start, _end,this.pag);
       }
     },
-    getdata: function(start, end) {
+    getdata: function(start, end,val,type) {
+      // console.log("oldstart:",this.oldstart)
+      // console.log('start:',start)
+      // console.log('oldend:',this.oldend)
+      // console.log('end:',end)
+      // console.log('val',val)
+      if(this.oldstart != start || this.oldend != end || val == 1){
+        // console.log('vates')
+        this.votes = [];
+      }
       let obj = {
         shopId: this.shopId,
         begainTime: start,
-        endTime: end
+        endTime: end,
+        page:val,
+        rows:10
       };
+      this.oldstart == start;
+      this.oldend == end;
       let _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
@@ -242,16 +275,34 @@ export default {
         if (res.data.code == "0") {
           let _data = res.data.data;
           this.total = _data.total;
-          this.votes = [];
           this.totalPrice = 0;
           if (_data.list) {
             this.totalPrice = _data.list[0].totalPrice;
             let data = _data.list;
             let arr = data.splice(0, 1);
-            this.votes = data;
+            if(data.length>0){
+              for(let j=0;j<data.length;j++){
+                this.votes.push(data[j])
+              }
+            }else{
+                this.allLoaded = true;
+            }
+          }
+          if(type == 'top'){
+            this.$refs.loadmore.onTopLoaded();
+          }else if(type == 'bot'){
+              this.$refs.loadmore.onBottomLoaded();
           }
         }
       });
+    },
+    loadTop: function() {//下拉加载
+      this.pag = 1;
+      this.getdata(this.start,this.end,this.pag,'top')
+    },
+    loadBottom: function() {// 上拉加载
+      ++this.pag;
+      this.getdata(this.start,this.end,this.pag,'bot')
     }
   }
 };
@@ -336,7 +387,6 @@ export default {
   }
   .income_list {
     background-color: #fff;
-    padding-top: 470px;
     ul {
       padding: 0;
       margin: 0;
@@ -427,6 +477,11 @@ export default {
         border-bottom: 1px solid #b1b1b1;
       }
     }
+  }
+  .filling{
+    width: 100%;
+    height: 475px;
+    background: red;
   }
   .select {
     width: 672px;
