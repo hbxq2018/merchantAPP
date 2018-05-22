@@ -205,19 +205,19 @@ export default {
           let _date = new Date();
           let _start='', _deff = 60*60*24*1000;
         //   let _end = _this.$UTILS.dateConv(_date);
-          let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + deff*1;
+          let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + _deff*1;
           _end = _this.$UTILS.dateConv(new Date(_end));
           console.log("_end:",_end)
           if(this.actday == '今日'){
-            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*1;
+            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff*1;
             _start = _this.$UTILS.dateConv(new Date(_start));
             this.getdata(_start,_end);
           }else if(this.actday == '7日'){
-            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*7;
+            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff*7;
             _start = _this.$UTILS.dateConv(new Date(_start));
             this.getdata(_start,_end);
           }else if(this.actday == '15日'){
-            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - deff*15;
+            _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff*15;
             _start = _this.$UTILS.dateConv(new Date(_start));
             this.getdata(_start,_end);
           }
