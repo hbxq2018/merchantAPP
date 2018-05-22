@@ -118,7 +118,7 @@ function dateConv(dateStr) {
     today = dateStr.getDate();
   month = month > 9 ? month : "0" + month;
   today = today > 9 ? today : "0" + today;
-  return year + "-" + month + "-" + today;
+  return year + "/" + month + "/" + today;
 }
 
 const methods = {

@@ -5,7 +5,7 @@
             <mt-button icon="back"></mt-button>
           </router-link>
         </mt-header>
-        <div class="top_distance" v-if="data.length>0">
+        <div class="top_distance" v-if="data">
           <div class="check_top">
             <div class="check_top_time" ><span>2018</span>年</div>
             <div class="income_operate_time" @click="moreyear">
@@ -25,7 +25,7 @@
             </div>
           </div>
         </div>
-        <div class="top_distance" v-else>暂无数据</div>
+        <div  v-if="!data" class="top_distance">暂无数据</div>
   </div>
 </template>
 
@@ -67,10 +67,10 @@ export default {
     let _this = this;
     let _date = new Date();
     let _start =_this.$UTILS.dateConv(_date);
-    let arr = _start.split("-");
-    arr[1] = "01";
+    let arr = _start.split("/");
+    arr[1]= '01';
     arr[2] = "01";
-    _start = arr.join("-");
+    _start = arr.join("/");
     let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
     _end = _this.$UTILS.dateConv(new Date(_end));
     let obj = {
@@ -78,15 +78,14 @@ export default {
       begainTime: _start,
       endTime: _end
     };
-    let parms = "",
-      value = "";
+    let parms = "",value = "";
     for (var key in obj) {
       value += key + '=' + obj[key] + '&';
     }
     value = value.substring(0, value.length-1);
     this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
       if (res.data.code == 0) {
-        this.data = res.data.data;
+        _this.data = res.data.data;
       }
     });
   }

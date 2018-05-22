@@ -214,7 +214,7 @@ export default {
       _end = _this.$UTILS.dateConv(new Date(_end));
       console.log("_end:", _end);
       if (this.actday == "今日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 1;
+        _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.getdata(_start, _end);
       } else if (this.actday == "7日") {

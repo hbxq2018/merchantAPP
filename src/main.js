@@ -13,6 +13,7 @@ import UTILS from '../untils/util'
 Vue.prototype.$axios = axios;
 Vue.prototype.$GLOBAL = GLOBAL;
 Vue.prototype.$UTILS = UTILS;
+
 Vue.use(MintUI);
 new Vue({
   el: '#app',

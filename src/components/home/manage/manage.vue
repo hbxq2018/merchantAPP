@@ -110,7 +110,7 @@ export default {
       });
     },
     getshopinfo:function(){ //获取商家信息
-      this.$axios.get('/api/shop/get/'+this.shopId)
+      this.$axios.get('zzshop/get/'+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){
           let data = res.data.data;

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/login/login'
+import Author from '@/components/login/author'
 import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
 import Writeoff from '@/components/home/income/writeoff'
@@ -23,6 +24,7 @@ import Edit from '@/components/home/manage/edit'
 import Ticket from '@/components/home/ticket/ticket'
 Vue.use(Router)
 
+
 export default new Router({
   routes: [
     {
@@ -39,6 +41,11 @@ export default new Router({
       path: '/home',
       name: 'Home',
       component: Home
+    },
+    {
+      path: '/author',
+      name: 'Author',
+      component: Author
     },
     {
       path: '/manage',
