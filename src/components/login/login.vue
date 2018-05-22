@@ -46,7 +46,7 @@ export default {
       veridyTime: "", //获取验证码的时间
       verifyCode: "", //验证码
       timeFlag: true,
-      _type:'2' //来源   1小程序 2H5 3安卓 4IOS 
+      _type: "2" //来源   1小程序 2H5 3安卓 4IOS
     };
   },
   store,
@@ -68,17 +68,20 @@ export default {
       }
       return flag;
     },
-    securityCode() { //获取验证码
+    securityCode() {
+      //获取验证码
       let _this = this;
       if (!this.timeFlag) {
         return false;
       }
       let RegExp = /^(1[3584]\d{9})$/;
-      if ( RegExp.test(this.telephone)) {
+      if (RegExp.test(this.telephone)) {
         // this.$GLOBAL.API  <==> /api/   上线时所有替换
-        console.log("this.telephone:",this.telephone)
+        console.log("this.telephone:", this.telephone);
         this.$axios
-          .post("/api/app/sms/sendForShopAppRegister?shopMobile="+this.telephone)
+          .post(
+            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+          )
           .then(res => {
             let data = res.data;
             if (data.code == 0) {
@@ -111,11 +114,12 @@ export default {
             console.log(err);
           });
       } else {
-        this.telephone='';
+        this.telephone = "";
         Toast("请填写正确的手机号");
       }
     },
-    verification() {//判断输入验证码是否正确
+    verification() {
+      //判断输入验证码是否正确
       let _parms = {
           shopMobile: this.telephone,
           smsContent: this.password
@@ -139,14 +143,16 @@ export default {
           console.log(err);
         });
     },
-    signIn() {//商家注册
+    signIn() {
+      //商家注册
       let _this = this;
       this.$axios
         .get("/api/app/user/findUserByMobile?mobile=" + this.telephone)
         .then(res => {
           this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
-            if (res.data.data == null) {//新用户为null
+            if (res.data.data == null) {
+              //新用户为null
               _this.addShop();
             } else if (
               res.data.data.userType == 1 &&
@@ -168,9 +174,10 @@ export default {
           console.log(err);
         });
     },
-    addShop() { //添加商户 
+    addShop() {
+      //添加商户
       let _this = this;
-      let _parms = { mobile: this.telephone,sourceType:this._type };
+      let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
         .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
@@ -185,7 +192,8 @@ export default {
           console.log(err);
         });
     },
-    getshopinfo: function(id) { //获取商家信息
+    getshopinfo: function(id) {
+      //获取商家信息
       this.$axios.get("/api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
@@ -193,12 +201,14 @@ export default {
         }
       });
     },
-    searchByUserId(id) {//判断商家是否在审核中
+    searchByUserId(id) {
+      //判断商家是否在审核中
       let _this = this;
       this.$axios
         .get("/api/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
-          if (res.data.code == 0) {//0待审核  1审核通过  2审核不通过
+          if (res.data.code == 0) {
+            //0待审核  1审核通过  2审核不通过
             if (res.data.data && res.data.data.status) {
               let status = res.data.data.status;
               if (status == 0) {
@@ -218,7 +228,7 @@ export default {
                 });
               }
             } else {
-              this.$router.push({name: 'Process',params:{}});
+              this.$router.push({ name: "Process", params: {} });
             }
           }
         });
@@ -231,28 +241,27 @@ export default {
     },
     setScroll() {
       const ua = navigator.userAgent.toLowerCase();
-        if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
-          this._type = 4;
-        } else if (/(Android)/i.test(ua)) {
-          this._type = 3;
-          document.documentElement.style.height = this.screenHeight + "px";
-          document.body.style.height = this.screenHeight + "px";
-        } else {
-        	this._type = 2;
-        }
-    },
+      if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+        this._type = 4;
+      } else if (/(Android)/i.test(ua)) {
+        this._type = 3;
+        document.documentElement.style.height = this.screenHeight + "px";
+        document.body.style.height = this.screenHeight + "px";
+      } else {
+        this._type = 2;
+      }
+    }
   },
-  created(){
-    console.log("this.telephone")
+  created() {
+    console.log("this.telephone");
     this.setScroll();
   }
-  
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
-@import 'mint-ui/lib/style.css';
+@import "mint-ui/lib/style.css";
 @import url(../../common/css/common.css);
 .login {
   width: 100%;

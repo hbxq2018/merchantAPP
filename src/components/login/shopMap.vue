@@ -3,15 +3,17 @@
     <mt-header title="详细地址">
       <mt-button slot="left" icon="back" @click="backtrack"></mt-button>
     </mt-header>
-    <span @click="turnprovince">
-      <mt-cell title="省/县/市" is-link>{{obj.Province}}-{{obj.City}}-{{obj.county}}</mt-cell>
-    </span>
-    <mt-cell title="详细地址"><input v-model="obj.address" class="address" type="text"></mt-cell>
-    <div class="tishi">提示：为了方便顾客准确导航，请在地图标出店铺位置</div>
-    <div class="map" id="container" style="width:100%; height:600px">
-    </div>
-    <div v-show="ispro" class="molde" @click="shutprovince">
-       <mt-picker :slots="myAddressSlots" @change="onMyAddressChange"></mt-picker>
+    <div class="shopMap_cont">
+      <span @click="turnprovince">
+        <mt-cell title="省/县/市" is-link>{{obj.Province}}-{{obj.City}}-{{obj.county}}</mt-cell>
+      </span>
+      <mt-cell title="详细地址"><input v-model="obj.address" class="address" type="text"></mt-cell>
+      <div class="tishi">提示：为了方便顾客准确导航，请在地图标出店铺位置</div>
+      <div class="map" id="container" style="width:100%; height:600px">
+      </div>
+      <div v-show="ispro" class="molde" @click="shutprovince">
+        <mt-picker :slots="myAddressSlots" @change="onMyAddressChange"></mt-picker>
+      </div>
     </div>
   </div>
 </template>
@@ -199,42 +201,52 @@
   }
 </script>
 <style lang="less">
-  .shopMap{
-    .map{
+  .shopMap {
+    .mint-header {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 80%;
+      z-index: 1000;
     }
-    .mint-cell-value{
-      color: #808080;
-      font-size: 30px;
-    }
-    .address{
-      width: 550px;
-      border: none;
-    }
-    .tishi{
-      width: 100%;
-      height: 65px;
-      line-height: 65px;
-      color: #fff;
-      background: #4897FE;
-      text-align: center;
-    }
-    .molde{
-      width:100%;
-      height:100%;
-      position:fixed;
-      left:0;
-      top:0;
-      z-index: 99999;
-      overflow:auto;
-      background:rgba(0,0,0,0.44)!important;
-      .picker{
+    .shopMap_cont{
+      padding-top: 80px;
+      .map{
+        width: 100%;
+        height: 80%;
+      }
+      .mint-cell-value{
+        color: #808080;
+        font-size: 30px;
+      }
+      .address{
+        width: 550px;
+        border: none;
+      }
+      .tishi{
+        width: 100%;
+        height: 65px;
+        line-height: 65px;
+        color: #fff;
+        background: #4897FE;
+        text-align: center;
+      }
+      .molde{
         width:100%;
-        background: #fff;
-        position:absolute;
+        height:100%;
+        position:fixed;
         left:0;
-        bottom:0;
+        top:0;
+        z-index: 99999;
+        overflow:auto;
+        background:rgba(0,0,0,0.44)!important;
+        .picker{
+          width:100%;
+          background: #fff;
+          position:absolute;
+          left:0;
+          bottom:0;
+        }
       }
     }
   }
