@@ -40,8 +40,8 @@
                 <span class="stleft">选择起始时间</span>
             </div>
             <div class="date">
-                <div @click.stop="openPicker(1)">开始时间：{{start}}</div>
-                <div @click.stop="openPicker(2)">结束时间：{{end}}</div>
+                <div @click.stop="openPicker(1)">开始时间：<span>{{start}}</span></div>
+                <div @click.stop="openPicker(2)">结束时间：<span>{{end}}</span></div>
             </div>
             <div class="selbut">
                 <div class="close" @click="close">取消</div>
@@ -462,23 +462,27 @@ export default {
       border-bottom: 15px solid #fff;
       border-left: 15px solid rgba(0, 0, 0, 0);
       float: right;
+      margin-top: 65px;
       margin-right: 43px;
     }
     .moreday {
       width: 126px;
-      height: 244px;
+      height: 220px;
       background: #fff;
       float: right;
       margin-right: -70px;
-      margin-top: 14px;
-
+      margin-top: 79px;
+      border-radius: 20px;
       .adays {
         width: 80%;
         margin-left: 10%;
-        height: 77px;
-        line-height: 77px;
+        height: 70px;
+        line-height: 70px;
         font-style: normal;
         border-bottom: 1px solid #b1b1b1;
+      }
+      .adays:nth-last-child(1){
+        border: none;
       }
     }
   }
@@ -512,6 +516,9 @@ export default {
         text-align: left;
         width: 80%;
         margin-left: 10%;
+        span{
+          color: #fc5e2d;
+        }
       }
     }
     .selbut {

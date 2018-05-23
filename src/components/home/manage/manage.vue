@@ -1,12 +1,9 @@
 <template>
   <div class="manage">
       <mt-header :title="name">
-        <router-link to="/home" slot="left">
-            <mt-button icon="back"></mt-button>
-        </router-link>
+        <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         <mt-button slot="right" @click="save">保存</mt-button>
-      </mt-header>
-
+      </mt-header> 
       <div class="man_info">商户信息</div>
 
       <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
@@ -15,21 +12,21 @@
 
       <div class="hexiaoyuan">
           <i class="man_hexiao">核销员</i>
-          <i class="man_add" @click="clickadd">+添加</i>
+          <i class="man_add" @click="clickadd" v-if="ismain">+添加</i>
       </div>
       <ul class="man_write" v-if="writedata">
           <li class="man_lis" v-for="(item,index) in writedata" :key="index" >
             <img class="man_src" :src="item.iconUrl" :alt="item.name">
            <span class="man_name">{{set(item)}}</span>
-           <span class="nam_del" @click="clickdel" :id="index">删除</span>
+           <span class="nam_del" @click="clickdel" :id="index" v-if="ismain">删除</span>
           </li>
       </ul>
   </div>
 </template>
 <script>
-import { MessageBox ,Toast} from "mint-ui";
-import store from '@/vuex/store'
-import {mapState,mapMutations} from 'vuex';
+import { MessageBox, Toast } from "mint-ui";
+import store from "@/vuex/store";
+import { mapState, mapMutations } from "vuex";
 export default {
   name: "Manage",
   data() {
@@ -49,7 +46,7 @@ export default {
         },
         {
           name: "环境分类",
-         to: "/edit",
+          to: "/edit",
           value: ""
         },
         {
@@ -59,163 +56,279 @@ export default {
         },
         {
           name: "店铺简介",
-         to: "/edit",
+          to: "/edit",
           value: ""
         }
       ],
-      writedata:[]
-    }
+      writedata: [],
+      ismain: false
+    };
   },
   store,
-  computed:{
-    ...mapState(['userInfo','shopId']),
+  computed: {
+    ...mapState(["userInfo", "shopId", "shopInfo"])
   },
   methods: {
-    ...mapMutations(['setuserInfo']),
-    set:function(val){
-      if(val.nickName){
-        return val.nickName
-      }else if(val.userName){
-        let name =  val.userName.substr(0,3)+"****"+val.userName.substr(7);  
-        return name 
+    ...mapMutations(["setuserInfo"]),
+    account: function() {
+      //查询当前用户是否是当前商家的主账号
+      let obj = { shopId: this.userInfo.id },
+        _value = "",
+        hxdata = {};
+      for (var key in obj) {
+        _value += key + "=" + obj[key] + "&";
+      }
+      _value = _value.substring(0, _value.length - 1);
+      this.$axios
+        .get("/api/app/shopCashier/adminByShopId?" + _value)
+        .then(res => {
+          if (res.data.code == "0") {
+            if (res.data.data && res.data.data.id) {
+              if (res.data.data.cashierId == this.shopInfo.id) {
+                this.ismain = true;
+              }
+            } else {
+              this.ismain = false;
+            }
+          }
+        });
+    },
+    clickback: function() {
+      MessageBox.confirm("是否确定放弃修改?").then(
+        action => {
+          this.$router.push({ name: "Home", params: {} });
+        },
+        () => {
+          // MessageBox('提示', '是否放弃保存修改内容？');
+        }
+      );
+    },
+    set: function(val) {
+      if (val.nickName) {
+        return val.nickName;
+      } else if (val.userName) {
+        let name = val.userName.substr(0, 3) + "****" + val.userName.substr(7);
+        return name;
       }
     },
     save: function() {
       let userdata = this.userInfo;
-      MessageBox.confirm('确定进行保存?').then(action => {
-        let obj = {
-          id:userdata.id,
-          phone:userdata.phone,
-          mobile:userdata.mobile,
-          address:userdata.address,
-          shopInfo:userdata.shopInfo,
-          locationX:userdata.locationX,
-          locationY:userdata.locationY,
-          businessCate:userdata.businessCate
-        }
-        let _value='';
-        for(var key in obj) {
-          _value += key + '=' + obj[key] + '&';
-        }
-        _value = _value.substring(0, _value.length-1);
-        this.$axios.post("/api/app/shop/update?"+_value)
-        .then((res) => {
-          if(res.data.code == '0'){
-            MessageBox('提示', '保存成功');
-            this.getshopinfo();
+      MessageBox.confirm("确定进行保存?").then(
+        action => {
+          let obj = {
+            id: userdata.id,
+            phone: userdata.phone,
+            mobile: userdata.mobile,
+            address: userdata.address,
+            shopInfo: userdata.shopInfo,
+            locationX: userdata.locationX,
+            locationY: userdata.locationY,
+            businessCate: userdata.businessCate
+          };
+          let _value = "";
+          for (var key in obj) {
+            _value += key + "=" + obj[key] + "&";
           }
-        })
-      },() => {
-        MessageBox('提示', '是否放弃保存修改内容？');
+          _value = _value.substring(0, _value.length - 1);
+          this.$axios.post("/api/app/shop/update?" + _value).then(res => {
+            if (res.data.code == "0") {
+              MessageBox("提示", "保存成功");
+              this.getshopinfo();
+            }
+          });
+        },
+        () => {
+          MessageBox("提示", "是否放弃保存修改内容？");
+        }
+      );
+    },
+    getshopinfo: function() {
+      //获取商家信息
+      this.$axios.get("/api/shop/get/" + this.shopId).then(res => {
+        if (res.data.code == "0") {
+          let data = res.data.data;
+          this.setuserInfo(data);
+        }
       });
     },
-    getshopinfo:function(){ //获取商家信息
-      this.$axios.get('zzshop/get/'+this.shopId)
-      .then((res) => {
-        if(res.data.code ==  '0'){
-          let data = res.data.data;
-          this.setuserInfo(data)
-        }
-      })
-    },
-    clickformli:function(e){
+    clickformli: function(e) {
       const ind = e.currentTarget.id;
-      let obj={};
-      for(let i=0;i<this.formdata.length;i++){
-        if(ind == this.formdata[i].id){
-          obj = this.formdata[i]
-          this.$router.push({name:'/edit',params:{id:obj.id,name:obj.name}})
+      let obj = {};
+      for (let i = 0; i < this.formdata.length; i++) {
+        if (ind == this.formdata[i].id) {
+          obj = this.formdata[i];
+          this.$router.push({
+            name: "/edit",
+            params: { id: obj.id, name: obj.name }
+          });
         }
       }
     },
     clickadd: function() {
-      MessageBox.prompt("添加核销员").then(({ value, action }) => {
-        if(action == 'confirm'){
-          let obj = {
-              src: "../../../../static/images/timg (2).jpg",
-              name: ""
-          }
-          if(value){
-            const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
-            if (!reg.test(value)) {
-              MessageBox('提示', '手机号输入错误');  
-              return false;  
-            }
-            let obj = {
-              shopId:this.shopId,
-              mobile:value
-            }
-            let _value='';
-            for(var key in obj) {
-              _value += key + '=' + obj[key] + '&';
-            }
-            _value = _value.substring(0, _value.length-1);
-            this.$axios.post("/api/app/user/addHxUser?"+_value)
-            .then((res) => {
-              if(res.data.code == '0'){
-                this.getWritelist(1)
+      MessageBox.prompt("添加核销员").then(
+        ({ value, action }) => {
+          if (action == "confirm") {
+            if (value) {
+              const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              if (!reg.test(value)) {
+                MessageBox("提示", "手机号输入错误");
               }else{
-                MessageBox('提示', res.data.message);  
+                this.inquire(value,'add')
               }
-            })
-          }else{
-            MessageBox('提示', '请输入核销员手机号');
+            } else {
+              MessageBox("提示", "请输入核销员手机号");
+            }
           }
+        },
+        () => {}
+      );
+    },
+    inquire: function(value,type) {//查询要添加的用户是否已经是核销员
+      let obj1 = { mobile: value },_value1 = "", hxdata = {};
+      for (var key in obj1) {
+        _value1 += key + "=" + obj1[key] + "&";
+      }
+      _value1 = _value1.substring(0, _value1.length - 1);
+      this.$axios.get("/api/app/user/findUserByMobile?" + _value1).then(res => {
+        if (res.data.code == "0") {
+          hxdata = res.data.data;
+          console.log("hxdata:", hxdata);
+          if (hxdata.userType == 2 && hxdata.shopId) {
+            if(type == 'del'){
+              this.deleteHxUser(value);
+              this.shopCashier(hxdata, 2);
+            }else{
+              MessageBox("提示", "该用户已是核销员，请勿重复添加");
+            }
+          } else {
+            if(type == 'add'){
+              this.addHxUser(value);
+              this.shopCashier(hxdata, 1);
+            }
+          }
+        } else {
+          MessageBox("提示", res.data.message);
         }
-      },()=>{});
+      });
+    },
+    addHxUser: function(value) {
+      let obj = {
+        shopId: this.shopId,
+        mobile: value
+      };
+      let _value = "";
+      for (var key in obj) {
+        _value += key + "=" + obj[key] + "&";
+      }
+      _value = _value.substring(0, _value.length - 1);
+      this.$axios.post("/api/app/user/addHxUser?" + _value).then(res => {
+        if (res.data.code == "0") {
+          this.getWritelist(1);
+        } else {
+          MessageBox("提示", res.data.message);
+        }
+      });
+    },
+    shopCashier: function(data,type) {
+      let obj = {
+        cashierId: data.id,
+        cashierName: data.userName,
+        shopId: this.userInfo.id,
+        parentId: this.shopInfo.id
+      };
+      let _value = "",
+        url = "";
+      for (var key in obj) {
+        _value += key + "=" + obj[key] + "&";
+      }
+      _value = _value.substring(0, _value.length - 1);
+      if (type == 1) {
+        url = "app/shopCashier/add?";
+      } else if (type == 2) {
+        url = "app/shopCashier/delete?";
+      }
+      this.$axios.post("/api/" + url + _value).then(res => {
+        if (res.data.code == "0") {
+          console.log("操作成功");
+        } else {
+          // MessageBox("提示", res.data.message);
+        }
+      });
     },
     clickdel: function(e) {
       const ind = e.currentTarget.id;
-      MessageBox.confirm('确定要删除吗？').then(action => {
-        let [...arr] = this.writedata
-        if(action == 'confirm'){
-          let obj = {
-            shopId:this.shopId,
-            mobile:arr[ind].mobile
-          }
-          let _value='';
-          for(var key in obj) {
-            _value += key + '=' + obj[key] + '&';
-          }
-          _value = _value.substring(0, _value.length-1);
-          this.$axios.post("/api/app/user/deleteHxUser?"+_value)
-          .then((res) => {
-            if(res.data.code == '0'){
-              this.getWritelist(2)
-            }
-          })
-        }
-      },()=>{});
-    },
-    setvalue:function(val){
-      if(val.length>13){
-        let str = val.substring(0,13) + '...';
-        return str
+      let [...arr] = this.writedata;
+      console.log("arr:", arr);
+
+      if (arr[ind].mobile == this.shopInfo.mobile) {
+        MessageBox("提示", "不可以删除主账号");
       }else{
-        return val
+        MessageBox.confirm("确定要删除吗？").then(
+        action => {
+          if (action == "confirm") {
+            // this.inquire(arr[ind].mobile,'del')
+            this.deleteHxUser(arr[ind].mobile);
+            this.shopCashier(arr[ind], 2);
+          }
+        },
+        () => {}
+      );
       }
     },
-    getWritelist:function(val){  //获取核销员列表
-      this.$axios.post("/api/app/user/listForShopId?shopId="+this.shopId)
-      .then((res) => {
-        if(res.data.code ==  '0'){
-          this.writedata = res.data.data;
-          if(val == '1'){
-            Toast('添加成功');
-          }else if(val == '2'){
-            Toast('删除成功');
-          };
-        }
-      })
+    deleteHxUser:function(value){
+      let obj = {
+        shopId: this.shopId,
+        mobile: value
+      };
+      let _value = "";
+      for (var key in obj) {
+        _value += key + "=" + obj[key] + "&";
+      }
+      _value = _value.substring(0, _value.length - 1);
+      this.$axios
+        .post("/api/app/user/deleteHxUser?" + _value)
+        .then(res => {
+          if (res.data.code == "0") {
+            this.getWritelist(2);
+          }
+        });
     },
-    setformdata:function(){
-      if(this.userInfo){
+    setvalue: function(val) {
+      if (val.length > 13) {
+        let str = val.substring(0, 13) + "...";
+        return str;
+      } else {
+        return val;
+      }
+    },
+    getWritelist: function(val) {
+      //获取核销员列表
+      this.$axios
+        .post("/api/app/user/listForShopId?shopId=" + this.shopId)
+        .then(res => {
+          if (res.data.code == "0") {
+            this.writedata = res.data.data;
+            if (val == "1") {
+              Toast("添加成功");
+            } else if (val == "2") {
+              Toast("删除成功");
+            }
+          }
+        });
+    },
+    setformdata: function() {
+      if (this.userInfo) {
         let shopdata = this.userInfo;
         let ind = shopdata.businessCate.indexOf("/");
-        let val1 = shopdata.businessCate.slice(0,ind);
-        let val2 = shopdata.businessCate.slice(ind+1,shopdata.businessCate.length);
+        let val1 = shopdata.businessCate.slice(0, ind);
+        let val2 = shopdata.businessCate.slice(
+          ind + 1,
+          shopdata.businessCate.length
+        );
         this.name = shopdata.shopName;
-        this.formdata[0].value = shopdata.phone?shopdata.phone:shopdata.mobile;
+        this.formdata[0].value = shopdata.phone
+          ? shopdata.phone
+          : shopdata.mobile;
         this.formdata[1].value = val1;
         this.formdata[2].value = val2;
         this.formdata[3].value = shopdata.address;
@@ -223,25 +336,27 @@ export default {
       }
     }
   },
-  created:function(){
-    
-    if(this.writedata.length<1){
-      this.getWritelist()
+  created: function() {
+    this.account();
+    console.log("userInfo:", this.userInfo);
+    console.log("shotInfo:", this.shopInfo);
+    if (this.writedata.length < 1) {
+      this.getWritelist();
     }
 
-    if(!this.formdata[0].value){
+    if (!this.formdata[0].value) {
       this.setformdata();
     }
-   if (this.$route.query.address) {
+    if (this.$route.query.address) {
       let adr = this.$route.query;
       this.address = adr.Province + adr.City + adr.county + adr.address;
       (this.locationX = adr.lng),
         (this.locationY = adr.lat),
         (this.city = adr.City);
     }
-    if(this.$route.params.ind){
-      let obj = this.$route.params
-      this.formdata[obj.ind].value = obj.value
+    if (this.$route.params.ind) {
+      let obj = this.$route.params;
+      this.formdata[obj.ind].value = obj.value;
     }
   }
 };

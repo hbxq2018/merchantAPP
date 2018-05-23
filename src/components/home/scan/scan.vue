@@ -1,8 +1,16 @@
 <template>
   <div class="scan">
-    <div id="bcid">
+    <div id="bcid" class="bcid" v-if="usedis">
       <div style="height:40%"></div>
       <p class="tip">...载入中...</p>
+    </div>
+    <div v-if="!usedis" class="bcid">
+      
+      <div class="tishi">
+        券不存在或者已经被使用<br>
+        <button @click="scanning">开始扫码</button>
+      </div>
+      
     </div>
     <footer>
       <div class="footerleft" @click="gowrite">
@@ -23,7 +31,8 @@ export default {
   data() {
     return {
       codeUrl: "",
-      codenum: ""
+      codenum: "",
+      usedis:true
     };
   },
   created: function() {},
@@ -31,6 +40,9 @@ export default {
     this.startRecognize();
   },
   methods: {
+    scanning:function(){
+      this.usedis = !this.usedis;
+    },
     //创建扫描控件
     startRecognize() {
       let that = this;
@@ -64,6 +76,7 @@ export default {
           if (data.code == 0) {
             if(data.data.isUsed == 1){
               Toast("券不存在或者已经被使用");
+              this.usedis = false;
             }else{
               this.gowrite();
             }
@@ -112,7 +125,7 @@ export default {
 .scan {
   height: 100%;
   color: #fff;
-  #bcid {
+  .bcid {
     width: 100%;
     position: absolute;
     left: 0;
@@ -122,6 +135,12 @@ export default {
     text-align: center;
     color: #fff;
     background: #ccc;
+    .tishi{
+      margin-top: 60%;
+      button{
+        margin-top:40px;
+      }
+    }
   }
   footer {
     position: absolute;

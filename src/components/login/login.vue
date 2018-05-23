@@ -103,7 +103,7 @@ export default {
                     ? Math.floor(countdown / 60) + "分"
                     : "";
                 senconds = countdown % 60 == 0 ? "" : countdown % 60 + "秒";
-                _this.veridyBtn = minutes + senconds + "后发送验证码";
+                _this.veridyBtn = minutes + senconds + "后重发验证码";
               }, 1000);
             } else {
               _this.timeFlag = false;

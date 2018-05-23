@@ -170,7 +170,7 @@ export default {
   top: 0px;
   width: 100%;
   height: 100%;
-  margin-top: 10%;
+  margin-top: 11%;
   z-index: 1;
   padding-top: 20px;
   .code {
