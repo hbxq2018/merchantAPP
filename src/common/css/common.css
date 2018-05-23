@@ -163,6 +163,7 @@ ol {
 /* 公共样式 非mint-ui样式 */
 .loadBottom{
     overflow: scroll;
+    height: 600px;
 }
 .category .category_item{
     height: 100px;

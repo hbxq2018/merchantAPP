@@ -57,7 +57,7 @@ export default {
     //   app/so/getForOrder/
       if(this.$route.params.id){
         let id = this.$route.params.id;
-      this.$axios.get('/api/app/hx/get/'+id)
+      this.$axios.get("/app/hx/get/"+id)
         .then((res) => {
             if(res.data.code ==  '0'){
                let _data = res.data.data;

@@ -131,6 +131,7 @@ export default {
     },
     loadTop: function() {//下拉加载
       this.pag = 1;
+      this.allLoaded = false;
       this.getdata(this.pag,'top')
     },
     loadBottom: function() {// 上拉加载
@@ -139,6 +140,10 @@ export default {
     }
   },
   created: function() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+      this.scrollMode = 'touch';
+    }
     this.getdata(this.pag)
   }
 };

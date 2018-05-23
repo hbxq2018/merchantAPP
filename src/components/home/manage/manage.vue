@@ -98,7 +98,7 @@ export default {
           _value += key + '=' + obj[key] + '&';
         }
         _value = _value.substring(0, _value.length-1);
-        this.$axios.post('/api/app/shop/update?'+_value)
+        this.$axios.post("/api/app/shop/update?"+_value)
         .then((res) => {
           if(res.data.code == '0'){
             MessageBox('提示', '保存成功');
@@ -150,7 +150,7 @@ export default {
               _value += key + '=' + obj[key] + '&';
             }
             _value = _value.substring(0, _value.length-1);
-            this.$axios.post('/api/app/user/addHxUser?'+_value)
+            this.$axios.post("/api/app/user/addHxUser?"+_value)
             .then((res) => {
               if(res.data.code == '0'){
                 this.getWritelist(1)
@@ -178,7 +178,7 @@ export default {
             _value += key + '=' + obj[key] + '&';
           }
           _value = _value.substring(0, _value.length-1);
-          this.$axios.post('/api/app/user/deleteHxUser?'+_value)
+          this.$axios.post("/api/app/user/deleteHxUser?"+_value)
           .then((res) => {
             if(res.data.code == '0'){
               this.getWritelist(2)
@@ -196,7 +196,7 @@ export default {
       }
     },
     getWritelist:function(val){  //获取核销员列表
-      this.$axios.post('/api/app/user/listForShopId?shopId='+this.shopId)
+      this.$axios.post("/api/app/user/listForShopId?shopId="+this.shopId)
       .then((res) => {
         if(res.data.code ==  '0'){
           this.writedata = res.data.data;

@@ -131,6 +131,10 @@ export default {
   },
   created: function() {
     let _this = this;
+    const ua = navigator.userAgent.toLowerCase();
+      if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+        this.scrollMode = 'touch';
+      }
     let _date = new Date();
     let _mindata =
       new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000 * 365;
@@ -278,11 +282,10 @@ export default {
           this.totalPrice = 0;
           if (_data.list) {
             this.totalPrice = _data.list[0].totalPrice;
-            let data = _data.list;
-            let arr = data.splice(0, 1);
-            if(data.length>0){
-              for(let j=0;j<data.length;j++){
-                this.votes.push(data[j])
+            let arr = _data.list.splice(0, 1);
+            if(_data.list.length>0){
+              for(let j=0;j<_data.list.length;j++){
+                this.votes.push(_data.list[j])
               }
             }else{
                 this.allLoaded = true;
@@ -298,6 +301,7 @@ export default {
     },
     loadTop: function() {//下拉加载
       this.pag = 1;
+      this.allLoaded = false;
       this.getdata(this.start,this.end,this.pag,'top')
     },
     loadBottom: function() {// 上拉加载
@@ -480,7 +484,7 @@ export default {
   }
   .filling{
     width: 100%;
-    height: 475px;
+    height: 465px;
     background: red;
   }
   .select {

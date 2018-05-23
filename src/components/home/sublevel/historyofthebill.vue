@@ -83,7 +83,7 @@ export default {
       value += key + '=' + obj[key] + '&';
     }
     value = value.substring(0, value.length-1);
-    this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
+    this.$axios.get("/apiapp/hx/listAmount?" + value).then(res => {
       if (res.data.code == 0) {
         _this.data = res.data.data;
       }
@@ -95,11 +95,10 @@ export default {
 <style lang="less">
 .billCheck {
   width: 100%;
-  height: 100%;
+  height:94%;
+  padding-top: 10%;
   background: #ebebeb;
-  .top_distance:nth-child(2) {
-    margin-top: 90px;
-  }
+ 
   .check_top {
     width: 100%;
     height: 80px;

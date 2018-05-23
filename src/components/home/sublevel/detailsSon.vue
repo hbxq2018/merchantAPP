@@ -15,21 +15,21 @@
         <div class="murcielago">
             <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
         </div>
-            <div class="loadBottom" :style="{'-webkit-overflow-scrolling': scrollMode}">
-        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmore"> 
-        <div class="order_history" v-for="(item,index) in writedata" :key="index">
-            <div class="order_h_sublevel">
-                <div class="roder_left">
-                    <b>{{item.couponAmount}}<span>元代金券</span></b>
-                    <p>{{item.updateTime}}</p>
-                </div>
-                <div class="roder-right">
-                    <span>&yen;{{item.couponAmount/10}}</span>
+        <div class="loadBottom" :style="{'-webkit-overflow-scrolling': scrollMode}">
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore"> 
+            <div class="order_history" v-for="(item,index) in writedata" :key="index">
+                <div class="order_h_sublevel">
+                    <div class="roder_left">
+                        <b>{{item.couponAmount}}<span>元代金券</span></b>
+                        <p>{{item.updateTime}}</p>
+                    </div>
+                    <div class="roder-right">
+                        <span>&yen;{{item.couponAmount/10}}</span>
+                    </div>
                 </div>
             </div>
+          </mt-loadmore>
         </div>
-        </mt-loadmore>
-    </div>
      </div>
   </div>
 </template>
@@ -94,11 +94,11 @@ export default {
             this.first = _data[0];
             _data = _data.slice(1, _data.length);
             if(_data.length>0){
-                for(let i=0;i<_data.length;i++){
-                    this.writedata.push(_data[i]);
-                }
+              for(let i=0;i<_data.length;i++){
+                  this.writedata.push(_data[i]);
+              }
             }else{
-                 this.allLoaded = true;
+              this.allLoaded = true;
             }
           }
           if(type == 'top'){
@@ -111,6 +111,7 @@ export default {
     },
     loadTop: function() {//下拉加载
       this.pag = 1;
+      this.allLoaded = false;
       this.getdata(this.pag,'top')
     },
     loadBottom: function() {// 上拉加载
@@ -119,6 +120,10 @@ export default {
     }
   },
   created: function() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+      this.scrollMode = 'touch';
+    }
     this.ind = this.$route.params.ind;
     this.getdata(this.pag)
   }

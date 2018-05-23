@@ -90,7 +90,7 @@ export default {
   created:function(){
     if(!this.data.id){  
         let mobile = '15827245422';
-        this.$axios.get('/api/app/user/findUserByMobile?mobile='+mobile)
+        this.$axios.get("/api/app/user/findUserByMobile?mobile="+mobile)
         .then((res) => {
             this.data= res.data.data
         })
