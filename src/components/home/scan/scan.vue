@@ -1,14 +1,13 @@
 <template>
   <div class="scan">
-    <div id="bcid" class="bcid" v-if="usedis">
+    <div id="bcid" class="bcid">
       <div style="height:40%"></div>
       <p class="tip">...载入中...</p>
     </div>
-    <div v-if="!usedis" class="bcid">
+    <div v-show="!usedis" class="bcid">
       
       <div class="tishi">
-        券不存在或者已经被使用<br>
-        <button @click="scanning">开始扫码</button>
+        <mt-button type="primary" @click="scanning">开始扫码</mt-button>
       </div>
       
     </div>
@@ -24,7 +23,9 @@
 </template>
 
 <script>
-import { Toast } from "mint-ui";
+import Vue from "vue";
+import { Toast,Button } from "mint-ui";
+Vue.component(Button.name, Button);
 let scan = null;
 export default {
   name: "Scan",
@@ -42,6 +43,7 @@ export default {
   methods: {
     scanning:function(){
       this.usedis = !this.usedis;
+      this.startRecognize();
     },
     //创建扫描控件
     startRecognize() {
@@ -51,19 +53,27 @@ export default {
       scan.onmarked = onmarked;
       that.startScan();
       function onmarked(type, result, file) {
+        //二维码type=0;  条形码type=1
         if (type == 0) {
-          let arr = result.split("/");
-          console.log("arr:", arr);
-          console.log("arr.length-1:", arr[arr.length - 1]);
-          console.log(typeof arr[arr.length - 1]);
-          if (typeof (arr[arr.length - 1] * 1) == "number") {
-            that.codenum = arr[arr.length - 1]; //获取券码
-            that.getbycode(that.codenum);
-          } else {
-            console.log("不是正确的券码");
+          if(result.indexOf("www.hbxq001.cn") > 0 ){
+            let arr = result.split("/");
+            if (typeof (arr[arr.length - 1] * 1) == "number") {
+              that.codenum = arr[arr.length - 1]; //获取券码
+              that.getbycode(that.codenum);
+            } else {
+              Toast("不是正确的享7券");
+              that.cancelScan();
+              that.usedis = false;
+            }
+          }else{
+            Toast("请扫描享7券的二维码");
+            that.cancelScan();
+            that.usedis = false;
           }
         } else {
-          console.log("请扫描二维码");
+          Toast("请扫描享7券的二维码");
+          that.cancelScan();
+          that.usedis = false;
         }
       }
     },
@@ -72,10 +82,10 @@ export default {
         .get("/api/app/cp/getByCode/" + val)
         .then(res => {
           let data = res.data;
-          console.log('res:',res)
           if (data.code == 0) {
             if(data.data.isUsed == 1){
               Toast("券不存在或者已经被使用");
+              this.cancelScan();
               this.usedis = false;
             }else{
               this.gowrite();
@@ -115,7 +125,6 @@ export default {
       if(this.codenum){
         _parms.code=this.codenum
       }
-      console.log('_parms:',_parms)
       this.$router.push({ name: "Write", params:_parms });
     }
   }
