@@ -20,13 +20,12 @@
 			<div class="othor_login">
 				<p class="othor_login_text">————<span>其他登陆方式</span>————</p>
 				<div id="returnIcon" class="othor_login_type">
-					<img id="loginByWX" class="login_weixin" src="../../../static/images/wx-icon.png" alt="" @click="weixinLogin"/>
+					<img class="login_weixin" src="../../../static/images/wx-icon.png" alt="" @click="weixinLogin"/>
 				</div>
 			</div>
 		</div>
     </div>
 </template>
-
 <script>
 import GLOBAL from "../../../untils/config/config";
 import { Toast } from "mint-ui";
@@ -46,7 +45,8 @@ export default {
       veridyTime: "", //获取验证码的时间
       verifyCode: "", //验证码
       timeFlag: true,
-      _type: "2" //来源   1小程序 2H5 3安卓 4IOS
+      _type: "2", //来源   1小程序 2H5 3安卓 4IOS
+      openId: ""   //微信openId
     };
   },
   store,
@@ -76,11 +76,11 @@ export default {
       }
       let RegExp = /^(1[3584]\d{9})$/;
       if (RegExp.test(this.telephone)) {
-        // this.$GLOBAL.API+  <==> /api/    上线时所有替换
+        // this.$GLOBAL.API  <==> /api/    上线时所有替换
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+            this.$GLOBAL.API+"/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
           )
           .then(res => {
             let data = res.data;
@@ -131,7 +131,7 @@ export default {
       }
       value = value.substring(0, value.length - 1);
       this.$axios
-        .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+        .get(this.$GLOBAL.API+"/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
         .then(res => {
           if (res.data.data == 0) {
             _this.signIn();
@@ -147,7 +147,7 @@ export default {
       //商家注册
       let _this = this;
       this.$axios
-        .get("/api/app/user/findUserByMobile?mobile=" + this.telephone)
+        .get(this.$GLOBAL.API+"/app/user/findUserByMobile?mobile=" + this.telephone)
         .then(res => {
           this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -179,7 +179,7 @@ export default {
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
+        .post(this.$GLOBAL.API+"/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -194,7 +194,7 @@ export default {
     },
     getshopinfo: function(id) {
       //获取商家信息
-      this.$axios.get("/api/shop/get/" + id).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.setuserInfo(data);
@@ -205,7 +205,7 @@ export default {
       //判断商家是否在审核中
       let _this = this;
       this.$axios
-        .get("/api/app/shopEnter/searchByUserId?userId=" + id)
+        .get(this.$GLOBAL.API+"/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
@@ -234,71 +234,10 @@ export default {
         });
     },
     weixinLogin() {
-      // let _this  = this;
-      // _this.$router.push({
-      //   name: "Author",
-      //   params: {}
-      // });
-      console.log("plus.oauth:",plus.oauth)
-       console.log("getServices:",getServices)
-       return false // 等待微信开发认证通过 开通微信登录后删除此句
-      plus.oauth.getServices(
-        function(services) {
-          auths = services;
-          console.log("auths:",auths)
-          for (var k in auths) {
-            console.log(auths[k].id);
-          }
-          //auths解释0QQ 1微信 2微博 3小米，但是不建议使用auths[1]类似的写法，因为各个设备排序不一样，比较坑爹
-          //注意获取使用unionid，此id通用后期的微信端等它会用户共享，（openid完全唯一）
-          //var s = auths[1];
-          var s;
-          for (var i = 0; i < auths.length; i++) {
-            //用这样的写法指定第三方，参照：
-            //[LOG] : xiaomi
-            //[LOG] : qq
-            //[LOG] : sinaweibo
-            //[LOG] : weixin
-
-            if (auths[i].id == "weixin") {
-              s = auths[i];
-              break;
-            }
-          }
-
-          if (!s.authResult) {
-            s.login(
-              function(e) {
-                // 获取登录操作结果
-                s.getUserInfo(
-                  function(e) {
-                    console.log(
-                      "获取用户信息成功：" + JSON.stringify(s.userInfo)
-                    );
-                    mui.toast("登录成功");
-                  },
-                  function(e) {
-                    console.log(
-                      "获取用户信息失败：" + e.message + " - " + e.code
-                    );
-                    mui.toast("获取用户信息失败");
-                  }
-                );
-              },
-              function(e) {
-                mui.toast("登录认证失败");
-              }
-            );
-          } else {
-            //已经登录认证
-            mui.toast("登录成功");
-          }
-        },
-        function(e) {
-          console.log("获取登录失败：" + e.message + " - " + e.code);
-          mui.toast("登录认证失败");
-        }
-      );
+      this.$router.push({
+        name: "Author",
+        params: {}
+      });
     },
     setScroll() {
       const ua = navigator.userAgent.toLowerCase();

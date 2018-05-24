@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/login/login'
-import Author from '@/components/login/author'
 import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
 import Writeoff from '@/components/home/income/writeoff'
@@ -12,6 +11,7 @@ import ShopMap from '@/components/login/shopMap'
 import Category from '@/components/login/category'
 import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
+import Author from '@/components/login/author'
 import Menu from '@/components/home/menu'
 import Manage from '@/components/home/manage/manage'
 import Scan from '@/components/home/scan/scan'
@@ -23,7 +23,6 @@ import DetailsSon from '@/components/home/sublevel/detailsSon'
 import Edit from '@/components/home/manage/edit'
 import Ticket from '@/components/home/ticket/ticket'
 Vue.use(Router)
-
 
 export default new Router({
   routes: [
@@ -41,11 +40,6 @@ export default new Router({
       path: '/home',
       name: 'Home',
       component: Home
-    },
-    {
-      path: '/author',
-      name: 'Author',
-      component: Author
     },
     {
       path: '/manage',
@@ -96,6 +90,11 @@ export default new Router({
       path: '/examine',
       name: 'Examine',
       component: Examine
+    },
+    {
+      path: '/author',
+      name: 'Author',
+      component: Author
     },
     {
       path: '/menu',
