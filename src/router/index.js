@@ -11,7 +11,6 @@ import ShopMap from '@/components/login/shopMap'
 import Category from '@/components/login/category'
 import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
-import Author from '@/components/login/author'
 import Menu from '@/components/home/menu'
 import Manage from '@/components/home/manage/manage'
 import Scan from '@/components/home/scan/scan'
@@ -90,11 +89,6 @@ export default new Router({
       path: '/examine',
       name: 'Examine',
       component: Examine
-    },
-    {
-      path: '/author',
-      name: 'Author',
-      component: Author
     },
     {
       path: '/menu',

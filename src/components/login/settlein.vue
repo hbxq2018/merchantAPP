@@ -108,9 +108,10 @@ export default {
       categoryTxt: "选择经营品类",
       milieuTxt: "选择环境分类",
       isSelected: false, //是否选择经营品类
-      licenseUrl: "../../../static/images/add.png",
-      healthUrl: "../../../static/images/add.png",
-      ShopPhotoUrl: "../../../static/images/add.png"
+      defaultPic: require('../../../static/images/scan.png'),   //默认图片
+      licenseUrl: "",
+      healthUrl: "",
+      ShopPhotoUrl: ""
     };
   },
   store,
@@ -268,15 +269,15 @@ export default {
         Toast('请输入环境分类');
         return false;
       }
-      if (this.isNull(this.licenseUrl) || this.licenseUrl == '../../../static/images/add.png') {
+      if (this.isNull(this.licenseUrl) || this.licenseUrl == this.defaultPic) {
         Toast("请上传营业执照");
         return false;
       }
-      if (this.isNull(this.healthUrl) || this.healthUrl == '../../../static/images/add.png') {
+      if (this.isNull(this.healthUrl) || this.healthUrl == this.defaultPic) {
         Toast("请上传卫生许可证");
         return false;
       }
-      if (this.isNull(this.ShopPhotoUrl) || this.ShopPhotoUrl == '../../../static/images/add.png') {
+      if (this.isNull(this.ShopPhotoUrl) || this.ShopPhotoUrl == this.defaultPic) {
         Toast("请上传门头照");
         return false;
       }
@@ -329,6 +330,7 @@ export default {
     }
   },
   created() {
+    this.licenseUrl = this.healthUrl = this.ShopPhotoUrl = this.defaultPic;
     for (var key in this.newUserInfo) {
       this[key] = this.newUserInfo[key];
     }

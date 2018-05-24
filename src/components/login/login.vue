@@ -11,13 +11,13 @@
 					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
 				</div>
 				<div class="login_form_code">
-					<input type="number" class="login_form_inp" maxlength="4" placeholder="请输入验证码" v-model="password">
+					<input type="number" class="login_form_inp" maxlength="4" placeholder="请输入验证码" v-model="password" @keyup.enter="verification">
 				</div>
 				<div class="login_form_btn">
 					<button type="button" @click="verification"></button>
 				</div>
 			</form>
-			<div class="othor_login">
+			<div class="othor_login" v-if="!isSignWX">
 				<p class="othor_login_text">————<span>其他登陆方式</span>————</p>
 				<div id="returnIcon" class="othor_login_type">
 					<img class="login_weixin" src="../../../static/images/wx-icon.png" alt="" @click="weixinLogin"/>
@@ -46,7 +46,12 @@ export default {
       verifyCode: "", //验证码
       timeFlag: true,
       _type: "2", //来源   1小程序 2H5 3安卓 4IOS
-      openId: ""   //微信openId
+      openId: "",   //微信openId
+      sex: 2,      //微信用户性别
+      nickName: "阿花花",     //昵称
+      iconUrl: "http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTL1ylGpjjQyXskiaLdUmbdfG8hNVcXt7IQ2CofEVO5bjiaL1S2sekLmyjBmPsnhsClSoE8hnvHP2Asw/132",      //头像
+      isSignWX: false,   //是否登陆微信
+      wxType: 0    //微信返回信息的格式
     };
   },
   store,
@@ -133,8 +138,12 @@ export default {
       this.$axios
         .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
         .then(res => {
-          if (res.data.data == 0) {
-            _this.signIn();
+          if (res.data.code == 0) {
+            if(_this.wxType == 0) {
+              _this.signIn();
+            } else {
+              _this.addWXInfo();
+            }
           } else {
             Toast("输入信息有误");
           }
@@ -150,11 +159,11 @@ export default {
       this.$axios
         .get("/api/app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
-          this.setshopInfo(res.data.data);
+          _this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
             if (res.data.data == null) {
               //新用户为null
-              _this.addShop();
+              _this.addShop();   //商家注册
             } else if (
               res.data.data.userType == 1 &&
               !_this.isNull(res.data.data.mobile)
@@ -178,7 +187,47 @@ export default {
           console.log(err);
         });
     },
+    addWXInfo() {
+      let _this = this;
+      let _parms = {
+          mobile: this.telephone,
+          openId: this.openId
+      }
+      this.$axios
+      .post("/api/app/user/addAppUser", qs.stringify(_parms))
+      .then(res => {
+        if(res.data.code == 0) {
+          _this.upDateUserInfo();
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    },
+    upDateUserInfo() {
+      let _this = this;
+      //1小程序 2H5 3安卓 4IOS
+      let _parms = {
+        sourceType: this._type,
+        mobile: this.telephone,
+        nickName: this.nickName,
+        iconUrl: this.iconUrl,
+        sex: this.sex
+      };
+      this.$axios
+      .post("/api/app/user/updateByMobile", qs.stringify(_parms))
+      .then(res => {
+        console.log(res);
+        if(res.data.code == 0) {
+          _this.signIn();
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    },
     addShop() {
+      //获取到微信用户信息后，先用openId去查询是否有信息，如果没有就调添加用户接口addAppUser  
       //添加商户
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
@@ -198,11 +247,12 @@ export default {
     },
     getshopinfo: function(id) {
       //获取商家信息
+      let _this = this;
       this.$axios.get("/api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.$router.push({ name: "Home" });
-          this.setuserInfo(data);
+          _this.setuserInfo(data);
         }
       });
     },
@@ -233,15 +283,93 @@ export default {
                 });
               }
             } else {
-              this.$router.push({ name: "Process", params: {} });
+              _this.$router.push({ name: "Process", params: {} });
             }
           }
         });
     },
     weixinLogin() {
-      this.$router.push({
-        name: "Author",
-        params: {}
+      if(window.plus){
+          this.plusFunc();
+      }else{
+          document.addEventListener( "plusready", this.plusFunc(), false );
+      }
+    },
+    plusFunc() {     //微信获取用户信息
+      let _this = this;
+      let auths = [];
+      plus.oauth.getServices(function(services) {
+          auths = services;
+          var s;
+          for (var i = 0; i < auths.length; i++) {
+              if (auths[i].id == "weixin") {
+                  s = auths[i];
+                  break;
+              }
+          }
+          if (!s.authResult) {
+              s.login(function(e) {
+                  console.log("登陆认证成功！");
+                  // var s;
+                  // for (var i = 0; i < auths.length; i++) {
+                  //     if (auths[i].id == "weixin") {
+                  //         s = auths[i];
+                  //         break;
+                  //     }
+                  // }
+                  // if (!s.authResult) {
+                  //     console.log("未授权登陆！");
+                  // } else {
+                  s.getUserInfo(function(e) {
+                      var josnStr = JSON.stringify(s.userInfo);
+                      var jsonObj = s.userInfo;
+                      console.log("获取用户信息成功：" + josnStr);
+                      //通过openId查询用户信息
+                      _this.sex = s.userInfo.sex;
+                      _this.nickName = s.userInfo.nickname;
+                      _this.iconUrl = s.userInfo.headimgurl;
+                      _this.isSignWX = true;
+                      _this.openId = "o16Di01-jZ8yxr5AliPQpSp7a4uQ";
+                      _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
+                      .then(res => {
+                        let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
+                        console.log(data);
+                        if(data.code == 0) {
+                            if(data.data == null || data.data == "" || data.data == undefined || !data.data.mobile) {
+                              _this.wxType = 1;
+                              Toast("微信授权成功,请绑定手机号");
+                            } else {
+                              Toast("微信登陆成功");
+                              _this.telephone = data.data.mobile
+                              _this.upDateUserInfo();
+                            }
+                        }
+                      }).catch(err => {
+                          console.log(err);
+                      });
+                      // console.log(jsonObj.headimgurl);
+                      // for (var i in auths) {
+                      //   var s = auths[i];
+                      //   if (s.authResult) {
+                      //       s.logout(function(e) {
+                      //           console.log("注销登陆认证成功！");
+                      //       }, function(e) {
+                      //           console.log("注销登陆认证失败！");
+                      //       });
+                      //   }
+                      // }
+                  }, function(e) {
+                      console.log("获取用户信息失败：" + e.message + " - " + e.code);
+                  });
+                  // }
+              }, function(e) {
+                  console.log("登陆认证失败！");
+              });
+          } else {
+              console.log("已经登陆认证！");
+          }
+      }, function(e) {
+          console.log("获取登陆服务列表失败：" + e.message + " - " + e.code);
       });
     },
     setScroll() {
@@ -269,7 +397,7 @@ export default {
   },
   mounted() {
     // if(this.isWeiXin()){    //是来自微信内置浏览器
-    //   // 获取微信信息，如果之前没有使用微信登陆过，将进行授权登录
+    // 获取微信信息，如果之前没有使用微信登陆过，将进行授权登陆
     //   this.$axios.get("/api/index/index/wx_info").then((res) => {
     //     if(res.data.code!=0){
     //         location.href='/wx/index/wxAutoLogin';
