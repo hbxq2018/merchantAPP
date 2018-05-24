@@ -85,6 +85,7 @@ export default {
           if (data.code == 0) {
             if(data.data.isUsed == 1){
               Toast("券不存在或者已经被使用");
+              console.log("券不存在或者已经被使用")
               this.cancelScan();
               this.usedis = false;
             }else{
@@ -104,12 +105,14 @@ export default {
     },
     
     cancelScan() {//关闭扫描
+      console.log("cancelScan")
       if (!window.plus) return;
       scan.cancel();
       this.closeScan();
     },
    
     closeScan() { //关闭条码识别控件
+      console.log("closeScan")
       if (!window.plus) return;
       scan.close();
     },
@@ -127,6 +130,9 @@ export default {
       }
       this.$router.push({ name: "Write", params:_parms });
     }
+  },
+  beforeDestroy: function () {  //销毁前运行
+     this.cancelScan();
   }
 };
 </script>

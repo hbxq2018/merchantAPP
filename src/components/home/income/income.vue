@@ -188,7 +188,7 @@ export default {
       if (this.start && this.end) {
         let _start = new Date(this.start);
         let _end = new Date(this.end);
-        let pag = 1;
+        this.pag = 1;
         _start = _start.getTime();
         _end = _end.getTime();
         this.oldstart = this.start;

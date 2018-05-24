@@ -139,7 +139,7 @@ export default {
     getskulist: function() {
       this.$axios.get("/api/app/sku/list").then(res => {
         if (res.data.code == "0") {
-          let data = res.data.data.list;
+          let data = res.data.data.list.slice(1);
           let _arr = [];
           for (let i in data) {
             _arr.push(data[i].inPrice);

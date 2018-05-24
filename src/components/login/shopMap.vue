@@ -183,15 +183,19 @@
               let locationX = _obj.lng +'/'+'locationX';
               this.setuserInfo(locationX);
           }
-          
+          if(this.$route.query.ind == 2){
+            Toast({
+              message: '返回后请在右上角点击保存',
+              duration: 2000
+            });
+          }
           setTimeout(() => {
             this.$router.push({path: this.goback,query:_obj})
-          }, 1000);
+          }, 2000);
         }
       }
     },
     created:function(){
-      // console.log("this.$route.query:",this.$route.query)
       if(this.$route.query.ind == 1){
         this.goback = 'settlein'
       }else if(this.$route.query.ind == 2){

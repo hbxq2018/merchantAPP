@@ -12,7 +12,6 @@
         <div class="code money"><span slot="left">实际需付款（元）</span>  <span v-if="diffs>0">{{diffs}}</span></div>
         <button :class="isdiff?'actbutton subbutton':'subbutton'" type="submit" @click="submit">确认核销</button>
     </div>
- 
 </div>
 </template>
 <script>

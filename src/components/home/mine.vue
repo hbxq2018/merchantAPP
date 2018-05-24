@@ -68,6 +68,7 @@ export default {
         MessageBox.confirm('确定要退出登录吗?').then(action => {
         if(action == 'confirm'){
             let obj={},id='';
+            localStorage.setItem("userId",'');
             this.setuserInfo(obj)
             this.setshopId(id)
             this.setNewUserInfo(obj)

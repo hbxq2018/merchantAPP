@@ -60,6 +60,7 @@ export default {
           value: ""
         }
       ],
+      issave: true,
       writedata: [],
       ismain: false
     };
@@ -70,8 +71,8 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
+     //查询当前用户是否是当前商家的主账号
     account: function() {
-      //查询当前用户是否是当前商家的主账号
       let obj = { shopId: this.userInfo.id },
         _value = "",
         hxdata = {};
@@ -93,16 +94,23 @@ export default {
           }
         });
     },
+    //返回home页面
     clickback: function() {
-      MessageBox.confirm("是否确定放弃修改?").then(
-        action => {
-          this.$router.push({ name: "Home", params: {} });
-        },
-        () => {
-          // MessageBox('提示', '是否放弃保存修改内容？');
-        }
-      );
+      console.log('issave:',this.issave)
+      if (this.issave) {
+        this.$router.push({ name: "Home", params: {} });
+      } else {
+        MessageBox.confirm("是否确定放弃修改?").then(
+          action => {
+            this.$router.push({ name: "Home", params: {} });
+          },
+          () => {
+            // MessageBox('提示', '是否放弃保存修改内容？');
+          }
+        );
+      }
     },
+    //电话号码格式化
     set: function(val) {
       if (val.nickName) {
         return val.nickName;
@@ -111,6 +119,7 @@ export default {
         return name;
       }
     },
+    //保存修改信息
     save: function() {
       let userdata = this.userInfo;
       MessageBox.confirm("确定进行保存?").then(
@@ -133,6 +142,7 @@ export default {
           this.$axios.post("/api/app/shop/update?" + _value).then(res => {
             if (res.data.code == "0") {
               MessageBox("提示", "保存成功");
+              this.issave = true;
               this.getshopinfo();
             }
           });
@@ -142,8 +152,8 @@ export default {
         }
       );
     },
+    //获取商家信息
     getshopinfo: function() {
-      //获取商家信息
       this.$axios.get("/api/shop/get/" + this.shopId).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
@@ -151,9 +161,12 @@ export default {
         }
       });
     },
+    //进入修改页面
     clickformli: function(e) {
+       console.log("issave2:",this.issave)
       const ind = e.currentTarget.id;
       let obj = {};
+      this.issave = false;
       for (let i = 0; i < this.formdata.length; i++) {
         if (ind == this.formdata[i].id) {
           obj = this.formdata[i];
@@ -172,8 +185,8 @@ export default {
               const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
               if (!reg.test(value)) {
                 MessageBox("提示", "手机号输入错误");
-              }else{
-                this.inquire(value,'add')
+              } else {
+                this.inquire(value, "add");
               }
             } else {
               MessageBox("提示", "请输入核销员手机号");
@@ -183,8 +196,11 @@ export default {
         () => {}
       );
     },
-    inquire: function(value,type) {//查询要添加的用户是否已经是核销员
-      let obj1 = { mobile: value },_value1 = "", hxdata = {};
+    inquire: function(value, type) {
+      //查询要添加的用户是否已经是核销员
+      let obj1 = { mobile: value },
+        _value1 = "",
+        hxdata = {};
       for (var key in obj1) {
         _value1 += key + "=" + obj1[key] + "&";
       }
@@ -194,14 +210,14 @@ export default {
           hxdata = res.data.data;
           console.log("hxdata:", hxdata);
           if (hxdata.userType == 2 && hxdata.shopId) {
-            if(type == 'del'){
+            if (type == "del") {
               this.deleteHxUser(value);
               this.shopCashier(hxdata, 2);
-            }else{
+            } else {
               MessageBox("提示", "该用户已是核销员，请勿重复添加");
             }
           } else {
-            if(type == 'add'){
+            if (type == "add") {
               this.addHxUser(value);
               this.shopCashier(hxdata, 1);
             }
@@ -229,7 +245,7 @@ export default {
         }
       });
     },
-    shopCashier: function(data,type) {
+    shopCashier: function(data, type) {
       let obj = {
         cashierId: data.id,
         cashierName: data.userName,
@@ -262,20 +278,20 @@ export default {
 
       if (arr[ind].mobile == this.shopInfo.mobile) {
         MessageBox("提示", "不可以删除主账号");
-      }else{
+      } else {
         MessageBox.confirm("确定要删除吗？").then(
-        action => {
-          if (action == "confirm") {
-            // this.inquire(arr[ind].mobile,'del')
-            this.deleteHxUser(arr[ind].mobile);
-            this.shopCashier(arr[ind], 2);
-          }
-        },
-        () => {}
-      );
+          action => {
+            if (action == "confirm") {
+              // this.inquire(arr[ind].mobile,'del')
+              this.deleteHxUser(arr[ind].mobile);
+              this.shopCashier(arr[ind], 2);
+            }
+          },
+          () => {}
+        );
       }
     },
-    deleteHxUser:function(value){
+    deleteHxUser: function(value) {
       let obj = {
         shopId: this.shopId,
         mobile: value
@@ -285,13 +301,11 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios
-        .post("/api/app/user/deleteHxUser?" + _value)
-        .then(res => {
-          if (res.data.code == "0") {
-            this.getWritelist(2);
-          }
-        });
+      this.$axios.post("/api/app/user/deleteHxUser?" + _value).then(res => {
+        if (res.data.code == "0") {
+          this.getWritelist(2);
+        }
+      });
     },
     setvalue: function(val) {
       if (val.length > 13) {

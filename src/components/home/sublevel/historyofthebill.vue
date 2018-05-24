@@ -83,7 +83,7 @@ export default {
       value += key + '=' + obj[key] + '&';
     }
     value = value.substring(0, value.length-1);
-    this.$axios.get("/apiapp/hx/listAmount?" + value).then(res => {
+    this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
       if (res.data.code == 0) {
         _this.data = res.data.data;
       }

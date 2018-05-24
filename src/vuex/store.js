@@ -46,12 +46,6 @@ const mutations={
     setNewUserInfo(state, obj) {
         state.newUserInfo = obj;
     },
-    reduce(state){
-        state.count--;
-    },
-    setphone(state,phone){
-        state.phone = phone
-    },
     setshopInfo(state,data){
         state.shopInfo = data
     }

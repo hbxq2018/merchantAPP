@@ -7,11 +7,11 @@
 			</div>
 			<form class="login_form">
 				<div class="login_form_tele">
-					<input type="number" class="login_form_inp" placeholder="请输入手机号" v-model="telephone">
+					<input type="number" class="login_form_inp" maxlength="11" placeholder="请输入手机号" v-model="telephone">
 					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
 				</div>
 				<div class="login_form_code">
-					<input type="number" class="login_form_inp" placeholder="请输入验证码" v-model="password">
+					<input type="number" class="login_form_inp" maxlength="4" placeholder="请输入验证码" v-model="password">
 				</div>
 				<div class="login_form_btn">
 					<button type="button" @click="verification"></button>
@@ -80,7 +80,7 @@ export default {
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-            this.$GLOBAL.API+"/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
           )
           .then(res => {
             let data = res.data;
@@ -131,7 +131,7 @@ export default {
       }
       value = value.substring(0, value.length - 1);
       this.$axios
-        .get(this.$GLOBAL.API+"/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+        .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
         .then(res => {
           if (res.data.data == 0) {
             _this.signIn();
@@ -143,11 +143,12 @@ export default {
           console.log(err);
         });
     },
-    signIn() {
+    signIn(val) {
       //商家注册
       let _this = this;
+      let mobile = val?val:this.telephone;
       this.$axios
-        .get(this.$GLOBAL.API+"/app/user/findUserByMobile?mobile=" + this.telephone)
+        .get("/api/app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
           this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -164,9 +165,12 @@ export default {
               !_this.isNull(res.data.data.mobile)
             ) {
               //商家
+              localStorage.setItem("userId",res.data.data.id);
               _this.setshopId(res.data.data.shopId);
               _this.getshopinfo(res.data.data.shopId);
-              _this.$router.push({ name: "Home" });
+              if(!val){
+                _this.$router.push({ name: "Home" });
+              }
             }
           }
         })
@@ -179,7 +183,7 @@ export default {
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post(this.$GLOBAL.API+"/app/user/addShopAppUser", qs.stringify(_parms))
+        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -194,9 +198,10 @@ export default {
     },
     getshopinfo: function(id) {
       //获取商家信息
-      this.$axios.get(this.$GLOBAL.API+"/shop/get/" + id).then(res => {
+      this.$axios.get("/api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
+          this.$router.push({ name: "Home" });
           this.setuserInfo(data);
         }
       });
@@ -205,7 +210,7 @@ export default {
       //判断商家是否在审核中
       let _this = this;
       this.$axios
-        .get(this.$GLOBAL.API+"/app/shopEnter/searchByUserId?userId=" + id)
+        .get("/api/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
@@ -274,7 +279,16 @@ export default {
   },
   created() {
     this.setScroll();
-    this.isWeiXin();
+    let userId = localStorage.getItem("userId"); 
+    if(userId){
+        this.$axios.get("/api/app/user/get/" + userId).then(res => {
+        if (res.data.code == "0") {
+          this.signIn(res.data.data.mobile)
+        }
+      });
+    }else{
+       console.log("oh no!")
+    }
   }
 };
 </script>

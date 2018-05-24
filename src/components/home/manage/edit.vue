@@ -2,9 +2,10 @@
   <div class="edit">
       <mt-header :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
+        <mt-button slot="right"  @click="save">保存</mt-button>
       </mt-header> 
       <div class="edit_content">
-        <mt-field v-show="ind == '0'" v-model="data.phone" label="手机号" placeholder="请输入新手机号" ref="phone" type="tel" ></mt-field>
+        <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="手机号" placeholder="请输入新手机号" ref="phone" type="tel" ></mt-field>
         <!-- <mt-checklist  
             v-if="ind == '1' || ind == '2'" 
             :max="_max"
@@ -20,12 +21,12 @@
             </li>
           </ul>
         </div>
-        <mt-field v-show="ind == 4"  label="简介" v-model="data.Introduction" placeholder="商家简介" type="textarea" rows="8"></mt-field>
+        <mt-field class="indright" v-show="ind == 4" v-model="data.Introduction" placeholder="商家简介" type="textarea" rows="8"></mt-field>
       </div> 
   </div>
 </template>
 <script>
-import { Field, Checklist, Toast } from "mint-ui";
+import { Field, Checklist, Toast,MessageBox } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 export default {
@@ -120,6 +121,7 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo"]),
     clickback: function() {
+      this.$router.push({ name: "Manage", params: {} });
       const ind = this.ind;
       if (ind == 0) {
         const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
@@ -186,6 +188,82 @@ export default {
           }
         }
       }
+    },
+    //保存修改信息
+    save: function() {
+      const ind = this.ind;
+      let _this = this;
+      if (ind == 0) {
+        const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
+        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
+        if (reg.test(this.data.phone)) {
+          let mobile = this.data.phone + "/" + "mobile";
+          this.setuserInfo(mobile);
+
+          //    this.$router.go(-1) //返回上一页面
+        } else if (reg2.test(this.data.phone)) {
+          let phone = this.data.phone + "/" + "phone";
+          this.setuserInfo(phone);
+
+        } else {
+          Toast("联系方式输入有误，请重新输入");
+          this.data.phone = "";
+        }
+      } else if (ind == 1) {
+        let arr = [];
+        for (let i = 0; i < this.checkedArr.length; i++) {
+          arr.push(this.checkedArr[i].label);
+        }
+        let val = arr.join(",");
+        val += "1";
+        let businessCate = val + "/" + "businessCate";
+        this.setuserInfo(businessCate);
+      } else if (ind == 2) {
+        // let val = this.value.join(",");
+        let val = this.checkedArr[0].label;
+        val += "2";
+        let businessCate = val + "/" + "businessCate";
+        this.setuserInfo(businessCate);
+      } else if (ind == 3) {
+      } else if (ind == 4) {
+        let shopInfo = this.data.Introduction + "/" + "shopInfo";
+        this.setuserInfo(shopInfo);
+        this.$router.push({ name: "Manage", params: {} });
+      }
+      let userdata = this.userInfo;
+      MessageBox.confirm("确定进行保存?").then(
+        action => {
+          let obj = {
+            id: userdata.id,
+            phone: userdata.phone,
+            mobile: userdata.mobile,
+            address: userdata.address,
+            shopInfo: userdata.shopInfo,
+            locationX: userdata.locationX,
+            locationY: userdata.locationY,
+            businessCate: userdata.businessCate
+          };
+          let _value = "";
+          for (var key in obj) {
+            _value += key + "=" + obj[key] + "&";
+          }
+          _value = _value.substring(0, _value.length - 1);
+          this.$axios.post("/api/app/shop/update?" + _value).then(res => {
+            if (res.data.code == "0") {
+              Toast({
+                message: '保存成功',
+                duration: 2000
+              });
+              setTimeout(function(){
+                _this.$router.push({ name: "Manage", params: {} });
+              },2000)
+            }
+          });
+        },
+        () => {
+          MessageBox("提示", "是否放弃保存修改内容？");
+        }
+      );
     }
   },
   watch: {
@@ -241,12 +319,16 @@ export default {
   }
   .edit_content {
     padding-top: 80px;
+
     .mint-cell-title,
     .mint-cell-text {
-      width: 300px;
+      width: 100px;
     }
-    .mint-field-core {
-      border: 1px solid #b1b1b1 !important;
+    .indleft input{
+     text-align: right;
+    }
+    .indright input{
+      text-align: left;
     }
     .category {
       ul {
