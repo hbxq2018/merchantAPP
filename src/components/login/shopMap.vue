@@ -208,6 +208,8 @@
   }
 </script>
 <style lang="less">
+@import "mint-ui/lib/style.css";
+@import url(../../common/css/common.css);
   .shopMap {
     .mint-header {
       position: fixed;

@@ -375,6 +375,8 @@ export default {
 };
 </script>
 <style lang="less">
+@import "mint-ui/lib/style.css";
+@import url(../../../common/css/common.css);
 .manage {
   .mint-header {
     position: fixed;

@@ -160,6 +160,15 @@ ol {
     color: #808080;
 }
 
+.mint-cell-allow-right::after {
+    width: 2px;
+    height: 2px;
+}
+
+.mint-cell-value.is-link {
+    margin-right: 30px;
+}
+
 /* 公共样式 非mint-ui样式 */
 .loadBottom{
     overflow: scroll;

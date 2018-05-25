@@ -215,6 +215,7 @@ export default {
     border-radius: 10px;
     border: none;
     color: #fff;
+    background-color: #D8D8D8;
   }
   .actbutton {
     background: #fc512d;
