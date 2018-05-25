@@ -4,23 +4,22 @@
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         <mt-button slot="right" @click="save">保存</mt-button>
       </mt-header> 
-      <div class="man_info">商户信息</div>
-
-      <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
-      
-      <div class="man_info">员工管理</div>
-
-      <div class="hexiaoyuan">
-          <i class="man_hexiao">核销员</i>
-          <i class="man_add" @click="clickadd" v-if="ismain">+添加</i>
+      <div class="manage_cont">
+        <div class="man_info">商户信息</div>
+        <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
+        <div class="man_info">员工管理</div>
+        <div class="hexiaoyuan">
+            <i class="man_hexiao">核销员</i>
+            <i class="man_add" @click="clickadd" v-if="ismain">+添加</i>
+        </div>
+        <ul class="man_write" v-if="writedata">
+            <li class="man_lis" v-for="(item,index) in writedata" :key="index" >
+              <img class="man_src" :src="item.iconUrl" :alt="item.name">
+            <span class="man_name">{{set(item)}}</span>
+            <span class="nam_del" @click="clickdel" :id="index" v-if="ismain">删除</span>
+            </li>
+        </ul>
       </div>
-      <ul class="man_write" v-if="writedata">
-          <li class="man_lis" v-for="(item,index) in writedata" :key="index" >
-            <img class="man_src" :src="item.iconUrl" :alt="item.name">
-           <span class="man_name">{{set(item)}}</span>
-           <span class="nam_del" @click="clickdel" :id="index" v-if="ismain">删除</span>
-          </li>
-      </ul>
   </div>
 </template>
 <script>
@@ -377,6 +376,15 @@ export default {
 </script>
 <style lang="less">
 .manage {
+  .mint-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+  }
+  .manage_cont {
+    padding-top: 80px;
+  }
   .man_info {
     background: #ebebeb;
     height: 68px;

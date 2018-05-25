@@ -314,6 +314,7 @@ export default {
       top: 0;
       left: 0;
       width: 100%;
+      z-index: 1000;
   }
   p {
     margin: 0;
@@ -446,6 +447,7 @@ export default {
     position: fixed;
     left: 0;
     top: 0;
+    z-index: 1001;
     overflow: auto;
     height: 100%;
     background: rgba(0, 0, 0, 0.44);

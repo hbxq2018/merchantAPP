@@ -307,20 +307,9 @@ export default {
                   break;
               }
           }
-          console.log(s)
           if (!s.authResult) {
               s.login(function(e) {
                   console.log("登陆认证成功！");
-                  // var s;
-                  // for (var i = 0; i < auths.length; i++) {
-                  //     if (auths[i].id == "weixin") {
-                  //         s = auths[i];
-                  //         break;
-                  //     }
-                  // }
-                  // if (!s.authResult) {
-                  //     console.log("未授权登陆！");
-                  // } else {
                   s.getUserInfo(function(e) {
                       var josnStr = JSON.stringify(s.userInfo);
                       var jsonObj = s.userInfo;
@@ -331,7 +320,6 @@ export default {
                       _this.iconUrl = s.userInfo.headimgurl;
                       _this.isSignWX = true;
                       _this.openId = "o16Di01-jZ8yxr5AliPQpSp7a4uQ";
-                      // _this_
                       _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
                       .then(res => {
                         let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
@@ -349,21 +337,9 @@ export default {
                       }).catch(err => {
                           console.log(err);
                       });
-                      // console.log(jsonObj.headimgurl);
-                      // for (var i in auths) {
-                      //   var s = auths[i];
-                      //   if (s.authResult) {
-                      //       s.logout(function(e) {
-                      //           console.log("注销登陆认证成功！");
-                      //       }, function(e) {
-                      //           console.log("注销登陆认证失败！");
-                      //       });
-                      //   }
-                      // }
                   }, function(e) {
                       console.log("获取用户信息失败：" + e.message + " - " + e.code);
                   });
-                  // }
               }, function(e) {
                   console.log("登陆认证失败！");
               });

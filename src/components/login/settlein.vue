@@ -12,7 +12,7 @@
     <p class="form_title">商户信息</p>
     <div class="form">
         <mt-field label="申请人" placeholder="输入申请人姓名" type="text" v-model="userName"></mt-field>
-        <mt-field label="联系方式" placeholder="输入手机或电话号码" type="number" v-model="phone"></mt-field>
+        <mt-field label="联系方式"  :attr="{ maxlength: 11 }" placeholder="输入手机或电话号码" type="number" v-model="phone"></mt-field>
         <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopName"></mt-field>
         <div class="category clearfix" @click="addrSlide">
           <div class="category_l">详细地址</div>
@@ -235,10 +235,6 @@ export default {
     submitForm() {//提交表单
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");
-        return false;
-      }
-      if (this.isNull(this.phone)) {
-        Toast("请输入联系方式");
         return false;
       }
       let RegExp = /^((0\d{2,3}\d{7,8})|(1[3584]\d{9}))$/;
