@@ -31,6 +31,7 @@ export default {
           this.msg = "入驻审核中";
           this.examineImg = "../../../static/images/wait.png";
           this.colorSit = "";
+          this.toHref = "";
           this.colorBtn = "";
       } else if(this.status == 1) {
           this.msg = "恭喜你，审核通过";

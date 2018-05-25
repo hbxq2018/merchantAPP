@@ -188,10 +188,13 @@
               message: '返回后请在右上角点击保存',
               duration: 2000
             });
-          }
-          setTimeout(() => {
+            setTimeout(() => {
+              this.$router.push({path: this.goback,query:_obj})
+            }, 2000);
+          }else{
             this.$router.push({path: this.goback,query:_obj})
-          }, 2000);
+          }
+          
         }
       }
     },

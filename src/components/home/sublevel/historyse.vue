@@ -15,7 +15,7 @@
     <div class="data_statistics">
         <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
     </div>
-    <div class="loadBottom" :style="{'-webkit-overflow-scrolling': scrollMode}">
+    <div class="loadBottom hisbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
         <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmore">    
             <div class="order_history" v-for="(item,index) in totalQuantity" :key="index">
                 <div class="order_h_sublevel">
@@ -168,6 +168,7 @@ export default {
     height: 224px;
     background: #fff;
     padding-top: 88px;
+    position: absolute;
     b:nth-child(1) {
       font-size: 30px;
       padding: 39px 0px 14px 0px;
@@ -190,7 +191,14 @@ export default {
     line-height: 96px;
     font-size: 26px;
     color: #808080;
+    position: absolute;
+    top: 312px;
     letter-spacing: 2px;
+  }
+  .hisbox{
+    position: absolute;
+    top: 400px;
+    width: 100%;
   }
   .order_h_sublevel:last-child {
     border-bottom: none;

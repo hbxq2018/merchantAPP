@@ -47,9 +47,9 @@ export default {
       timeFlag: true,
       _type: "2", //来源   1小程序 2H5 3安卓 4IOS
       openId: "",   //微信openId
-      sex: 2,      //微信用户性别
-      nickName: "阿花花",     //昵称
-      iconUrl: "http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTL1ylGpjjQyXskiaLdUmbdfG8hNVcXt7IQ2CofEVO5bjiaL1S2sekLmyjBmPsnhsClSoE8hnvHP2Asw/132",      //头像
+      sex: 0,      //微信用户性别
+      nickName: "",     //昵称
+      iconUrl: "",      //头像
       isSignWX: false,   //是否登陆微信
       wxType: 0    //微信返回信息的格式
     };
@@ -85,7 +85,7 @@ export default {
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+            "/api//app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
           )
           .then(res => {
             let data = res.data;
@@ -136,7 +136,7 @@ export default {
       }
       value = value.substring(0, value.length - 1);
       this.$axios
-        .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+        .get("/api//app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             if(_this.wxType == 0) {
@@ -157,7 +157,7 @@ export default {
       let _this = this;
       let mobile = val?val:this.telephone;
       this.$axios
-        .get("/api/app/user/findUserByMobile?mobile=" + mobile)
+        .get("/api//app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
           _this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -194,7 +194,7 @@ export default {
           openId: this.openId
       }
       this.$axios
-      .post("/api/app/user/addAppUser", qs.stringify(_parms))
+      .post("/api//app/user/addAppUser", qs.stringify(_parms))
       .then(res => {
         if(res.data.code == 0) {
           _this.upDateUserInfo();
@@ -215,7 +215,7 @@ export default {
         sex: this.sex
       };
       this.$axios
-      .post("/api/app/user/updateByMobile", qs.stringify(_parms))
+      .post("/api//app/user/updateByMobile", qs.stringify(_parms))
       .then(res => {
         console.log(res);
         if(res.data.code == 0) {
@@ -232,7 +232,7 @@ export default {
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
+        .post("/api//app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -307,6 +307,7 @@ export default {
                   break;
               }
           }
+          console.log(s)
           if (!s.authResult) {
               s.login(function(e) {
                   console.log("登陆认证成功！");
@@ -330,7 +331,8 @@ export default {
                       _this.iconUrl = s.userInfo.headimgurl;
                       _this.isSignWX = true;
                       _this.openId = "o16Di01-jZ8yxr5AliPQpSp7a4uQ";
-                      _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
+                      // _this_
+                      _this.$axios.get("/api//app/user/findByOpenId/" + _this.openId, {})
                       .then(res => {
                         let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
                         console.log(data);
@@ -383,33 +385,13 @@ export default {
       } else {
         this._type = 2;
       }
-    },
-    isWeiXin() {
-      //是否是微信内置浏览器
-      let ua = window.navigator.userAgent.toLowerCase();
-      console.log(ua); //mozilla/5.0 (iphone; cpu iphone os 9_1 like mac os x) applewebkit/601.1.46 (khtml, like gecko)version/9.0 mobile/13b143 safari/601.1
-      if (ua.match(/MicroMessenger/i) == "micromessenger") {
-        console.log("true");
-      } else {
-        console.log("false");
-      }
     }
-  },
-  mounted() {
-    // if(this.isWeiXin()){    //是来自微信内置浏览器
-    // 获取微信信息，如果之前没有使用微信登陆过，将进行授权登陆
-    //   this.$axios.get("/api/index/index/wx_info").then((res) => {
-    //     if(res.data.code!=0){
-    //         location.href='/wx/index/wxAutoLogin';
-    //     }
-    //   })
-    // }
   },
   created() {
     this.setScroll();
     let userId = localStorage.getItem("userId"); 
     if(userId){
-        this.$axios.get("/api/app/user/get/" + userId).then(res => {
+        this.$axios.get("/api//app/user/get/" + userId).then(res => {
         if (res.data.code == "0") {
           this.signIn(res.data.data.mobile)
         }

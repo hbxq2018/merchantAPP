@@ -1,7 +1,7 @@
 <template>
     <div class="income">
 		<div class="income_top">
-        <mt-header title="营业数据" class="income_header">
+        <mt-header fixed title="营业数据" class="income_header">
             <router-link to="/home" slot="left">
                 <mt-button icon="back"></mt-button>
             </router-link>
@@ -181,8 +181,7 @@ export default {
       }
     },
     close: function() {
-      this.start = "";
-      this.end = "";
+      
     },
     cfrm: function() {
       if (this.start && this.end) {
@@ -334,7 +333,7 @@ export default {
     border: 1px solid red;
   }
   .income_banner {
-    margin-top: -1px;
+    margin-top: 83px;
     background-color: #fc5e2d;
     display: flex;
     height: 264px;

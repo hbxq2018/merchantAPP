@@ -108,7 +108,7 @@ export default {
       categoryTxt: "选择经营品类",
       milieuTxt: "选择环境分类",
       isSelected: false, //是否选择经营品类
-      defaultPic: require('../../../static/images/scan.png'),   //默认图片
+      defaultPic: require('../../../static/images/add.png'),   //默认图片
       licenseUrl: "",
       healthUrl: "",
       ShopPhotoUrl: ""
@@ -233,7 +233,6 @@ export default {
       this.$router.push({ name: "ShopMap" });
     },
     submitForm() {//提交表单
-  
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");
         return false;
@@ -309,6 +308,9 @@ export default {
           }
           if (res.data.code == 0) {
             Toast("提交成功，请等待审核");
+            setTimeout(function(){
+              this.$router.push({name: "Examine",params:{status:0}})
+            },1500)
           }
         })
         .catch(err => {

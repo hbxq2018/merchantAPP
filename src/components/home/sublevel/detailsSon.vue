@@ -15,7 +15,7 @@
         <div class="murcielago">
             <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
         </div>
-        <div class="loadBottom" :style="{'-webkit-overflow-scrolling': scrollMode}">
+        <div class="loadBottom detabox" :style="{'-webkit-overflow-scrolling': scrollMode}">
           <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore"> 
             <div class="order_history" v-for="(item,index) in writedata" :key="index">
                 <div class="order_h_sublevel">
@@ -147,7 +147,7 @@ export default {
     background: #fff;
     letter-spacing: 2px;
     line-height: 60px;
-    position: relative;
+    position: absolute;
     overflow: hidden;
     padding-top: 88px;
     p {
@@ -168,12 +168,19 @@ export default {
   }
   .murcielago {
     width: 100%;
+    position: absolute;
+    top: 312px;
     background: #ebebeb;
     height: 96px;
     font-size: 26px;
     color: #808080;
     line-height: 96px;
     letter-spacing: 2px;
+  }
+  .detabox{
+    position: absolute;
+    top: 400px;
+    width: 100%;
   }
   .order_history {
     background: #fff;
