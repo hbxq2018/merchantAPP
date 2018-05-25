@@ -50,8 +50,8 @@
         </div>
     </div>
     <div class="filling"></div>
-    <div class="loadBottom" :style="{'-webkit-overflow-scrolling': scrollMode}">
-      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmore">
+    <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmores">
         <div class="income_list">
           <ul>
               <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
@@ -251,13 +251,7 @@ export default {
       }
     },
     getdata: function(start, end,val,type) {
-      // console.log("oldstart:",this.oldstart)
-      // console.log('start:',start)
-      // console.log('oldend:',this.oldend)
-      // console.log('end:',end)
-      // console.log('val',val)
       if(this.oldstart != start || this.oldend != end || val == 1){
-        // console.log('vates')
         this.votes = [];
       }
       let obj = {
@@ -289,11 +283,13 @@ export default {
             }else{
                 this.allLoaded = true;
             }
+          }else{
+            this.allLoaded = true;
           }
           if(type == 'top'){
-            this.$refs.loadmore.onTopLoaded();
+            this.$refs.loadmores.onTopLoaded();
           }else if(type == 'bot'){
-              this.$refs.loadmore.onBottomLoaded();
+           this.$refs.loadmores.onBottomLoaded();
           }
         }
       });
@@ -333,7 +329,7 @@ export default {
     border: 1px solid red;
   }
   .income_banner {
-    margin-top: 83px;
+    margin-top: 82px;
     background-color: #fc5e2d;
     display: flex;
     height: 264px;
@@ -487,8 +483,12 @@ export default {
   }
   .filling{
     width: 100%;
-    height: 465px;
-    background: red;
+    height: 460px;
+  }
+  .inbox{
+    position: absolute;
+    top: 460px;
+    width: 100%;
   }
   .select {
     width: 672px;

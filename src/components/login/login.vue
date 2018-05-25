@@ -85,7 +85,7 @@ export default {
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-            "/api//app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
           )
           .then(res => {
             let data = res.data;
@@ -136,7 +136,7 @@ export default {
       }
       value = value.substring(0, value.length - 1);
       this.$axios
-        .get("/api//app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+        .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             if(_this.wxType == 0) {
@@ -157,7 +157,7 @@ export default {
       let _this = this;
       let mobile = val?val:this.telephone;
       this.$axios
-        .get("/api//app/user/findUserByMobile?mobile=" + mobile)
+        .get("/api/app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
           _this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -194,7 +194,7 @@ export default {
           openId: this.openId
       }
       this.$axios
-      .post("/api//app/user/addAppUser", qs.stringify(_parms))
+      .post("/api/app/user/addAppUser", qs.stringify(_parms))
       .then(res => {
         if(res.data.code == 0) {
           _this.upDateUserInfo();
@@ -215,7 +215,7 @@ export default {
         sex: this.sex
       };
       this.$axios
-      .post("/api//app/user/updateByMobile", qs.stringify(_parms))
+      .post("/api/app/user/updateByMobile", qs.stringify(_parms))
       .then(res => {
         console.log(res);
         if(res.data.code == 0) {
@@ -232,7 +232,7 @@ export default {
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post("/api//app/user/addShopAppUser", qs.stringify(_parms))
+        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -332,7 +332,7 @@ export default {
                       _this.isSignWX = true;
                       _this.openId = "o16Di01-jZ8yxr5AliPQpSp7a4uQ";
                       // _this_
-                      _this.$axios.get("/api//app/user/findByOpenId/" + _this.openId, {})
+                      _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
                       .then(res => {
                         let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
                         console.log(data);
@@ -391,7 +391,7 @@ export default {
     this.setScroll();
     let userId = localStorage.getItem("userId"); 
     if(userId){
-        this.$axios.get("/api//app/user/get/" + userId).then(res => {
+        this.$axios.get("/api/app/user/get/" + userId).then(res => {
         if (res.data.code == "0") {
           this.signIn(res.data.data.mobile)
         }
