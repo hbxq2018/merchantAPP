@@ -10,7 +10,7 @@
     <div class="history_money">
         <b><em>{{time | formatDate}}</em>月应缴服务费</b>
         <span>&yen;{{dataarr.totalService}}</span>
-        <P>打款日:次月5号</P>
+        <!-- <P>打款日:次月5号</P> -->
     </div>
     <div class="data_statistics">
         <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
@@ -169,20 +169,23 @@ export default {
     background: #fff;
     padding-top: 88px;
     position: absolute;
+    background-color: #fc5e2d;
+      color: #fff;
     b:nth-child(1) {
       font-size: 30px;
       padding: 39px 0px 14px 0px;
       display: block;
-      color: #191919;
+      color: #fff;
+      font-weight: 100;
     }
-    p:nth-child(3) {
-      font-size: 24px;
-      color: #fc5e2d;
-      padding-top: 12px;
-    }
+    // p:nth-child(3) {
+    //   font-size: 24px;
+    //   color: #fff;
+    //   padding-top: 12px;
+    // }
     span {
       font-size: 56px;
-      color: #191919;
+      color: #fff;
     }
   }
   .data_statistics {

@@ -318,8 +318,8 @@ export default {
                       _this.sex = s.userInfo.sex;
                       _this.nickName = s.userInfo.nickname;
                       _this.iconUrl = s.userInfo.headimgurl;
+                      _this.openId = s.userInfo.openid;
                       _this.isSignWX = true;
-                      _this.openId = "o16Di01-jZ8yxr5AliPQpSp7a4uQ";
                       _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
                       .then(res => {
                         let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
