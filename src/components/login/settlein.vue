@@ -233,6 +233,7 @@ export default {
       this.$router.push({ name: "ShopMap" });
     },
     submitForm() {//提交表单
+      let _this = this;
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");
         return false;
@@ -305,7 +306,7 @@ export default {
           if (res.data.code == 0) {
             Toast("提交成功，请等待审核");
             setTimeout(function(){
-              this.$router.push({name: "Examine",params:{status:0}})
+              _this.$router.push({name: "Examine",params:{status:0}})
             },1500)
           }
         })

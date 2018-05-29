@@ -368,7 +368,7 @@ export default {
     let userId = localStorage.getItem("userId"); 
     if(userId){
         this.$axios.get("/api/app/user/get/" + userId).then(res => {
-        if (res.data.code == "0") {
+        if (res.data.code == "0" && res.data.data != null && res.data.data != "null") {
           this.signIn(res.data.data.mobile)
         }
       });
