@@ -181,6 +181,7 @@ export default {
     position: absolute;
     top: 400px;
     width: 100%;
+    min-height: 1100px;
   }
   .order_history {
     background: #fff;

@@ -315,6 +315,7 @@ export default {
       left: 0;
       width: 100%;
       z-index: 1000;
+      background-color: #fc5e2d;
   }
   p {
     margin: 0;
@@ -491,6 +492,7 @@ export default {
     position: absolute;
     top: 460px;
     width: 100%;
+    min-height: 1224px;
   }
   .select {
     width: 672px;
