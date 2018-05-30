@@ -91,7 +91,7 @@ export default {
           // 命名的路由   (有待研究)
           // this.$router.push({ name: '/home/manage', params: {}})
         }else if(ind == 4){
-              this.$router.push({ path: '/ticket'})
+              this.$router.push({ path: '/Promotion'})
         }
     }
   }

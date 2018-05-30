@@ -21,6 +21,11 @@ import Historyofthebill from '@/components/home/sublevel/historyofthebill'
 import DetailsSon from '@/components/home/sublevel/detailsSon'
 import Edit from '@/components/home/manage/edit'
 import Ticket from '@/components/home/ticket/ticket'
+import Promotion from '@/components/home/ticket/promotion'
+import SetMeal from '@/components/home/ticket/setMeal'
+import ToSetMeal from '@/components/home/ticket/toSetMeal'
+import Dishes from '@/components/home/manage/dishes'
+import AddDishes from '@/components/home/manage/addDishes'
 Vue.use(Router)
 
 export default new Router({
@@ -129,6 +134,31 @@ export default new Router({
       path:'/ticket',
       name:'Ticket',
       component:Ticket
+    },
+    {
+      path:'/promotion',
+      name:'Promotion',
+      component:Promotion
+    },
+    {
+      path:'/setMeal',
+      name:'SetMeal',
+      component:SetMeal
+    },
+    {
+      path:'/toSetMeal',
+      name:'ToSetMeal',
+      component:ToSetMeal
+    },
+    {
+      path:'/dishes',
+      name:'Dishes',
+      component:Dishes
+    },
+    {
+      path:'/addDishes',
+      name:'AddDishes',
+      component:AddDishes
     }
   ]
 })

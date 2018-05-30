@@ -1,7 +1,7 @@
 <template>
   <div class="ticket">
     <mt-header :title="name">
-        <router-link to="/home" slot="left">
+        <router-link to="/promotion" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
         <mt-button slot="right" @click="addticket">+添加</mt-button>

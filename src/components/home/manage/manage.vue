@@ -7,6 +7,8 @@
       <div class="manage_cont">
         <div class="man_info">商户信息</div>
         <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
+        <div class="man_info">推荐菜管理</div>
+        <mt-cell title="推荐菜" is-link :to="{path:'/dishes'}"></mt-cell>
         <div class="man_info">员工管理</div>
         <div class="hexiaoyuan">
             <i class="man_hexiao">核销员</i>
