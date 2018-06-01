@@ -5,19 +5,23 @@
             <mt-button icon="back"></mt-button>
         </router-link>
     </mt-header>
-    <div class="setMealBox">
-        <div class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
-            <img class="icon fl" src="../../../../static/images/noPass.png" alt="">
-            <div class="text fl">
-                <p>{{item.name}}</p>
-                <p>
-                    <span>折后价 ￥{{item.discountPrice}}元</span>
-                    <span>门市价 ￥{{item.realPrice}}元</span>
-                </p>
-                <p>发布日期：{{item.date}}</p>
-            </div>
-            <div class="arrow fr"></div>
-        </div>
+    <div class="setMealBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
+			<ul id="setMealUl" class="setMealUl">
+                <div class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
+                    <img class="icon fl" :src="item.picUrl" alt="">
+                    <div class="text fl">
+                        <p>{{item.skuName}}</p>
+                        <p>
+                            <span>折后价 ￥{{item.agioPrice}}元</span>
+                            <span>门市价 ￥{{item.sellPrice}}元</span>
+                        </p>
+                        <p>发布日期：{{item.createTime}}</p>
+                    </div>
+                    <div class="arrow fr"></div>
+                </div>
+            </ul>
+		</mt-loadmore>
     </div>
     <div class="setMealBottom" @click="toSetMeal()">
         <span>+</span>
@@ -50,7 +54,10 @@ export default {
               discountPrice: '58',
               date: '2018-06-05'
           }
-      ]
+      ],
+      page: 1,
+      allLoaded: false,
+      scrollMode: "auto"
     };
   },
   store,
@@ -59,12 +66,65 @@ export default {
   },
   methods: {
      ...mapMutations(['setuserInfo']),
+     setMealList(type) {
+        let _this = this, _param = "";
+        _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8" 
+        this.$axios.get("/api/app/sku/agioList?" + _param).then(res => {
+            if (res.data.code == 0) {
+                let lists = res.data.data.list;
+                if(_this.page == 1) {
+                    _this.list = [];
+                }
+                if(lists && lists.length > 0) {
+                    for(let i = 0; i < lists.length; i++) {
+                        _this.list.push(lists[i]);
+                    }
+                    setTimeout(function() {
+                        var setMealUl = document.getElementById('setMealUl');
+                        var height = setMealUl.getElementsByClassName('setMeal_list')[0].offsetHeight;
+                        setMealUl.style.height = Math.ceil((height / 210) * 230 + 2) * _this.list.length + "px";
+                    },2000);
+                    if(lists.length < 8) {
+                        _this.allLoaded = true;
+                    }
+                } else {
+                    _this.allLoaded = true;
+                    Toast('暂无数据');
+                }
+                if(type == 'top'){
+                    _this.$refs.loadmore.onTopLoaded();
+                }else if(type == 'bot'){
+                    _this.$refs.loadmore.onBottomLoaded();
+                }
+                console.log(_this.allLoaded)
+            } 
+            else {
+                _this.allLoaded = true;
+            }
+        });
+    },
+    loadTop() {
+      //下拉加载
+      this.page = 1;
+      this.allLoaded = false;
+      this.setMealList("top");
+    },
+    loadBottom() {
+      // 上拉加载
+      console.log("上拉");
+      ++this.page;
+      this.setMealList("bot");
+    },
     toSetMeal(id) {
         this.$router.push({ name: "ToSetMeal", params: {id: id} });
     }
   },
   created: function() {
-    
+    const ua = navigator.userAgent.toLowerCase();
+    if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+      this.scrollMode = "touch";
+    }
+    this.setMealList();
   }
 };
 </script>
@@ -72,69 +132,79 @@ export default {
 @import url(../../../common/css/common.css);
 .setMeal {
     height: 100%;
+    .mint-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
     .setMealBox {
-        height: 100%;
-        margin-top: -80px;
-        padding-top: 80px;
+        min-height: 1300px;
+        width: 100%;
+        background-color: #ebebeb;
+        padding: 81px 0 110px 0;
         box-sizing: border-box;
-        background-color: #EBEBEB;
-        .setMeal_list {
-            height: 170px;
+        overflow: scroll;
+        .setMealUl {
             width: 100%;
-            background-color: #fff;
-            padding: 20px 30px;
-            box-sizing: border-box;
-            margin-bottom: 20px;
-            .icon {
-                width: 130px;
-                height: 130px;
-                margin-right: 20px;
-            }
-            .text {
-                text-align: left;
-                color: #191919;
-                p:nth-child(1) {
-                    // margin-top: 10px;
-                    font-size: 36px;
-                    font-weight: 600;
+            .setMeal_list {
+                height: 170px;
+                width: 100%;
+                background-color: #fff;
+                padding: 20px 30px;
+                box-sizing: border-box;
+                margin-bottom: 20px;
+                .icon {
+                    width: 130px;
+                    height: 130px;
+                    margin-right: 20px;
                 }
-                p:nth-child(2) {
-                    margin-top: 12px;
-                    span:nth-child(1) {
-                        color: #FF5252;
-                        font-size: 30px;
+                .text {
+                    text-align: left;
+                    color: #191919;
+                    p:nth-child(1) {
+                        // margin-top: 10px;
+                        font-size: 36px;
+                        font-weight: 600;
                     }
-                    span:nth-child(2) {
-                        color: #555555;
-                        font-size: 24px;
+                    p:nth-child(2) {
+                        margin-top: 12px;
+                        span:nth-child(1) {
+                            color: #FF5252;
+                            font-size: 30px;
+                        }
+                        span:nth-child(2) {
+                            color: #555555;
+                            font-size: 24px;
+                        }
+                    }
+                    p:nth-child(3) {
+                        color: #B1B1B1;
+                            font-size: 22px;
                     }
                 }
-                p:nth-child(3) {
-                    color: #B1B1B1;
-                        font-size: 22px;
-                }
-            }
-            .arrow {
-                position: relative;
-                width: 30px;
-                height: 30px;
-                margin-top: 50px;
-                &:before, &:after {
-                    position: absolute;
-                    top: 0;
-                    content: '';
-                    display: block;
-                    border-top: 15px solid transparent;
-                    border-right: 15px solid transparent;
-                    border-bottom: 15px solid transparent;
-                }
-                &:before {
-                    left: 5px;
-                    border-left: 15px solid #B1B1B1;
-                }
-                &:after {
-                    left: 0px;
-                    border-left: 15px solid #fff;
+                .arrow {
+                    position: relative;
+                    width: 30px;
+                    height: 30px;
+                    margin-top: 50px;
+                    &:before, &:after {
+                        position: absolute;
+                        top: 0;
+                        content: '';
+                        display: block;
+                        border-top: 15px solid transparent;
+                        border-right: 15px solid transparent;
+                        border-bottom: 15px solid transparent;
+                    }
+                    &:before {
+                        left: 5px;
+                        border-left: 15px solid #B1B1B1;
+                    }
+                    &:after {
+                        left: 0px;
+                        border-left: 15px solid #fff;
+                    }
                 }
             }
         }

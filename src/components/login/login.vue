@@ -47,6 +47,7 @@ export default {
       timeFlag: true,
       _type: "2", //来源   1小程序 2H5 3安卓 4IOS
       openId: "",   //微信openId
+      unionId: "",  //微信unionId
       sex: 0,      //微信用户性别
       nickName: "",     //昵称
       iconUrl: "",      //头像
@@ -191,7 +192,8 @@ export default {
       let _this = this;
       let _parms = {
           mobile: this.telephone,
-          openId: this.openId
+          openId: this.openId,
+          unionId: this.unionId    //微信unionId
       }
       this.$axios
       .post("/api/app/user/addAppUser", qs.stringify(_parms))
@@ -319,8 +321,10 @@ export default {
                       _this.nickName = s.userInfo.nickname;
                       _this.iconUrl = s.userInfo.headimgurl;
                       _this.openId = s.userInfo.openid;
+                      _this.unionId = s.userInfo.unionid ? s.userInfo.unionid : "";
                       _this.isSignWX = true;
-                      _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
+                      // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
+                      _this.$axios.get("/api/app/user/findByOpIdAndUnId/?openId=" + _this.openId + "&unionId=" + _this.unionId, {})
                       .then(res => {
                         let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
                         console.log(data);
