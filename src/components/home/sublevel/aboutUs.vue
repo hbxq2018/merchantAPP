@@ -21,7 +21,7 @@ export default {
   name: "aboutMe",
   data() {
     return{
-        index:2,
+          index:2,
           msg:'aboutMe',
           data:{
             //   src: "../../../../static/images/xiang7Logo.png",

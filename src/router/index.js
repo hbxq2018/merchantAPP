@@ -26,6 +26,12 @@ import SetMeal from '@/components/home/ticket/setMeal'
 import ToSetMeal from '@/components/home/ticket/toSetMeal'
 import Dishes from '@/components/home/manage/dishes'
 import AddDishes from '@/components/home/manage/addDishes'
+import ServiceManual from '@/components/home/sublevel/ServiceManual'   
+import Aboutthefood from '@/components/home/sublevel/synopsisManual/aboutthefood'
+import Howtocheckin from '@/components/home/sublevel/synopsisManual/howtocheckin'     
+import Howtouse from '@/components/home/sublevel/synopsisManual/howtouse'    
+import ImproveService from '@/components/home/sublevel/synopsisManual/improveService'
+import Questions from '@/components/home/sublevel/synopsisManual/questions'
 Vue.use(Router)
 
 export default new Router({
@@ -119,6 +125,36 @@ export default new Router({
       path: '/historyse',
       name: 'Historyse',
       component: Historyse
+    },
+    { //我的页面-->使用手册
+      path: '/serviceManual',
+      name: 'ServiceManual',
+      component: ServiceManual
+    },
+    { //我的页面-->使用手册-->关于享7美食
+      path: '/aboutthefood',
+      name: 'Aboutthefood',
+      component: Aboutthefood   
+    },
+    { //我的页面-->使用手册-->如何入住
+      path: '/howtocheckin',
+      name: 'Howtocheckin',
+      component: Howtocheckin   
+    },
+    { //我的页面-->使用手册-->如何使用
+      path: '/howtouse',
+      name: 'Howtouse',
+      component: Howtouse   
+    },
+    { //我的页面-->使用手册-->如何提高客流量  
+      path: '/improveService',
+      name: 'ImproveService',
+      component: ImproveService
+    },
+    { //我的页面-->使用手册-->常见问题  
+      path: '/questions',
+      name: 'Questions',
+      component: Questions
     },
     { //我的页面-->历史账单
       path: '/historyofthebill',

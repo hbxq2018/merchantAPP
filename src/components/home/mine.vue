@@ -43,6 +43,12 @@ export default {
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },{
                 // src: "../../../static/images/customer_service.png",
+                src: require("../../../static/images/shiyongsc.png"),
+                name:'开店助手',
+                // arrowDiagrams:"../../../static/images/home_arrow.png",
+                arrowDiagrams:require("../../../static/images/home_arrow.png")
+            },{
+                // src: "../../../static/images/customer_service.png",
                 src: require("../../../static/images/customer_service.png"),
                 name:'联系客服',
                 // arrowDiagrams:"../../../static/images/home_arrow.png",
@@ -79,12 +85,14 @@ export default {
       },
       WeIntroduce:function(e){
           const listBoxID = e.currentTarget.id
-          if(listBoxID ==2 ){
+          if(listBoxID ==3 ){
               this.$router.push('/aboutUs')
           }else if(listBoxID ==0){
               this.$router.push('/historyse')
-          }else if(listBoxID ==1){
+          }else if(listBoxID ==2){
               window.location.href="tel:027-59728120"
+          }else if(listBoxID ==1){
+              this.$router.push('/serviceManual')
           }
       }
   },
