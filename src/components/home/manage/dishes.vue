@@ -8,7 +8,7 @@
     <div class="dishesBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
 		<mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
 			<ul id="dishesUl" class="dishesUl">
-				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toAddDishes">
+				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(item.id)">
 					<img class="icon fl" :src="item.picUrl" alt="">
 					<div class="text fl">
 						<p>{{item.skuName}}</p>
@@ -19,7 +19,7 @@
 			</ul>
 		</mt-loadmore>
     </div>
-    <div class="dishesBottom" @click="toAddDishes">
+    <div class="dishesBottom" @click="toAddDishes()">
         <span>+</span>
         <span>添加推荐菜</span>
     </div>
@@ -63,13 +63,11 @@ export default {
             for (let i = 0; i < lists.length; i++) {
               _this.list.push(lists[i]);
             }
-            setTimeout(function() {
-              var dishesUl = document.getElementById("dishesUl");
-              var height = dishesUl.getElementsByClassName("dishes_list")[0]
-                .offsetHeight;
-              dishesUl.style.height =
-                Math.ceil(height / 210 * 230 + 2) * _this.list.length + "px";
-            }, 2000);
+            // setTimeout(function() {
+            //   var dishesUl = document.getElementById("dishesUl");
+            //   var height = dishesUl.getElementsByClassName("dishes_list")[0].offsetHeight;
+            //   dishesUl.style.height = Math.ceil(height / 210 * 230 + 2) * _this.list.length + "px";
+            // }, 2000);
             if (lists.length < 8) {
               _this.allLoaded = true;
             }
@@ -88,8 +86,8 @@ export default {
         }
       });
     },
-    toAddDishes() {
-      this.$router.push({ path: "/addDishes", params: {} });
+    toAddDishes(id) {
+      this.$router.push({ name: "AddDishes", params: {id: id} });
     },
     loadTop() {
       //下拉加载
@@ -132,6 +130,7 @@ export default {
     overflow: scroll;
     .dishesUl {
       width: 100%;
+      min-height: 1100px;
       .dishes_list {
         height: 170px;
         width: 100%;

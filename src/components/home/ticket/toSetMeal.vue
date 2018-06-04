@@ -12,127 +12,175 @@
                 <img src="../../../../static/images/camera.png" alt="">
                 <p>添加商品图片</p>
             </div>
-            <img class="uploadPic" :src="uploadUrl" alt="" v-if="uploadUrl">
+            <img class="uploadPic" :src="picUrl" alt="" v-if="picUrl">
             <input type="file" ref="foodsPic" @change="getFile">
         </div>
         <div class="form_name form_item clearfix">
             <span class="fl">套餐名称</span>
-            <input class="fr" type="text" placeholder="例:双人餐" v-model="setMealName" maxlength="13">
+            <input class="fr" type="text" placeholder="例:双人餐" v-model="skuName" maxlength="13">
         </div>
         <div class="form_price">
             <div class="form_item clearfix">
                 <span class="fl">原价</span>
-                <input class="fr" type="text" placeholder="请输入原价（元）" v-model="sellPrice" maxlength="13">
+                <input class="fr" type="number" placeholder="请输入原价（元）" v-model="sellPrice" maxlength="13">
                 <p class="form_line"></p>
             </div>
             <div class="form_item clearfix">
                 <span class="fl">优惠价</span>
-                <input class="fr" type="text" placeholder="请输入优惠价格（元）" v-model="agioPrice" maxlength="13">
+                <input class="fr" type="number" placeholder="请输入优惠价格（元）" v-model="agioPrice" maxlength="13">
             </div>
         </div>
         <div class="form_other">
             <p class="form_item_tit">主菜</p>
             <div class="form_inner">
-                <div class="form_item clearfix">
-                    <span class="fl">菜品名称</span>
-                    <input class="fr" type="text" placeholder="例如：麻婆豆腐（1份）" v-model="dishName1" maxlength="13">
-                </div>
-                <div class="form_item clearfix">
-                    <span class="fl">价格</span>
-                    <input class="fr" type="text" placeholder="请输入原价" v-model="dishPrice1" maxlength="13">
+                <div class="form_inner_li" v-for="(item,index) in mainObj" :key="index">
+                    <div class="form_item clearfix">
+                        <span class="fl">菜品名称</span>
+                        <input class="fr" type="text" placeholder="例如：麻婆豆腐(1份)" v-model="item.mainName" maxlength="13">
+                    </div>
+                    <div class="form_item clearfix">
+                        <span class="fl">价格</span>
+                        <input class="fr" type="number" placeholder="请输入原价" v-model="item.mainPrice" maxlength="13">
+                    </div>
                 </div>
             </div>
             <div class="form_btns">
-                <div class="form_btn">
+                <div class="form_btn" @click="removeGroup(1)">
                     <img src="../../../../static/images/cancelIcon.png" alt="">
                     删除该组
                 </div>
-                <div class="form_btn">
+                <div class="form_btn" @click="addGroup(1)">
                     <img src="../../../../static/images/addIcon.png" alt="">
                     添加一组
                 </div>
             </div>
         </div>
         <div class="form_other">
-            <p class="form_item_tit">其他</p>
+            <p class="form_item_tit">其他(选填)</p>
             <div class="form_inner">
-                <div class="form_item clearfix">
-                    <span class="fl">菜品名称</span>
-                    <input class="fr" type="text" placeholder="例如：饮料、凉菜（1份）" v-model="otherDishName1" maxlength="13">
-                </div>
-                <div class="form_item clearfix">
-                    <span class="fl">价格</span>
-                    <input class="fr" type="text" placeholder="请输入原价" v-model="otherDishPrice1" maxlength="13">
+                <div class="form_inner_li" v-for="(item,index) in otherObj" :key="index">
+                    <div class="form_item clearfix">
+                        <span class="fl">菜品名称</span>
+                        <input class="fr" type="text" placeholder="例如：饮料、凉菜(1份)" v-model="item.otherName" maxlength="13">
+                    </div>
+                    <div class="form_item clearfix">
+                        <span class="fl">价格</span>
+                        <input class="fr" type="number" placeholder="请输入原价" v-model="item.otherPrice" maxlength="13">
+                    </div>
                 </div>
             </div>
             <div class="form_btns">
-                <div class="form_btn">
+                <div class="form_btn" @click="removeGroup(2)">
                     <img src="../../../../static/images/cancelIcon.png" alt="">
                     删除该组
                 </div>
-                <div class="form_btn">
+                <div class="form_btn" @click="addGroup(2)">
                     <img src="../../../../static/images/addIcon.png" alt="">
                     添加一组
                 </div>
             </div>
         </div>
         <div class="form_other">
-            <p class="form_item_tit">备注</p>
+            <p class="form_item_tit">备注(选填)</p>
             <div class="form_inner">
-                <div class="form_item remark clearfix">
-                    <span class="fl">菜品名称</span>
-                    <input class="fr" type="text" placeholder="例如：免费提供餐巾纸" v-model="reMarkName1" maxlength="13">
+                <div class="form_inner_li" v-for="(item,index) in remarkObj" :key="index">
+                    <div class="form_item remark clearfix">
+                        <span class="fl">菜品名称</span>
+                        <input class="fr" type="text" placeholder="例如：免费提供餐巾纸" v-model="item.remarkName" maxlength="13">
+                    </div>
                 </div>
             </div>
             <div class="form_btns">
-                <div class="form_btn">
+                <div class="form_btn" @click="removeGroup(3)">
                     <img src="../../../../static/images/cancelIcon.png" alt="">
                     删除该组
                 </div>
-                <div class="form_btn">
+                <div class="form_btn" @click="addGroup(3)">
                     <img src="../../../../static/images/addIcon.png" alt="">
                     添加一组
                 </div>
             </div>
         </div>
     </div>
+    <div class="toSetMeal_bot" v-if="id">
+        <div class="cancel" @click="getBack">取消</div>
+        <div class="delete" @click="deleteMeal">删除</div>
+    </div>
   </div>
 </template>
 
 <script>
-import { Picker,Toast } from "mint-ui";
-import store from '@/vuex/store'
+import { MessageBox, Toast } from "mint-ui";
+import store from "@/vuex/store";
 import qs from "qs";
-import {mapState,mapMutations,mapGetters} from 'vuex'
+import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "toSetMeal",
   data() {
     return {
+      id: "",
       name: "添加套餐",
-      uploadUrl: "",
-      setMealName: "",
+      picUrl: "",
+      skuName: "",
       sellPrice: "",
       agioPrice: "",
-      dishName1: "",
-      dishPrice1: "",
-      otherDishName1: "",
-      otherDishPrice1: "",
-      reMarkName1: ""
+      mainObj: [{ mainName: "", mainPrice: "" }],
+      otherObj: [{ otherName: "", otherPrice: "" }],
+      remarkObj: [{ remarkName: "" }]
     };
   },
   store,
-  computed:{
-    ...mapState(['shopInfo', 'userInfo']),
+  computed: {
+    ...mapState(["shopInfo", "userInfo"])
   },
   methods: {
-     ...mapMutations(['setshopInfo', 'setuserInfo']),
+    ...mapMutations(["setshopInfo", "setuserInfo"]),
+    getSingleMeal() {
+      //查询单个套餐
+      let _this = this;
+      let _param =
+        "id=" +
+        this.id +
+        "&shopId=" +
+        this.userInfo.id +
+        "&zanUserId=" +
+        this.shopInfo.id;
+      this.$axios.get("/api/app/sku/getAgio?" + _param).then(res => {
+        if (res.data.code != 0) {
+          Toast("系统繁忙请稍后再试");
+          _this.id = "";
+          return false;
+        }
+        let data = res.data.data;
+        _this.picUrl = data.picUrl;
+        _this.skuName = data.skuName;
+        _this.sellPrice = data.sellPrice;
+        _this.agioPrice = data.agioPrice;
+        let skuInfo = JSON.parse(data.skuInfo);
+        let mainObj = [], otherObj = [], remarkObj = [];
+        for (let i = 0; i < skuInfo.length; i++) {
+          let skuInfoEle = skuInfo[i];
+          for (var key in skuInfoEle) {
+            if (key == "mainName") {
+              mainObj.push(skuInfoEle);
+            } else if(key == "otherName") {
+              otherObj.push(skuInfoEle);
+            } else if(key == "remarkName") {
+              remarkObj.push(skuInfoEle);
+            }
+          }
+        }
+        _this.mainObj = mainObj;
+        _this.otherObj = otherObj;
+        _this.remarkObj = remarkObj;
+      });
+    },
     getFile: function(e) {
+      //上传图片
       //上传图片
       let _this = this,
         inputDOM = {};
-      console.log(e);
       inputDOM = this.$refs.foodsPic;
-      console.log(inputDOM);
       // 通过DOM取文件数据
       this.file = inputDOM.files[0];
       this.errText = "";
@@ -153,90 +201,149 @@ export default {
             Toast("系统繁忙请稍后再试");
             return false;
           }
-          _this.uploadUrl = res.data.data.picUrl;
+          _this.picUrl = res.data.data.picUrl;
         })
         .catch(err => {
           Toast("系统繁忙请稍后再试");
         });
     },
-    save() {
-        // if(!this.uploadUrl) {
-        //     Toast('请上传套餐图片!');
-        //     return false;
-        // }
-        // if(!this.setMealName) {
-        //     Toast('请填写套餐名称!');
-        //     return false;
-        // }
-        // if(!this.sellPrice || !this.agioPrice) {
-        //     Toast('请填写套餐价格!');
-        //     return false;
-        // }
-        // if(!this.dishName1 || !this.dishPrice1 || !this.otherDishName1 || !this.otherDishPrice1 || !this.reMarkName1) {
-        //     Toast('请填写套餐详情!');
-        //     return false;
-        // }
-        
-        let data = {
-            picUrl: this.uploadUrl,
-            skuName: this.setMealName,
-            skuType: "5",
-            stockNum: "9999",
-            opreatorId: this.shopInfo.id,
-            shopId: this.userInfo.id,
-            opreatorName: this.shopInfo.userName,
-            sellPrice: this.sellPrice,
-            agioPrice: this.agioPrice,
-            inPrice: "20",
-            skuInfo: [
-                {
-                    dish: this.dishName1,
-                    price: this.dishPrice1
-
-                },
-                {
-                    dish: this.otherDishName1,
-                    price: this.otherDishPrice1
-
-                },
-                {
-                    dish: this.reMarkName1,
-                    price: 0
-                }
-            ]
+    addGroup(id) {
+      //添加一组
+      if (id == 1) {
+        if (
+          this.mainObj[this.mainObj.length - 1].mainName &&
+          this.mainObj[this.mainObj.length - 1].mainPrice
+        ) {
+          this.mainObj.push({ mainName: "", mainPrice: "" });
+        } else {
+          Toast("请先填完以上两项");
         }
-        console.log(data);
-        let _param = "", skuInfo = "";
-        for(let key in data) {
-            if(key == "skuInfo") {
-                // let skuInfo = "[";
-                // for(let i = 0; i < data["skuInfo"].length; i++) {
-                //     let skuStr = data["skuInfo"][i];
-                //     skuInfo += "{";
-                //     for(var k in skuStr) {
-                //         skuInfo += k + ":" + skuStr[k] + ",";
-                //     }
-                //     skuInfo = skuInfo.substring(0, skuInfo.length - 1);
-                //     skuInfo += "}";
-                //     skuInfo += ","
-                //     skuInfo = skuInfo.substring(0, skuInfo.length - 1);
-                // }
-                // skuInfo += "]";
-                console.log(JSON.stringify(data[key]))
-                _param += key + "=" + JSON.stringify(data[key]) + "&";
-            } else {
-                _param += key + "=" + data[key] + "&";
+      } else if (id == 2) {
+        if (
+          this.otherObj[this.otherObj.length - 1].otherName &&
+          this.otherObj[this.otherObj.length - 1].otherPrice
+        ) {
+          this.otherObj.push({ otherName: "", otherPrice: "" });
+        } else {
+          Toast("请先填完以上两项");
+        }
+      } else if (id == 3) {
+        if (this.remarkObj[this.remarkObj.length - 1].remarkName) {
+          this.remarkObj.push({ remarkName: "" });
+        } else {
+          Toast("请先填完以上一项");
+        }
+      }
+    },
+    removeGroup(id) {
+      //删除该组
+      let obj = {};
+      if (id == 1) {
+        obj = this.mainObj;
+      } else if (id == 2) {
+        obj = this.otherObj;
+      } else if (id == 3) {
+        obj = this.remarkObj;
+      }
+      if (obj.length > 1) {
+        obj.splice(obj.length - 1, 1);
+      } else {
+        Toast("仅剩一项了,不能再删了");
+      }
+    },
+    deleteMeal() {      //删除该套餐
+      let _this = this;          
+      MessageBox.confirm("确定删除?").then(
+        action => {
+          this.$axios
+          .post("/api/app/sku/delete?id=" + this.id)
+          .then(res => {
+            if (res.data.code != 0) {
+              Toast("系统繁忙请稍后再试");
+              return false;
             }
+            Toast("该商品已删除");
+            _this.$router.push({path: '/setMeal'})
+          })
+          .catch(err => {
+            Toast("系统繁忙请稍后再试");
+          });
+        },
+        () => {
+          
         }
-        _param = _param.substring(0, _param.length - 1);
-        this.$axios
-        .post("/api/app/sku/add/?" + _param)
+      );
+    },
+    getBack() {
+        this.$router.push({ path: "/setMeal" });
+    },
+    save() {       //提交套餐
+      let _this = this, skuInfo = [], saveUrl = "add/?", _param = "";
+      if (!this.picUrl) {
+        Toast("请上传套餐图片!");
+        return false;
+      }
+      if (!this.skuName) {
+        Toast("请填写套餐名称!");
+        return false;
+      }
+      if (!this.sellPrice || !this.agioPrice) {
+        Toast("请填写套餐价格!");
+        return false;
+      }
+      for (let i = 0; i < this.mainObj.length; i++) {
+        if (!this.mainObj[i].mainName || !this.mainObj[i].mainPrice) {
+          Toast("请把主菜填写完整!");
+          return false;
+        }
+      }
+      skuInfo = skuInfo.concat(this.mainObj);
+      for (let i = 0; i < this.otherObj.length; i++) {
+        if (this.otherObj[i].otherName && this.otherObj[i].otherPrice) {
+          skuInfo.push(this.otherObj[i]);
+        }
+      }
+      for (let i = 0; i < this.remarkObj.length; i++) {
+        if (this.remarkObj[i].remarkName) {
+          skuInfo.push(this.remarkObj[i]);
+        }
+      }
+      let data = {
+        picUrl: this.picUrl,
+        skuName: this.skuName,
+        skuType: "5",
+        stockNum: "9999",
+        opreatorId: this.shopInfo.id,
+        shopId: this.userInfo.id,
+        opreatorName: this.shopInfo.userName,
+        sellPrice: this.sellPrice,
+        agioPrice: this.agioPrice,
+        inPrice: "20",
+        skuInfo: skuInfo
+      };
+      if(_this.id) {
+          data.id = _this.id;
+          saveUrl = "update/?"
+      }
+      for (let key in data) {
+        if (key == "skuInfo") {
+          _param += key + "=" + JSON.stringify(data[key]) + "&";
+          _param = _param.replace(/\{/g, "%7b");
+          _param = _param.replace(/\}/g, "%7d");
+        } else {
+          _param += key + "=" + data[key] + "&";
+        }
+      }
+      _param = _param.substring(0, _param.length - 1);
+      this.$axios
+        .post("/api/app/sku/" + saveUrl + _param)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
             return false;
           }
-          console.log(res);
+          Toast("该商品已成功添加");
+          _this.$router.push({ path: "/setMeal" });
         })
         .catch(err => {
           Toast("系统繁忙请稍后再试");
@@ -244,153 +351,181 @@ export default {
     }
   },
   created: function() {
-    console.log(this.$route.params.id)
+    if (this.$route.params.id) {
+      this.id = this.$route.params.id;
+      this.getSingleMeal();
+    }
   }
 };
 </script>
 <style lang="less">
 @import url(../../../common/css/common.css);
 .toSetMeal {
-    background-color: #EBEBEB;
-    height: 100%;
-    .toSetMealBox {
-        .addPicBox {
-            height: 312px;
-            box-sizing: border-box;
-            background-color: #fff;
-            margin-bottom: 20px;
-            padding-top: 60px;
-            position: relative;
-            .placeHolder {
-                img {
-                    height: 135px;
-                    width: 135px;
-                }
-                p {
-                    margin-top: 5px;
-                    color: #808080;
-                    font-size: 28px;
-                }
-            }
-            input {
-                width: 100%;
-                height: 100%;
-                background-color: #fff;
-                opacity: 0;
-                position: absolute;
-                left: 0;
-                top: 0;
-                z-index: 100;
-            }
-            .uploadPic {
-                width: 100%;
-                height: 100%;
-                background-color: #fff;
-                position: absolute;
-                left: 0;
-                top: 0;
-                z-index: 50;
-            }
+  background-color: #ebebeb;
+  height: 100%;
+  .toSetMealBox {
+    .addPicBox {
+      height: 312px;
+      box-sizing: border-box;
+      background-color: #fff;
+      margin-bottom: 20px;
+      padding-top: 60px;
+      position: relative;
+      .placeHolder {
+        img {
+          height: 135px;
+          width: 135px;
         }
-        .form_name {
-            padding: 0 30px;
+        p {
+          margin-top: 5px;
+          color: #808080;
+          font-size: 28px;
         }
-        .form_name, .form_price {
-            margin-bottom: 20px;
+      }
+      input {
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 100;
+      }
+      .uploadPic {
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 50;
+      }
+    }
+    .form_name {
+      padding: 0 30px;
+    }
+    .form_name,
+    .form_price {
+      margin-bottom: 20px;
+    }
+    .form_price {
+      background-color: #fff;
+      padding: 0 30px;
+      .form_item {
+        position: relative;
+      }
+      .form_line {
+        height: 2px;
+        width: 100%;
+        background-color: #e0e0e0;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+    }
+    .form_item {
+      height: 98px;
+      line-height: 98px;
+      width: 100%;
+      background-color: #fff;
+      font-size: 30px;
+      box-sizing: border-box;
+      span {
+        color: #191919;
+      }
+      input {
+        width: 70%;
+        border: 0;
+        height: 100%;
+        color: #b1b1b1;
+        text-align: right;
+        font-size: 28px;
+      }
+    }
+    .form_other {
+      color: #191919;
+      font-size: 28px;
+      background-color: #fff;
+      text-align: left;
+      padding: 0 30px 30px 30px;
+      box-sizing: border-box;
+      .form_item_tit {
+        height: 84px;
+        line-height: 84px;
+        position: relative;
+        padding-left: 28px;
+        &:after {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 28px;
+          width: 8px;
+          height: 28px;
+          background-color: #fc5e2d;
         }
-        .form_price {
-            background-color: #fff;
-            padding: 0 30px;
-            .form_item {
-                position: relative;
-            }
-            .form_line {
-                height: 2px;
-                width: 100%;
-                background-color: #E0E0E0;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-            }
+      }
+      .form_inner {
+        .form_inner_li {
+          box-sizing: border-box;
+          border: 2px solid #e0e0e0;
+          border-bottom: 0;
+        }
+        .remark {
+          border-bottom: 0 !important;
         }
         .form_item {
-            height: 98px;
-            line-height: 98px;
-            width: 100%;
-            background-color: #fff;
-            font-size: 30px;
-            box-sizing: border-box;
-            span {
-                color: #191919;
-            }
-            input {
-                width: 70%;
-                border: 0;
-                height: 100%;
-                color: #B1B1B1;
-                text-align: right;
-                font-size: 28px;
-            }
+          padding: 0 22px 0 26px;
+          &:nth-child(1) {
+            border-bottom: 2px solid #e0e0e0;
+          }
         }
-        .form_other {
-            color: #191919;
-            font-size: 28px;
-            background-color: #fff;
-            text-align: left;
-            padding: 0 30px 30px 30px;
-            box-sizing: border-box;
-            .form_item_tit {
-                height: 84px;
-                line-height: 84px;
-                position: relative;
-                padding-left: 28px;
-                &:after {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    top: 28px;
-                    width: 8px;
-                    height: 28px;
-                    background-color: #FC5E2D;
-                }
-            }
-            .form_inner {
-                box-sizing: border-box;
-                border: 2px solid #E0E0E0;
-                .remark {
-                    border-bottom: 0!important;
-                }
-                .form_item {
-                    padding: 0 22px 0 26px;
-                    &:nth-child(1) {
-                        border-bottom: 2px solid #E0E0E0;
-                    }
-                }
-            }
-            .form_btns {
-                height: 82px;
-                line-height: 82px;
-                text-align: center;
-                border: 1px solid #E0E0E0;
-                border-top: 0;
-                background-color: #FAFAFA;
-                display: flex;
-                .form_btn {
-                    flex-direction: row;
-                    width: 50%;
-                    height: 100%;
-                    box-sizing: border-box;
-                    &:nth-child(1) {
-                        border-right: 1px solid #E0E0E0;
-                    }
-                    img {
-                        height: 34px;
-                        width: 34px;
-                        vertical-align: middle;
-                    }
-                }
-            }
+      }
+      .form_btns {
+        height: 82px;
+        line-height: 82px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+        background-color: #fafafa;
+        display: flex;
+        .form_btn {
+          flex-direction: row;
+          width: 50%;
+          height: 100%;
+          box-sizing: border-box;
+          &:nth-child(1) {
+            border-right: 1px solid #e0e0e0;
+          }
+          img {
+            height: 34px;
+            width: 34px;
+            vertical-align: middle;
+          }
         }
+      }
     }
+  }
+  .toSetMeal_bot {
+    background-color: #ebebeb;
+    padding: 40px 0;
+    box-sizing: border-box;
+    display: flex;
+    div {
+      height: 80px;
+      line-height: 80px;
+      width: 50%;
+      margin: 0 20px;
+      border-radius: 8px;
+      font-size: 30px;
+    }
+    .cancel {
+      background-color: #fff;
+      color: #555555;
+    }
+    .delete {
+      background-color: #ff5b5b;
+      color: #fff;
+    }
+  }
 }
 </style>

@@ -16,7 +16,7 @@
                             <span>折后价 ￥{{item.agioPrice}}元</span>
                             <span>门市价 ￥{{item.sellPrice}}元</span>
                         </p>
-                        <p>发布日期：{{item.createTime}}</p>
+                        <p>发布日期：{{item.updateTime}}</p>
                     </div>
                     <div class="arrow fr"></div>
                 </div>
@@ -39,22 +39,7 @@ export default {
   data() {
     return {
       name: "套餐",
-      list: [
-          {
-              id: 1,
-              name: '豪华双人套餐',
-              realPrice: '128',
-              discountPrice: '108',
-              date: '2018-05-30'
-          },
-          {
-              id: 2,
-              name: '豪华单人套餐',
-              realPrice: '68',
-              discountPrice: '58',
-              date: '2018-06-05'
-          }
-      ],
+      list: [],
       page: 1,
       allLoaded: false,
       scrollMode: "auto"
@@ -77,13 +62,14 @@ export default {
                 }
                 if(lists && lists.length > 0) {
                     for(let i = 0; i < lists.length; i++) {
+                        lists[i].updateTime = _this.switchDate(lists[i].updateTime);
                         _this.list.push(lists[i]);
                     }
-                    setTimeout(function() {
-                        var setMealUl = document.getElementById('setMealUl');
-                        var height = setMealUl.getElementsByClassName('setMeal_list')[0].offsetHeight;
-                        setMealUl.style.height = Math.ceil((height / 210) * 230 + 2) * _this.list.length + "px";
-                    },2000);
+                    // setTimeout(function() {
+                    //     var setMealUl = document.getElementById('setMealUl');
+                    //     var height = setMealUl.getElementsByClassName('setMeal_list')[0].offsetHeight;
+                    //     setMealUl.style.height = Math.ceil((height / 210) * 230 + 2) * _this.list.length + "px";
+                    // },2000);
                     if(lists.length < 8) {
                         _this.allLoaded = true;
                     }
@@ -117,6 +103,14 @@ export default {
     },
     toSetMeal(id) {
         this.$router.push({ name: "ToSetMeal", params: {id: id} });
+    },
+    switchDate(s) {    //转换日期
+        let dateStr = new Date(s);
+        let yearStr = dateStr.getFullYear();
+        let monthStr = +dateStr.getMonth() + 1;
+        let dayStr = dateStr.getDate() > 9 ? dateStr.getDate() : "0" + dateStr.getDate();
+        monthStr = monthStr > 9 ? monthStr : "0" + monthStr;
+        return yearStr + "-" + monthStr + "-" + dayStr;
     }
   },
   created: function() {
@@ -147,6 +141,7 @@ export default {
         overflow: scroll;
         .setMealUl {
             width: 100%;
+            min-height: 1100px;
             .setMeal_list {
                 height: 170px;
                 width: 100%;
