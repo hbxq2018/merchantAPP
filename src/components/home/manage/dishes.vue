@@ -41,7 +41,8 @@ export default {
       touchStartY: 0,
       distance: 0,
       topFlag: false,    //是否到顶部
-      bottomFlag: false   //是否到底部
+      bottomFlag: false,   //是否到底部
+      flag: true    //节流阀
     };
   },
   store,
@@ -57,7 +58,6 @@ export default {
       this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
-          console.log(_this.page)
           if (_this.page == 1) {
             _this.list = [];
           }
@@ -65,11 +65,6 @@ export default {
             for (let i = 0; i < lists.length; i++) {
               _this.list.push(lists[i]);
             }
-            // setTimeout(function() {
-            //   var dishesUl = document.getElementById("dishesUl");
-            //   var height = dishesUl.getElementsByClassName("dishes_list")[0].offsetHeight;
-            //   dishesUl.style.height = Math.ceil(height / 210 * 230 + 2) * _this.list.length + "px";
-            // }, 2000);
             if (lists.length < 8) {
               _this.allLoaded = false;
             }
@@ -120,7 +115,7 @@ export default {
       let dishesUl = document.getElementById("dishesUl");
       let bottomH = document.getElementById("dishesBottom").clientHeight * 1.727;
       this.touchStartY = e.targetTouches[0].pageY;
-      if(this.getScrollTop() == 0) {
+      if(this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
       }else {
         this.topFlag = false;
@@ -138,7 +133,7 @@ export default {
     touchMove(e) {
       let dishesUl = document.getElementById("dishesUl");
       this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if(this.distance > 0 && this.topFlag == true) {
+      if(this.distance > 0 && this.topFlag == true && this.flag) {
         if(this.distance > 100) {
           this.distance = 100;
         }
@@ -152,17 +147,18 @@ export default {
       }
     },
     touchEnd() {
-      let dishesUl = document.getElementById("dishesUl")
-      if(this.distance > 0 && this.topFlag == true) {
+      let dishesUl = document.getElementById("dishesUl"), _this = this;
+      if(this.distance > 0 && this.topFlag == true && this.flag) {
+        this.flag = false;
         let index = 100;
         let timer = setInterval(function() {
           if(index == 0) {
             clearInterval(timer);
+            _this.flag = true;
           }
           index--;
           dishesUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
         }, 5);
-        console.log("下拉加载");
         this.page = 1;
         this.allLoaded = true;
         this.getDishList();
@@ -176,7 +172,6 @@ export default {
           index++;
           dishesUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
         }, 5);
-        console.log("上拉刷新");
         ++this.page;
         this.getDishList();
       }
@@ -203,11 +198,9 @@ export default {
     z-index: 1000;
   }
   .dishesBox {
-    // min-height: 1300px;
     width: 100%;
     padding: 81px 0 110px 0;
     box-sizing: border-box;
-    // overflow: scroll;
     .dishesUl {
       width: 100%;
       position: relative;

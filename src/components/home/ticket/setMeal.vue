@@ -7,7 +7,7 @@
     </mt-header>
     <div id="setMealBox" class="setMealBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
         <ul id="setMealUl" class="setMealUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-            <div class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
+            <li class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
                 <img class="icon fl" :src="item.picUrl" alt="">
                 <div class="text fl">
                     <p>{{item.skuName}}</p>
@@ -18,7 +18,7 @@
                     <p>发布日期：{{item.updateTime}}</p>
                 </div>
                 <div class="arrow fr"></div>
-            </div>
+            </li>
         </ul>
     </div>
     <div id="setMealBottom" class="setMealBottom" @click="toSetMeal()">
@@ -61,7 +61,6 @@ export default {
             if (res.data.code == 0) {
                 let lists = res.data.data.list;
                 if(_this.page == 1) {
-                    console.log(_this.page)
                     _this.list = [];
                 }
                 if(lists && lists.length > 0) {
@@ -69,11 +68,6 @@ export default {
                         lists[i].updateTime = _this.switchDate(lists[i].updateTime);
                         _this.list.push(lists[i]);
                     }
-                    // setTimeout(function() {
-                    //     var setMealUl = document.getElementById('setMealUl');
-                    //     var height = setMealUl.getElementsByClassName('setMeal_list')[0].offsetHeight;
-                    //     setMealUl.style.height = Math.ceil((height / 210) * 230 + 2) * _this.list.length + "px";
-                    // },2000);
                     if(lists.length < 8) {
                         _this.allLoaded = false;
                     }
@@ -125,7 +119,7 @@ export default {
       let setMealUl = document.getElementById("setMealUl");
       let bottomH = document.getElementById("setMealBottom").clientHeight * 1.727;
       this.touchStartY = e.targetTouches[0].pageY;
-      if(this.getScrollTop() == 0) {
+      if(this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
       }else {
         this.topFlag = false;
@@ -143,7 +137,7 @@ export default {
     touchMove(e) {
       let setMealUl = document.getElementById("setMealUl");
       this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if(this.distance > 0 && this.topFlag == true) {
+      if(this.distance > 0 && this.topFlag == true && this.flag) {
         if(this.distance > 100) {
           this.distance = 100;
         }
@@ -157,17 +151,18 @@ export default {
       }
     },
     touchEnd() {
-      let setMealUl = document.getElementById("setMealUl")
-      if(this.distance > 0 && this.topFlag == true) {
+      let setMealUl = document.getElementById("setMealUl"), _this = this;
+      if(this.distance > 0 && this.topFlag == true && this.flag) {
+        this.flag = false;
         let index = 100;
         let timer = setInterval(function() {
           if(index == 0) {
             clearInterval(timer);
+            _this.flag = true;
           }
           index--;
           setMealUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
         }, 5);
-        console.log("下拉加载");
         this.page = 1;
         this.allLoaded = true;
         this.setMealList();
@@ -181,7 +176,6 @@ export default {
           index++;
           setMealUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
         }, 5);
-        console.log("上拉刷新");
         ++this.page;
         this.setMealList();
       }
@@ -216,11 +210,9 @@ export default {
         z-index: 1000;
     }
     .setMealBox {
-        // min-height: 1300px;
         width: 100%;
         padding: 81px 0 110px 0;
         box-sizing: border-box;
-        // overflow: scroll;
         .setMealUl {
             width: 100%;
             position: relative;
