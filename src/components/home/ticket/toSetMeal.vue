@@ -36,11 +36,11 @@
                 <div class="form_inner_li" v-for="(item,index) in mainObj" :key="index">
                     <div class="form_item clearfix">
                         <span class="fl">菜品名称</span>
-                        <input class="fr" type="text" placeholder="例如：麻婆豆腐(1份)" v-model="item.mainName" maxlength="13">
+                        <input class="fr" type="text" placeholder="例如：麻婆豆腐(1份)" v-model="item.dish" maxlength="13">
                     </div>
                     <div class="form_item clearfix">
                         <span class="fl">价格</span>
-                        <input class="fr" type="number" placeholder="请输入原价" v-model="item.mainPrice" maxlength="13">
+                        <input class="fr" type="number" placeholder="请输入原价" v-model="item.price" maxlength="13">
                     </div>
                 </div>
             </div>
@@ -61,11 +61,11 @@
                 <div class="form_inner_li" v-for="(item,index) in otherObj" :key="index">
                     <div class="form_item clearfix">
                         <span class="fl">菜品名称</span>
-                        <input class="fr" type="text" placeholder="例如：饮料、凉菜(1份)" v-model="item.otherName" maxlength="13">
+                        <input class="fr" type="text" placeholder="例如：饮料、凉菜(1份)" v-model="item.dish" maxlength="13">
                     </div>
                     <div class="form_item clearfix">
                         <span class="fl">价格</span>
-                        <input class="fr" type="number" placeholder="请输入原价" v-model="item.otherPrice" maxlength="13">
+                        <input class="fr" type="number" placeholder="请输入原价" v-model="item.price" maxlength="13">
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                 <div class="form_inner_li" v-for="(item,index) in remarkObj" :key="index">
                     <div class="form_item remark clearfix">
                         <span class="fl">菜品名称</span>
-                        <input class="fr" type="text" placeholder="例如：免费提供餐巾纸" v-model="item.remarkName" maxlength="13">
+                        <input class="fr" type="text" placeholder="例如：免费提供餐巾纸" v-model="item.dish" maxlength="13">
                     </div>
                 </div>
             </div>
@@ -124,9 +124,9 @@ export default {
       skuName: "",
       sellPrice: "",
       agioPrice: "",
-      mainObj: [{ mainName: "", mainPrice: "" }],
-      otherObj: [{ otherName: "", otherPrice: "" }],
-      remarkObj: [{ remarkName: "" }]
+      mainObj: [{ dish: "", price: "" }],
+      otherObj: [{ dish: "", price: "" }],
+      remarkObj: [{ dish: "" }]
     };
   },
   store,
@@ -156,23 +156,13 @@ export default {
         _this.skuName = data.skuName;
         _this.sellPrice = data.sellPrice;
         _this.agioPrice = data.agioPrice;
-        let skuInfo = JSON.parse(data.skuInfo);
-        let mainObj = [], otherObj = [], remarkObj = [];
-        for (let i = 0; i < skuInfo.length; i++) {
-          let skuInfoEle = skuInfo[i];
-          for (var key in skuInfoEle) {
-            if (key == "mainName") {
-              mainObj.push(skuInfoEle);
-            } else if(key == "otherName") {
-              otherObj.push(skuInfoEle);
-            } else if(key == "remarkName") {
-              remarkObj.push(skuInfoEle);
-            }
-          }
-        }
-        _this.mainObj = mainObj;
-        _this.otherObj = otherObj;
-        _this.remarkObj = remarkObj;
+        let skuInfo = data.skuInfo.split("@");
+        _this.mainObj = JSON.parse(skuInfo[0]);
+        _this.otherObj = JSON.parse(skuInfo[1]);
+        _this.remarkObj = JSON.parse(skuInfo[2]);
+        console.log(_this.mainObj)
+        console.log(_this.otherObj)
+        console.log(_this.remarkObj)
       });
     },
     getFile: function(e) {
@@ -211,25 +201,25 @@ export default {
       //添加一组
       if (id == 1) {
         if (
-          this.mainObj[this.mainObj.length - 1].mainName &&
-          this.mainObj[this.mainObj.length - 1].mainPrice
+          this.mainObj[this.mainObj.length - 1].dish &&
+          this.mainObj[this.mainObj.length - 1].price
         ) {
-          this.mainObj.push({ mainName: "", mainPrice: "" });
+          this.mainObj.push({ dish: "", price: "" });
         } else {
           Toast("请先填完以上两项");
         }
       } else if (id == 2) {
         if (
-          this.otherObj[this.otherObj.length - 1].otherName &&
-          this.otherObj[this.otherObj.length - 1].otherPrice
+          this.otherObj[this.otherObj.length - 1].dish &&
+          this.otherObj[this.otherObj.length - 1].price
         ) {
-          this.otherObj.push({ otherName: "", otherPrice: "" });
+          this.otherObj.push({ dish: "", price: "" });
         } else {
           Toast("请先填完以上两项");
         }
       } else if (id == 3) {
-        if (this.remarkObj[this.remarkObj.length - 1].remarkName) {
-          this.remarkObj.push({ remarkName: "" });
+        if (this.remarkObj[this.remarkObj.length - 1].dish) {
+          this.remarkObj.push({ dish: "" });
         } else {
           Toast("请先填完以上一项");
         }
@@ -278,7 +268,7 @@ export default {
         this.$router.push({ path: "/setMeal" });
     },
     save() {       //提交套餐
-      let _this = this, skuInfo = [], saveUrl = "add/?", _param = "";
+      let _this = this, skuInfo = "", saveUrl = "add/?", _param = "";
       if (!this.picUrl) {
         Toast("请上传套餐图片!");
         return false;
@@ -292,22 +282,14 @@ export default {
         return false;
       }
       for (let i = 0; i < this.mainObj.length; i++) {
-        if (!this.mainObj[i].mainName || !this.mainObj[i].mainPrice) {
+        if (!this.mainObj[i].dish || !this.mainObj[i].price) {
           Toast("请把主菜填写完整!");
           return false;
         }
       }
-      skuInfo = skuInfo.concat(this.mainObj);
-      for (let i = 0; i < this.otherObj.length; i++) {
-        if (this.otherObj[i].otherName && this.otherObj[i].otherPrice) {
-          skuInfo.push(this.otherObj[i]);
-        }
-      }
-      for (let i = 0; i < this.remarkObj.length; i++) {
-        if (this.remarkObj[i].remarkName) {
-          skuInfo.push(this.remarkObj[i]);
-        }
-      }
+      skuInfo = JSON.stringify(this.mainObj) + "@" + JSON.stringify(this.otherObj) + "@" + JSON.stringify(this.remarkObj);
+      skuInfo = skuInfo.replace(/\{/g, "%7b");
+      skuInfo = skuInfo.replace(/\}/g, "%7d");
       let data = {
         picUrl: this.picUrl,
         skuName: this.skuName,
@@ -326,13 +308,7 @@ export default {
           saveUrl = "update/?"
       }
       for (let key in data) {
-        if (key == "skuInfo") {
-          _param += key + "=" + JSON.stringify(data[key]) + "&";
-          _param = _param.replace(/\{/g, "%7b");
-          _param = _param.replace(/\}/g, "%7d");
-        } else {
-          _param += key + "=" + data[key] + "&";
-        }
+        _param += key + "=" + data[key] + "&";
       }
       _param = _param.substring(0, _param.length - 1);
       this.$axios

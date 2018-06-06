@@ -6,8 +6,7 @@
         </router-link>
     </mt-header>
     <div class="dishesBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-		<mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
-			<ul id="dishesUl" class="dishesUl">
+			<ul id="dishesUl" class="dishesUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
 				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(item.id)">
 					<img class="icon fl" :src="item.picUrl" alt="">
 					<div class="text fl">
@@ -17,9 +16,8 @@
 					<div class="arrow fr"></div>
 				</li>
 			</ul>
-		</mt-loadmore>
     </div>
-    <div class="dishesBottom" @click="toAddDishes()">
+    <div id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
         <span>+</span>
         <span>添加推荐菜</span>
     </div>
@@ -28,8 +26,7 @@
 
 <script>
 import Vue from "vue";
-import { Picker, Toast, Loadmore } from "mint-ui";
-Vue.component(Loadmore.name, Loadmore);
+import { Picker, Toast } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -39,8 +36,12 @@ export default {
       name: "推荐菜管理",
       list: [],
       page: 1,
-      allLoaded: false,
-      scrollMode: "auto"
+      allLoaded: true,
+      scrollMode: "auto",
+      touchStartY: 0,
+      distance: 0,
+      topFlag: false,    //是否到顶部
+      bottomFlag: false   //是否到底部
     };
   },
   store,
@@ -49,13 +50,14 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
-    getDishList(type) {
+    getDishList() {
       let _this = this,
         _param = "";
       _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
       this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
+          console.log(_this.page)
           if (_this.page == 1) {
             _this.list = [];
           }
@@ -69,37 +71,115 @@ export default {
             //   dishesUl.style.height = Math.ceil(height / 210 * 230 + 2) * _this.list.length + "px";
             // }, 2000);
             if (lists.length < 8) {
-              _this.allLoaded = true;
+              _this.allLoaded = false;
             }
           } else {
-            _this.allLoaded = true;
+            _this.allLoaded = false;
             Toast("暂无数据");
           }
-          if (type == "top") {
-            _this.$refs.loadmore.onTopLoaded();
-          } else if (type == "bot") {
-            _this.$refs.loadmore.onBottomLoaded();
-          }
-          console.log(_this.allLoaded);
         } else {
-          _this.allLoaded = true;
+          _this.allLoaded = false;
         }
       });
     },
     toAddDishes(id) {
       this.$router.push({ name: "AddDishes", params: {id: id} });
     },
-    loadTop() {
-      //下拉加载
-      this.page = 1;
-      this.allLoaded = false;
-      this.getDishList("top");
+    getScrollTop(){    //获取顶部卷去高度
+    　　var scrollTop = 0, bodyScrollTop = 0, documentScrollTop = 0;
+    　　if(document.body){
+    　　　　bodyScrollTop = document.body.scrollTop;
+    　　}
+    　　if(document.documentElement){
+    　　　　documentScrollTop = document.documentElement.scrollTop;
+    　　}
+    　　scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;
+    　　return scrollTop;
     },
-    loadBottom() {
-      // 上拉加载
-      console.log("上拉");
-      ++this.page;
-      this.getDishList("bot");
+    getScrollHeight(){     //盒子总高度
+    　　var scrollHeight = 0, bodyScrollHeight = 0, documentScrollHeight = 0;
+    　　if(document.body){
+    　　　　bodyScrollHeight = document.body.scrollHeight;
+    　　}
+    　　if(document.documentElement){
+    　　　　documentScrollHeight = document.documentElement.scrollHeight;
+    　　}
+    　　scrollHeight = (bodyScrollHeight - documentScrollHeight > 0) ? bodyScrollHeight : documentScrollHeight;
+    　　return scrollHeight;
+    },
+    getWindowHeight(){     //屏幕可视高度
+    　　var windowHeight = 0;
+    　　if(document.compatMode == "CSS1Compat"){
+    　　　　windowHeight = document.documentElement.clientHeight;
+    　　}else{
+    　　　　windowHeight = document.body.clientHeight;
+    　　}
+    　　return windowHeight;
+    },
+    touchStart(e) {
+      let dishesUl = document.getElementById("dishesUl");
+      let bottomH = document.getElementById("dishesBottom").clientHeight * 1.727;
+      this.touchStartY = e.targetTouches[0].pageY;
+      if(this.getScrollTop() == 0) {
+        this.topFlag = true;
+      }else {
+        this.topFlag = false;
+      }
+      if(dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+          this.allLoaded = false;
+          this.bottomFlag = false;
+      } 
+      if(Math.abs(this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()) < 5 && this.allLoaded) {
+        this.bottomFlag = true;
+      } else {
+        this.bottomFlag = false;
+      }
+    },
+    touchMove(e) {
+      let dishesUl = document.getElementById("dishesUl");
+      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
+      if(this.distance > 0 && this.topFlag == true) {
+        if(this.distance > 100) {
+          this.distance = 100;
+        }
+        dishesUl.style.transform = "translate3d(0px, "+ this.distance +"px, 0px)";
+      } 
+      if(this.distance < 0 && this.bottomFlag == true) {
+        if(this.distance < -100) {
+          this.distance = -100;
+        }
+        dishesUl.style.transform = "translate3d(0px, "+ this.distance +"px, 0px)";
+      }
+    },
+    touchEnd() {
+      let dishesUl = document.getElementById("dishesUl")
+      if(this.distance > 0 && this.topFlag == true) {
+        let index = 100;
+        let timer = setInterval(function() {
+          if(index == 0) {
+            clearInterval(timer);
+          }
+          index--;
+          dishesUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
+        }, 5);
+        console.log("下拉加载");
+        this.page = 1;
+        this.allLoaded = true;
+        this.getDishList();
+      } 
+      if(this.distance < 0 && this.bottomFlag == true) {
+        let index = -100;
+        let timer = setInterval(function() {
+          if(index == 0) {
+            clearInterval(timer);
+          }
+          index++;
+          dishesUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
+        }, 5);
+        console.log("上拉刷新");
+        ++this.page;
+        this.getDishList();
+      }
     }
   },
   created: function() {
@@ -115,6 +195,7 @@ export default {
 @import url(../../../common/css/common.css);
 .dishes {
   height: 100%;
+  background-color: #ebebeb;
   .mint-header {
     position: fixed;
     top: 0;
@@ -122,15 +203,22 @@ export default {
     z-index: 1000;
   }
   .dishesBox {
-    min-height: 1300px;
+    // min-height: 1300px;
     width: 100%;
-    background-color: #ebebeb;
     padding: 81px 0 110px 0;
     box-sizing: border-box;
-    overflow: scroll;
+    // overflow: scroll;
     .dishesUl {
       width: 100%;
-      min-height: 1100px;
+      position: relative;
+      &:before {
+        content: '加载中..';
+        position: absolute;
+        left: 0;
+        top: -50px;
+        height: 20px;
+        width: 100%;
+      }
       .dishes_list {
         height: 170px;
         width: 100%;

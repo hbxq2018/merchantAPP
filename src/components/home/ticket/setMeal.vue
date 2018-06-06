@@ -5,25 +5,23 @@
             <mt-button icon="back"></mt-button>
         </router-link>
     </mt-header>
-    <div class="setMealBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
-			<ul id="setMealUl" class="setMealUl">
-                <div class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
-                    <img class="icon fl" :src="item.picUrl" alt="">
-                    <div class="text fl">
-                        <p>{{item.skuName}}</p>
-                        <p>
-                            <span>折后价 ￥{{item.agioPrice}}元</span>
-                            <span>门市价 ￥{{item.sellPrice}}元</span>
-                        </p>
-                        <p>发布日期：{{item.updateTime}}</p>
-                    </div>
-                    <div class="arrow fr"></div>
+    <div id="setMealBox" class="setMealBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+        <ul id="setMealUl" class="setMealUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+            <div class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
+                <img class="icon fl" :src="item.picUrl" alt="">
+                <div class="text fl">
+                    <p>{{item.skuName}}</p>
+                    <p>
+                        <span>折后价 ￥{{item.agioPrice}}元</span>
+                        <span>门市价 ￥{{item.sellPrice}}元</span>
+                    </p>
+                    <p>发布日期：{{item.updateTime}}</p>
                 </div>
-            </ul>
-		</mt-loadmore>
+                <div class="arrow fr"></div>
+            </div>
+        </ul>
     </div>
-    <div class="setMealBottom" @click="toSetMeal()">
+    <div id="setMealBottom" class="setMealBottom" @click="toSetMeal()">
         <span>+</span>
         <span>添加套餐</span>
     </div>
@@ -41,8 +39,13 @@ export default {
       name: "套餐",
       list: [],
       page: 1,
-      allLoaded: false,
-      scrollMode: "auto"
+      allLoaded: true,
+      scrollMode: "auto",
+      touchStartY: 0,
+      distance: 0,
+      topFlag: false,    //是否到顶部
+      bottomFlag: false,   //是否到底部
+      flag: true    //节流阀
     };
   },
   store,
@@ -51,13 +54,14 @@ export default {
   },
   methods: {
      ...mapMutations(['setuserInfo']),
-     setMealList(type) {
+     setMealList() {
         let _this = this, _param = "";
         _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8" 
         this.$axios.get("/api/app/sku/agioList?" + _param).then(res => {
             if (res.data.code == 0) {
                 let lists = res.data.data.list;
                 if(_this.page == 1) {
+                    console.log(_this.page)
                     _this.list = [];
                 }
                 if(lists && lists.length > 0) {
@@ -71,38 +75,116 @@ export default {
                     //     setMealUl.style.height = Math.ceil((height / 210) * 230 + 2) * _this.list.length + "px";
                     // },2000);
                     if(lists.length < 8) {
-                        _this.allLoaded = true;
+                        _this.allLoaded = false;
                     }
                 } else {
-                    _this.allLoaded = true;
+                    _this.allLoaded = false;
                     Toast('暂无数据');
                 }
-                if(type == 'top'){
-                    _this.$refs.loadmore.onTopLoaded();
-                }else if(type == 'bot'){
-                    _this.$refs.loadmore.onBottomLoaded();
-                }
-                console.log(_this.allLoaded)
             } 
             else {
-                _this.allLoaded = true;
+                _this.allLoaded = false;
             }
         });
     },
-    loadTop() {
-      //下拉加载
-      this.page = 1;
-      this.allLoaded = false;
-      this.setMealList("top");
-    },
-    loadBottom() {
-      // 上拉加载
-      console.log("上拉");
-      ++this.page;
-      this.setMealList("bot");
-    },
     toSetMeal(id) {
         this.$router.push({ name: "ToSetMeal", params: {id: id} });
+    },
+    getScrollTop(){    //获取顶部卷去高度
+    　　var scrollTop = 0, bodyScrollTop = 0, documentScrollTop = 0;
+    　　if(document.body){
+    　　　　bodyScrollTop = document.body.scrollTop;
+    　　}
+    　　if(document.documentElement){
+    　　　　documentScrollTop = document.documentElement.scrollTop;
+    　　}
+    　　scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;
+    　　return scrollTop;
+    },
+    getScrollHeight(){     //盒子总高度
+    　　var scrollHeight = 0, bodyScrollHeight = 0, documentScrollHeight = 0;
+    　　if(document.body){
+    　　　　bodyScrollHeight = document.body.scrollHeight;
+    　　}
+    　　if(document.documentElement){
+    　　　　documentScrollHeight = document.documentElement.scrollHeight;
+    　　}
+    　　scrollHeight = (bodyScrollHeight - documentScrollHeight > 0) ? bodyScrollHeight : documentScrollHeight;
+    　　return scrollHeight;
+    },
+    getWindowHeight() {     //屏幕可视高度
+    　　var windowHeight = 0;
+    　　if(document.compatMode == "CSS1Compat"){
+    　　　　windowHeight = document.documentElement.clientHeight;
+    　　}else{
+    　　　　windowHeight = document.body.clientHeight;
+    　　}
+    　　return windowHeight;
+    },
+    touchStart(e) {
+      let setMealUl = document.getElementById("setMealUl");
+      let bottomH = document.getElementById("setMealBottom").clientHeight * 1.727;
+      this.touchStartY = e.targetTouches[0].pageY;
+      if(this.getScrollTop() == 0) {
+        this.topFlag = true;
+      }else {
+        this.topFlag = false;
+      }
+      if(setMealUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+          this.allLoaded = false;
+          this.bottomFlag = false;
+      } 
+      if(Math.abs(this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()) < 5 && this.allLoaded) {
+        this.bottomFlag = true;
+      } else {
+        this.bottomFlag = false;
+      }
+    },
+    touchMove(e) {
+      let setMealUl = document.getElementById("setMealUl");
+      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
+      if(this.distance > 0 && this.topFlag == true) {
+        if(this.distance > 100) {
+          this.distance = 100;
+        }
+        setMealUl.style.transform = "translate3d(0px, "+ this.distance +"px, 0px)";
+      } 
+      if(this.distance < 0 && this.bottomFlag == true) {
+        if(this.distance < -100) {
+          this.distance = -100;
+        }
+        setMealUl.style.transform = "translate3d(0px, "+ this.distance +"px, 0px)";
+      }
+    },
+    touchEnd() {
+      let setMealUl = document.getElementById("setMealUl")
+      if(this.distance > 0 && this.topFlag == true) {
+        let index = 100;
+        let timer = setInterval(function() {
+          if(index == 0) {
+            clearInterval(timer);
+          }
+          index--;
+          setMealUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
+        }, 5);
+        console.log("下拉加载");
+        this.page = 1;
+        this.allLoaded = true;
+        this.setMealList();
+      } 
+      if(this.distance < 0 && this.bottomFlag == true) {
+        let index = -100;
+        let timer = setInterval(function() {
+          if(index == 0) {
+            clearInterval(timer);
+          }
+          index++;
+          setMealUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
+        }, 5);
+        console.log("上拉刷新");
+        ++this.page;
+        this.setMealList();
+      }
     },
     switchDate(s) {    //转换日期
         let dateStr = new Date(s);
@@ -126,6 +208,7 @@ export default {
 @import url(../../../common/css/common.css);
 .setMeal {
     height: 100%;
+    background-color: #ebebeb;
     .mint-header {
         position: fixed;
         top: 0;
@@ -133,15 +216,22 @@ export default {
         z-index: 1000;
     }
     .setMealBox {
-        min-height: 1300px;
+        // min-height: 1300px;
         width: 100%;
-        background-color: #ebebeb;
         padding: 81px 0 110px 0;
         box-sizing: border-box;
-        overflow: scroll;
+        // overflow: scroll;
         .setMealUl {
             width: 100%;
-            min-height: 1100px;
+            position: relative;
+            &:before {
+                content: '加载中..';
+                position: absolute;
+                left: 0;
+                top: -50px;
+                height: 20px;
+                width: 100%;
+            }
             .setMeal_list {
                 height: 170px;
                 width: 100%;
