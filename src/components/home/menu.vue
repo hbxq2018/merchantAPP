@@ -111,6 +111,7 @@ export default {
       left: 0;
       width: 100%;
       height: 111px;
+      -webkit-touch-callout:default;
     }
     & > .info {
       height: 133px;

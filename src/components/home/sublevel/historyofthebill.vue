@@ -15,7 +15,7 @@
           <div class="check_center" v-for="(item,index) in data" :key="index"  v-if="item" @click="particularsDetails(index)">
             <div class="checkCtSublevel">
               <div class="roder_left">
-                  <b>{{(index)}}<span>月账单</span></b>
+                  <b>{{data.length-index}}<span>月账单</span></b>
                   <p>&yen;{{item?item.totalPrice:'0'}}</p>
               </div>
               <div class="roder-right">
@@ -56,7 +56,8 @@ export default {
   },
   methods: {
     particularsDetails: function(ind) {
-      let obj = {ind:ind}
+      let _ind = this.data.length-ind
+      let obj = {ind:_ind}
       this.$router.push({ name: "DetailsSon", params: obj });
     },
     moreyear:function(){
@@ -85,7 +86,12 @@ export default {
     value = value.substring(0, value.length-1);
     this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
       if (res.data.code == 0) {
-        _this.data = res.data.data;
+        let _data =[];
+         for(key in res.data.data){
+           _data.push(res.data.data[key])
+         }
+        _data.reverse();
+        _this.data = _data;
       }
     });
   }

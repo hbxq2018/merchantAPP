@@ -15,9 +15,9 @@
     <div class="data_statistics">
         <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
     </div>
-    <div class="loadBottom hisbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmore">    
-            <div class="order_history" v-for="(item,index) in totalQuantity" :key="index">
+    <div class="hisbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore" >    
+            <div id="order_history" class="order_history" v-for="(item,index) in totalQuantity" :key="index">
                 <div class="order_h_sublevel">
                     <div class="roder_left">
                         <b>{{item.couponAmount}}<span>元代金券</span></b>
@@ -49,13 +49,13 @@ export default {
   data() {
     return {
       index: 2,
-      pag:'1',
+      pag: 0,
       dataarr: {},
       total: "",
       totalQuantity: [],
       time: "",
       allLoaded: false,
-      scrollMode: "auto" //移动端弹性滚动效果，touch为弹性滚动，auto是非弹性滚动  
+      scrollMode: "auto" //移动端弹性滚动效果，touch为弹性滚动，auto是非弹性滚动
     };
   },
   filters: {
@@ -67,9 +67,9 @@ export default {
     }
   },
   store,
-  components: {  
-      'v-loadmore':Loadmore
-    },
+  components: {
+    "v-loadmore": Loadmore
+  },
   computed: {
     ...mapState(["userInfo", "shopId"])
   },
@@ -80,11 +80,12 @@ export default {
     billCheck: function(e) {
       this.$router.push("/historyofthebill");
     },
-    getdata: function(val,type) { //獲取核銷數據
-      if(val == 1){
-          this.totalQuantity = [];
-      } 
-      let date = new Date();
+    getdata: function(val, type) {
+      //獲取核銷數據
+      if (val == 1) {
+        this.totalQuantity = [];
+      }
+      let date = new Date(),_this=this;
       let begain = formatDate(date, "yyyy/MM/dd");
       let _arr = begain.split("/");
       _arr[2] = "1";
@@ -96,8 +97,9 @@ export default {
         shopId: this.shopId,
         begainTime: _begainTime,
         endTime: _end,
-        page:val,
-        rows:10
+        page: val,
+        isBill: 1, //0未对账  1已对账
+        rows: 10
       };
       let parms = "",
         _value = "";
@@ -107,44 +109,53 @@ export default {
       _value = _value.substring(0, _value.length - 1);
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let _data = res.data.data;
-        let lists=[];
+        let lists = [];
         if (_data.list) {
           this.dataarr = _data.list[0];
           this.total = _data.total;
           lists = _data.list.slice(1, _data.list.length);
         }
-        if(lists.length>0){
-            for(let i=0;i<lists.length;i++){
-                this.totalQuantity.push(lists[i])
-            }
-        }else{
-            this.allLoaded = true;
+        if (lists.length > 0) {
+          for (let i = 0; i < lists.length; i++) {
+            this.totalQuantity.push(lists[i]);
+            setTimeout(function() {
+              var dishesUl = document.getElementById("order_history");
+              var height = dishesUl.getElementsByClassName("order_h_sublevel")[0]
+                .offsetHeight;
+              dishesUl.style.height =
+                Math.ceil(height / 210 * 230 + 2) * _this.totalQuantity.length + "px";
+            }, 2000);
+          }
+        } else {
+          this.allLoaded = true;
         }
-        
-       
-        if(type == 'top'){
-            this.$refs.loadmore.onTopLoaded();
-        }else if(type == 'bot'){
-            this.$refs.loadmore.onBottomLoaded();
+
+        if (type == "top") {
+          this.$refs.loadmore.onTopLoaded();
+        } else if (type == "bot") {
+          this.$refs.loadmore.onBottomLoaded();
         }
       });
     },
-    loadTop: function() {//下拉加载
+    loadTop: function() {
+      //下拉加载
       this.pag = 1;
       this.allLoaded = false;
-      this.getdata(this.pag,'top')
+      this.getdata(this.pag, "top");
     },
-    loadBottom: function() {// 上拉加载
+    loadBottom: function() {
+      // 上拉加载
+      console.log("fdsa");
       ++this.pag;
-      this.getdata(this.pag,'bot')
+      this.getdata(this.pag, "bot");
     }
   },
   created: function() {
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
-      this.scrollMode = 'touch';
+      this.scrollMode = "touch";
     }
-    this.getdata(this.pag)
+    this.loadBottom();
   }
 };
 </script>
@@ -155,7 +166,7 @@ export default {
   width: 100%;
   height: 100%;
   background: #ebebeb;
-  overflow:scroll;
+  overflow: scroll;
   .mint-header-title {
     font-size: 34px;
   }
@@ -170,7 +181,7 @@ export default {
     padding-top: 88px;
     position: absolute;
     background-color: #fc5e2d;
-      color: #fff;
+    color: #fff;
     b:nth-child(1) {
       font-size: 30px;
       padding: 39px 0px 14px 0px;
@@ -198,11 +209,15 @@ export default {
     top: 312px;
     letter-spacing: 2px;
   }
-  .hisbox{
+  .hisbox {
     position: absolute;
     top: 400px;
+    min-height: 1300px;
     width: 100%;
-    min-height: 1100px;
+    background-color: #ebebeb;
+  
+    box-sizing: border-box;
+    overflow: scroll;
   }
   .order_h_sublevel:last-child {
     border-bottom: none;
