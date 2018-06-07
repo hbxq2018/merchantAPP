@@ -32,6 +32,7 @@ import Howtocheckin from '@/components/home/sublevel/synopsisManual/howtocheckin
 import Howtouse from '@/components/home/sublevel/synopsisManual/howtouse'    
 import ImproveService from '@/components/home/sublevel/synopsisManual/improveService'
 import Questions from '@/components/home/sublevel/synopsisManual/questions'
+import Ihatetheqrcode from '@/components/home/ihatetheqrcode/ihatetheqrcode'
 Vue.use(Router)
 
 export default new Router({
@@ -159,12 +160,17 @@ export default new Router({
     { //我的页面-->历史账单
       path: '/historyofthebill',
       name: 'Historyofthebill',
-      component: Historyofthebill
+      component: Historyofthebill    
     },  
     { //我的页面-->历史账单详情
       path: '/detailsSon',
       name: 'DetailsSon',
       component: DetailsSon
+    },
+    { //我的页面-->商家二维码
+      path: '/ihatetheqrcode',
+      name: 'Ihatetheqrcode',
+      component: Ihatetheqrcode
     },
     {
       path:'/ticket',

@@ -1,0 +1,7 @@
+{
+	"index.html": {
+		"resources": [
+			"static/mui.min.js"
+		]
+	}
+}
