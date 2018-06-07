@@ -36,29 +36,25 @@ export default {
           },
           dataOne:[
             {
-                // src: "../../../static/images/juan-piao.png",
                 src: require("../../../static/images/juan-piao.png"),
                 name:'缴费服务',
-                // arrowDiagrams:"../../../static/images/home_arrow.png",
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },{
-                // src: "../../../static/images/customer_service.png",
                 src: require("../../../static/images/shiyongsc.png"),
                 name:'开店助手',
-                // arrowDiagrams:"../../../static/images/home_arrow.png",
                 arrowDiagrams:require("../../../static/images/home_arrow.png")
             },{
-                // src: "../../../static/images/customer_service.png",
                 src: require("../../../static/images/customer_service.png"),
                 name:'联系客服',
-                // arrowDiagrams:"../../../static/images/home_arrow.png",
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
                 tell:'027-59728176'
             },{
-                // src: "../../../static/images/guanyu-wm.png",
                 src: require("../../../static/images/guanyu-wm.png"),
                 name:'关于我们',
-                // arrowDiagrams:"../../../static/images/home_arrow.png",
+                arrowDiagrams:require("../../../static/images/home_arrow.png"),
+            },{
+                src: require("../../../static/images/yueseaef.png"),
+                name:'店铺/收款码',
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },
           ]
@@ -93,18 +89,11 @@ export default {
               window.location.href="tel:027-59728120"
           }else if(listBoxID ==1){
               this.$router.push('/serviceManual')
+          }else if(listBoxID ==4){
+              this.$router.push('/ihatetheqrcode')
           }
       }
   },
-  created:function(){
-    if(!this.data.id){  
-        let mobile = '15827245422';
-        this.$axios.get("/api/app/user/findUserByMobile?mobile="+mobile)
-        .then((res) => {
-            this.data= res.data.data
-        })
-    }
-  }
 }
 </script>
 <style lang="less">
@@ -172,6 +161,7 @@ export default {
         }
         .list_ontrol:nth-child(2){margin: 20px 0px;}
         .list_ontrol:nth-child(3){border-bottom: 1px solid #E0E0E0;}
+        .list_ontrol:nth-last-child(2){margin: 20px 0px;}
         button{
             width: 100%;
             height: 88px;

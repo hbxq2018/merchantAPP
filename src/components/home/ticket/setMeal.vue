@@ -159,6 +159,7 @@ export default {
           if(index == 0) {
             clearInterval(timer);
             _this.flag = true;
+            _this.distance = 0;
           }
           index--;
           setMealUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
@@ -240,9 +241,12 @@ export default {
                     text-align: left;
                     color: #191919;
                     p:nth-child(1) {
-                        // margin-top: 10px;
                         font-size: 36px;
                         font-weight: 600;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        width: 420px;
                     }
                     p:nth-child(2) {
                         margin-top: 12px;

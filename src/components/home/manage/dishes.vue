@@ -177,6 +177,7 @@ export default {
           if (index == 0) {
             clearInterval(timer);
             _this.flag = true;
+            _this.distance = 0;
           }
           index--;
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
@@ -252,18 +253,22 @@ export default {
           p:nth-child(1) {
             font-size: 36px;
             font-weight: 600;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 420px;
           }
           p:nth-child(2) {
             width: 460px;
             margin-top: 12px;
             color: #b1b1b1;
             font-size: 22px;
-            text-overflow: ellipsis;
+            line-height: 35px;
+            // text-overflow: ellipsis;
             overflow: hidden;
             display: -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
-            line-height: 35px;
           }
         }
         .arrow {
