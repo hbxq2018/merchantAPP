@@ -1,43 +1,45 @@
 <template>
   <div class="detailsSon">
+    <div class="details" id="sonbeijin">
       <mt-header fixed :title="name">
         <router-link to="/historyofthebill" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
       </mt-header>
       <div v-if="!first.totalService" class="nodata">本月没有产生服务费</div>
-      <div v-else>
-        <div class="detailsSon_top">
-            <p>{{payment}}</p>
-            <span>本月服务费：<em>&yen;{{first.totalService}}</em></span>
-            <!-- <img src="../../../../static/images/murcielagoimg.png" alt="赞图标"> -->
-        </div>
-        <div class="murcielago">
-            <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
-        </div>
-        <div class="loadBottom detabox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore"> 
-            <div class="order_history" v-for="(item,index) in writedata" :key="index">
-                <div class="order_h_sublevel">
-                    <div class="roder_left">
-                        <b>{{item.couponAmount}}<span>元代金券</span></b>
-                        <p>{{item.updateTime}}</p>
-                    </div>
-                    <div class="roder-right">
-                        <span>&yen;{{item.couponAmount/10}}</span>
-                    </div>
+      <div class="detailsSon_top"  v-if="first.totalService">
+        <p>{{payment}}</p>
+        <span>本月服务费：<em>&yen;{{first.totalService}}</em></span>
+          <!-- <img src="../../../../static/images/murcielagoimg.png" alt="赞图标"> -->
+      </div>
+      <div class="murcielago" v-if="first.totalService">
+          <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
+      </div>
+    </div>
+    <div class="songe"></div>
+    <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+      <ul id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+        <li class="order_history" v-for="(item,index) in writedata" :key="index">
+            <div class="order_h_sublevel">
+                <div class="roder_left">
+                    <b>{{item.couponAmount}}<span>元代金券</span></b>
+                    <p>{{item.updateTime}}</p>
+                </div>
+                <div class="roder-right">
+                    <span>&yen;{{item.couponAmount/10}}</span>
                 </div>
             </div>
-          </mt-loadmore>
-        </div>
-     </div>
+        </li>
+      </ul>
+    </div>
+     
   </div>
 </template>
 
 <script>
 import store from "@/vuex/store";
 import Vue from "vue";
-import {Loadmore } from "mint-ui";
+import { Loadmore } from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -48,9 +50,14 @@ export default {
       first: {},
       writedata: [],
       ind: 1,
-      pag:1,
-      allLoaded: false,
-      scrollMode: "auto"
+      page: 1,
+      allLoaded: true,
+      scrollMode: "auto",
+      touchStartY: 0,
+      distance: 0,
+      topFlag: false, //是否到顶部
+      bottomFlag: false, //是否到底部
+      flag: true //节流阀
     };
   },
   store,
@@ -61,10 +68,11 @@ export default {
     }
   },
   methods: {
-    getdata: function(val,type) { //獲取核銷數據
-      if(val == 1){
+    //獲取核銷數據
+    getdata: function( type) {
+      if (this.page == 1) {
         this.writedata = [];
-      } 
+      }
       let _start = "2018/" + this.ind + "/01";
       let _end = "";
       let _ind = this.ind * 1 + 1;
@@ -77,8 +85,8 @@ export default {
         shopId: this.shopId,
         begainTime: _start,
         endTime: _end,
-        page:val,
-        rows:10
+        page: this.page,
+        rows: 10
       };
       let parms = "",
         _value = "";
@@ -93,39 +101,142 @@ export default {
             let _data = res.data.data.list;
             this.first = _data[0];
             _data = _data.slice(1, _data.length);
-            if(_data.length>0){
-              for(let i=0;i<_data.length;i++){
-                  this.writedata.push(_data[i]);
+            if (_data.length > 0) {
+              for (let i = 0; i < _data.length; i++) {
+                this.writedata.push(_data[i]);
               }
-            }else{
+            } else {
               this.allLoaded = true;
             }
-          }
-          if(type == 'top'){
-            this.$refs.loadmore.onTopLoaded();
-          }else if(type == 'bot'){
-            this.$refs.loadmore.onBottomLoaded();
           }
         }
       });
     },
-    loadTop: function() {//下拉加载
-      this.pag = 1;
-      this.allLoaded = false;
-      this.getdata(this.pag,'top')
+    //获取顶部卷去高度
+    getScrollTop() {
+      var scrollTop = 0,
+        bodyScrollTop = 0,
+        documentScrollTop = 0;
+      if (document.body) {
+        bodyScrollTop = document.body.scrollTop;
+      }
+      if (document.documentElement) {
+        documentScrollTop = document.documentElement.scrollTop;
+      }
+      scrollTop =
+        bodyScrollTop - documentScrollTop > 0
+          ? bodyScrollTop
+          : documentScrollTop;
+      return scrollTop;
     },
-    loadBottom: function() {// 上拉加载
-      ++this.pag;
-      this.getdata(this.pag,'bot')
+    //盒子总高度
+    getScrollHeight() {
+      var scrollHeight = 0,
+        bodyScrollHeight = 0,
+        documentScrollHeight = 0;
+      if (document.body) {
+        bodyScrollHeight = document.body.scrollHeight;
+      }
+      if (document.documentElement) {
+        documentScrollHeight = document.documentElement.scrollHeight;
+      }
+      scrollHeight =
+        bodyScrollHeight - documentScrollHeight > 0
+          ? bodyScrollHeight
+          : documentScrollHeight;
+      return scrollHeight;
+    },
+    //屏幕可视高度
+    getWindowHeight() {
+      var windowHeight = 0;
+      if (document.compatMode == "CSS1Compat") {
+        windowHeight = document.documentElement.clientHeight;
+      } else {
+        windowHeight = document.body.clientHeight;
+      }
+      return windowHeight;
+    },
+    touchStart(e) {
+      let dishesUl = document.getElementById("detasonul");
+      let bottomH = document.getElementById("sonbeijin").clientHeight;
+      this.touchStartY = e.targetTouches[0].pageY;
+      if (this.getScrollTop() == 0 && this.flag) {
+        this.topFlag = true;
+      } else {
+        this.topFlag = false;
+      }
+      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+        this.allLoaded = false;
+        this.bottomFlag = false;
+      }
+      if (
+        Math.abs(
+          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
+        ) < 5 &&
+        this.allLoaded
+      ) {
+        this.bottomFlag = true;
+      } else {
+        this.bottomFlag = false;
+      }
+    },
+    touchMove(e) {
+      let dishesUl = document.getElementById("detasonul");
+      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
+      if (this.distance > 0 && this.topFlag == true && this.flag) {
+        if (this.distance > 100) {
+          this.distance = 100;
+        }
+        dishesUl.style.transform =
+          "translate3d(0px, " + this.distance + "px, 0px)";
+      }
+      if (this.distance < 0 && this.bottomFlag == true) {
+        if (this.distance < -100) {
+          this.distance = -100;
+        }
+        dishesUl.style.transform =
+          "translate3d(0px, " + this.distance + "px, 0px)";
+      }
+    },
+    touchEnd() {
+      let dishesUl = document.getElementById("detasonul"),
+        _this = this;
+      if (this.distance > 0 && this.topFlag == true && this.flag) {
+        this.flag = false;
+        let index = 100;
+        let timer = setInterval(function() {
+          if (index == 0) {
+            clearInterval(timer);
+            _this.flag = true;
+          }
+          index--;
+          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
+        }, 5);
+        this.page = 1;
+        this.allLoaded = true;
+        this.getdata();
+      }
+      if (this.distance < 0 && this.bottomFlag == true) {
+        let index = -100;
+        let timer = setInterval(function() {
+          if (index == 0) {
+            clearInterval(timer);
+          }
+          index++;
+          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
+        }, 5);
+        ++this.page;
+        this.getdata();
+      }
     }
   },
   created: function() {
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
-      this.scrollMode = 'touch';
+      this.scrollMode = "touch";
     }
     this.ind = this.$route.params.ind;
-    this.getdata(this.pag)
+    this.getdata(this.pag);
   }
 };
 </script>
@@ -147,9 +258,9 @@ export default {
     background: #fff;
     letter-spacing: 2px;
     line-height: 60px;
-    position: absolute;
+    position: fixed;
     overflow: hidden;
-    padding-top: 88px;
+    top: 80px;
     p {
       font-size: 40px;
       color: #fc5e2d;
@@ -166,9 +277,19 @@ export default {
       right: -10px;
     }
   }
+  .details {
+    width: 100%;
+    height: 412px;
+    z-index: 99999;
+    position: fixed;
+  }
+  .songe{
+    width: 100%;
+    height: 412px;
+  }
   .murcielago {
     width: 100%;
-    position: absolute;
+    position: fixed;
     top: 312px;
     background: #ebebeb;
     height: 96px;
@@ -177,11 +298,17 @@ export default {
     line-height: 96px;
     letter-spacing: 2px;
   }
-  .detabox{
-    position: absolute;
-    top: 400px;
+  .detabox {
     width: 100%;
-    min-height: 1100px;
+    margin-top: 500px;
+    .detasonul:before {
+        content: "加载中..";
+        position: absolute;
+        left: 0;
+        top: -50px;
+        height: 20px;
+        width: 100%;
+      }
   }
   .order_history {
     background: #fff;

@@ -44,16 +44,15 @@
                 <div @click.stop="openPicker(2)">结束时间：<span>{{end}}</span></div>
             </div>
             <div class="selbut">
-                <div class="close" @click="close">取消</div>
+                <div class="close">取消</div>
                 <div class="cfrm" @click="cfrm">确定</div>
             </div>
         </div>
     </div>
-    <div class="filling"></div>
+    <div class="filling" id="filling"></div>
     <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded"  ref="loadmores">
         <div class="income_list">
-          <ul>
+          <ul id="income" class="income" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
               <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
                   <div class="income_li_l">
                       <div class="face_value">
@@ -70,7 +69,7 @@
               </li>
           </ul>
         </div>
-      </mt-loadmore>
+  
     </div>
 
     <mt-datetime-picker
@@ -125,8 +124,13 @@ export default {
       votes: [],
       totalPrice: "",
       pag:1,
-      allLoaded: false,
-      scrollMode: "auto"
+      allLoaded: true,
+      scrollMode: "auto",
+      touchStartY: 0,
+      distance: 0,
+      topFlag: false, //是否到顶部
+      bottomFlag: false, //是否到底部
+      flag: true //节流阀
     };
   },
   created: function() {
@@ -156,6 +160,16 @@ export default {
     this.getdata(_start, _end,this.pag);
     this.actday = this.days[0].title;
   },
+  watch:{
+      start:function(){
+        this.page = 1;
+        this.getdata();
+      },
+      end:function(){
+        this.page = 1;
+        this.getdata();
+      }
+  },
   store,
   computed: {
     ...mapState(["shopId"])
@@ -179,9 +193,6 @@ export default {
         let arr = val.split("/");
         return arr[0] + "年" + arr[1] + "月" + arr[2] + "日";
       }
-    },
-    close: function() {
-      
     },
     cfrm: function() {
       if (this.start && this.end) {
@@ -251,14 +262,17 @@ export default {
       }
     },
     getdata: function(start, end,val,type) {
-      if(this.oldstart != start || this.oldend != end || val == 1){
+      // if(this.oldstart != start || this.oldend != end || val == 1){
+      //   this.votes = [];
+      // }
+      if(this.page == 1){
         this.votes = [];
       }
       let obj = {
         shopId: this.shopId,
-        begainTime: start,
-        endTime: end,
-        page:val,
+        begainTime: start?start:this.start,
+        endTime: end?end:this.end,
+        page:val?val:this.page,
         rows:10
       };
       this.oldstart == start;
@@ -276,32 +290,142 @@ export default {
           if (_data.list) {
             this.totalPrice = _data.list[0].totalPrice;
             let arr = _data.list.splice(0, 1);
+            console.log('_data.list:',_data.list)
+              console.log('_data.list:',_data.list.length)
             if(_data.list.length>0){
               for(let j=0;j<_data.list.length;j++){
                 this.votes.push(_data.list[j])
+                 console.log('votes:',this.votes)
+              console.log('votes:',this.votes.length)
               }
+             
             }else{
                 this.allLoaded = true;
             }
           }else{
             this.allLoaded = true;
           }
-          if(type == 'top'){
-            this.$refs.loadmores.onTopLoaded();
-          }else if(type == 'bot'){
-           this.$refs.loadmores.onBottomLoaded();
-          }
         }
       });
     },
-    loadTop: function() {//下拉加载
-      this.pag = 1;
-      this.allLoaded = false;
-      this.getdata(this.start,this.end,this.pag,'top')
+
+    getScrollTop() {
+      //获取顶部卷去高度
+      var scrollTop = 0,
+        bodyScrollTop = 0,
+        documentScrollTop = 0;
+      if (document.body) {
+        bodyScrollTop = document.body.scrollTop;
+      }
+      if (document.documentElement) {
+        documentScrollTop = document.documentElement.scrollTop;
+      }
+      scrollTop =
+        bodyScrollTop - documentScrollTop > 0
+          ? bodyScrollTop
+          : documentScrollTop;
+      return scrollTop;
     },
-    loadBottom: function() {// 上拉加载
-      ++this.pag;
-      this.getdata(this.start,this.end,this.pag,'bot')
+    getScrollHeight() {
+      //盒子总高度
+      var scrollHeight = 0,
+        bodyScrollHeight = 0,
+        documentScrollHeight = 0;
+      if (document.body) {
+        bodyScrollHeight = document.body.scrollHeight;
+      }
+      if (document.documentElement) {
+        documentScrollHeight = document.documentElement.scrollHeight;
+      }
+      scrollHeight =
+        bodyScrollHeight - documentScrollHeight > 0
+          ? bodyScrollHeight
+          : documentScrollHeight;
+      return scrollHeight;
+    },
+    getWindowHeight() {
+      //屏幕可视高度
+      var windowHeight = 0;
+      if (document.compatMode == "CSS1Compat") {
+        windowHeight = document.documentElement.clientHeight;
+      } else {
+        windowHeight = document.body.clientHeight;
+      }
+      return windowHeight;
+    },
+    touchStart(e) {
+      let dishesUl = document.getElementById("income");
+      let bottomH =
+        document.getElementById("filling").clientHeight;
+      this.touchStartY = e.targetTouches[0].pageY;
+      if (this.getScrollTop() == 0 && this.flag) {
+        this.topFlag = true;
+      } else {
+        this.topFlag = false;
+      }
+      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+        this.allLoaded = false;
+        this.bottomFlag = false;
+      }
+      if (
+        Math.abs(
+          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
+        ) < 5 &&
+        this.allLoaded
+      ) {
+        this.bottomFlag = true;
+      } else {
+        this.bottomFlag = false;
+      }
+    },
+    touchMove(e) {
+      let dishesUl = document.getElementById("income");
+      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
+      if (this.distance > 0 && this.topFlag == true && this.flag) {
+        if (this.distance > 100) {
+          this.distance = 100;
+        }
+        dishesUl.style.transform =
+          "translate3d(0px, " + this.distance + "px, 0px)";
+      }
+      if (this.distance < 0 && this.bottomFlag == true) {
+        if (this.distance < -100) {
+          this.distance = -100;
+        }
+        dishesUl.style.transform =
+          "translate3d(0px, " + this.distance + "px, 0px)";
+      }
+    },
+    touchEnd() {
+      let dishesUl = document.getElementById("income"),
+        _this = this;
+      if (this.distance > 0 && this.topFlag == true && this.flag) {
+        this.flag = false;
+        let index = 100;
+        let timer = setInterval(function() {
+          if (index == 0) {
+            clearInterval(timer);
+            _this.flag = true;
+          }
+          index--;
+          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
+        }, 5);
+        this.page = 1;
+        this.allLoaded = true;
+        this.getdata();
+      }
+      if (this.distance < 0 && this.bottomFlag == true) {
+        let index = -100;
+        let timer = setInterval(function() {
+          if (index == 0) {
+            clearInterval(timer);
+          }
+          index++;
+          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
+        }, 5);
+        ++this.page;
+        this.getdata();
+      }
     }
   }
 };
@@ -391,6 +515,15 @@ export default {
     ul {
       padding: 0;
       margin: 0;
+      position: relative;
+      &:before {
+        content: "加载中..";
+        position: absolute;
+        left: 0;
+        top: -50px;
+        height: 20px;
+        width: 100%;
+      }
       li {
         display: flex;
         padding: 16px 40px;
@@ -492,7 +625,7 @@ export default {
     position: absolute;
     top: 460px;
     width: 100%;
-    min-height: 1224px;
+    height: 870px;
   }
   .select {
     width: 672px;

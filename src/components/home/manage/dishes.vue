@@ -40,9 +40,9 @@ export default {
       scrollMode: "auto",
       touchStartY: 0,
       distance: 0,
-      topFlag: false,    //是否到顶部
-      bottomFlag: false,   //是否到底部
-      flag: true    //节流阀
+      topFlag: false, //是否到顶部
+      bottomFlag: false, //是否到底部
+      flag: true //节流阀
     };
   },
   store,
@@ -78,53 +78,72 @@ export default {
       });
     },
     toAddDishes(id) {
-      this.$router.push({ name: "AddDishes", params: {id: id} });
+      this.$router.push({ name: "AddDishes", params: { id: id } });
     },
-    getScrollTop(){    //获取顶部卷去高度
-    　　var scrollTop = 0, bodyScrollTop = 0, documentScrollTop = 0;
-    　　if(document.body){
-    　　　　bodyScrollTop = document.body.scrollTop;
-    　　}
-    　　if(document.documentElement){
-    　　　　documentScrollTop = document.documentElement.scrollTop;
-    　　}
-    　　scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;
-    　　return scrollTop;
+    getScrollTop() {
+      //获取顶部卷去高度
+      var scrollTop = 0,
+        bodyScrollTop = 0,
+        documentScrollTop = 0;
+      if (document.body) {
+        bodyScrollTop = document.body.scrollTop;
+      }
+      if (document.documentElement) {
+        documentScrollTop = document.documentElement.scrollTop;
+      }
+      scrollTop =
+        bodyScrollTop - documentScrollTop > 0
+          ? bodyScrollTop
+          : documentScrollTop;
+      return scrollTop;
     },
-    getScrollHeight(){     //盒子总高度
-    　　var scrollHeight = 0, bodyScrollHeight = 0, documentScrollHeight = 0;
-    　　if(document.body){
-    　　　　bodyScrollHeight = document.body.scrollHeight;
-    　　}
-    　　if(document.documentElement){
-    　　　　documentScrollHeight = document.documentElement.scrollHeight;
-    　　}
-    　　scrollHeight = (bodyScrollHeight - documentScrollHeight > 0) ? bodyScrollHeight : documentScrollHeight;
-    　　return scrollHeight;
+    getScrollHeight() {
+      //盒子总高度
+      var scrollHeight = 0,
+        bodyScrollHeight = 0,
+        documentScrollHeight = 0;
+      if (document.body) {
+        bodyScrollHeight = document.body.scrollHeight;
+      }
+      if (document.documentElement) {
+        documentScrollHeight = document.documentElement.scrollHeight;
+      }
+      scrollHeight =
+        bodyScrollHeight - documentScrollHeight > 0
+          ? bodyScrollHeight
+          : documentScrollHeight;
+      return scrollHeight;
     },
-    getWindowHeight(){     //屏幕可视高度
-    　　var windowHeight = 0;
-    　　if(document.compatMode == "CSS1Compat"){
-    　　　　windowHeight = document.documentElement.clientHeight;
-    　　}else{
-    　　　　windowHeight = document.body.clientHeight;
-    　　}
-    　　return windowHeight;
+    getWindowHeight() {
+      //屏幕可视高度
+      var windowHeight = 0;
+      if (document.compatMode == "CSS1Compat") {
+        windowHeight = document.documentElement.clientHeight;
+      } else {
+        windowHeight = document.body.clientHeight;
+      }
+      return windowHeight;
     },
     touchStart(e) {
       let dishesUl = document.getElementById("dishesUl");
-      let bottomH = document.getElementById("dishesBottom").clientHeight * 1.727;
+      let bottomH =
+        document.getElementById("dishesBottom").clientHeight * 1.727;
       this.touchStartY = e.targetTouches[0].pageY;
-      if(this.getScrollTop() == 0 && this.flag) {
+      if (this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
-      }else {
+      } else {
         this.topFlag = false;
       }
-      if(dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
-          this.allLoaded = false;
-          this.bottomFlag = false;
-      } 
-      if(Math.abs(this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()) < 5 && this.allLoaded) {
+      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+        this.allLoaded = false;
+        this.bottomFlag = false;
+      }
+      if (
+        Math.abs(
+          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
+        ) < 5 &&
+        this.allLoaded
+      ) {
         this.bottomFlag = true;
       } else {
         this.bottomFlag = false;
@@ -133,44 +152,47 @@ export default {
     touchMove(e) {
       let dishesUl = document.getElementById("dishesUl");
       this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if(this.distance > 0 && this.topFlag == true && this.flag) {
-        if(this.distance > 100) {
+      if (this.distance > 0 && this.topFlag == true && this.flag) {
+        if (this.distance > 100) {
           this.distance = 100;
         }
-        dishesUl.style.transform = "translate3d(0px, "+ this.distance +"px, 0px)";
-      } 
-      if(this.distance < 0 && this.bottomFlag == true) {
-        if(this.distance < -100) {
+        dishesUl.style.transform =
+          "translate3d(0px, " + this.distance + "px, 0px)";
+      }
+      if (this.distance < 0 && this.bottomFlag == true) {
+        if (this.distance < -100) {
           this.distance = -100;
         }
-        dishesUl.style.transform = "translate3d(0px, "+ this.distance +"px, 0px)";
+        dishesUl.style.transform =
+          "translate3d(0px, " + this.distance + "px, 0px)";
       }
     },
     touchEnd() {
-      let dishesUl = document.getElementById("dishesUl"), _this = this;
-      if(this.distance > 0 && this.topFlag == true && this.flag) {
+      let dishesUl = document.getElementById("dishesUl"),
+        _this = this;
+      if (this.distance > 0 && this.topFlag == true && this.flag) {
         this.flag = false;
         let index = 100;
         let timer = setInterval(function() {
-          if(index == 0) {
+          if (index == 0) {
             clearInterval(timer);
             _this.flag = true;
           }
           index--;
-          dishesUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
+          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
         }, 5);
         this.page = 1;
         this.allLoaded = true;
         this.getDishList();
-      } 
-      if(this.distance < 0 && this.bottomFlag == true) {
+      }
+      if (this.distance < 0 && this.bottomFlag == true) {
         let index = -100;
         let timer = setInterval(function() {
-          if(index == 0) {
+          if (index == 0) {
             clearInterval(timer);
           }
           index++;
-          dishesUl.style.transform = "translate3d(0px, "+index+"px, 0px)";
+          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
         }, 5);
         ++this.page;
         this.getDishList();
@@ -205,7 +227,7 @@ export default {
       width: 100%;
       position: relative;
       &:before {
-        content: '加载中..';
+        content: "加载中..";
         position: absolute;
         left: 0;
         top: -50px;
