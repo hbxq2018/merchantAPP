@@ -16,7 +16,7 @@
           <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
       </div>
     </div>
-    <div class="songe"></div>
+    <!-- <div class="songe"></div> -->
     <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode}">
       <ul id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
         <li class="order_history" v-for="(item,index) in writedata" :key="index">
@@ -208,6 +208,7 @@ export default {
           if (index == 0) {
             clearInterval(timer);
             _this.flag = true;
+            _this.distance = 0;
           }
           index--;
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
@@ -285,12 +286,12 @@ export default {
   }
   .songe{
     width: 100%;
-    height: 412px;
+    height: 420px;
   }
   .murcielago {
     width: 100%;
     position: fixed;
-    top: 312px;
+    top: 300px;
     background: #ebebeb;
     height: 96px;
     font-size: 26px;
@@ -300,7 +301,7 @@ export default {
   }
   .detabox {
     width: 100%;
-    margin-top: 500px;
+    padding-top:400px; 
     .detasonul:before {
         content: "加载中..";
         position: absolute;

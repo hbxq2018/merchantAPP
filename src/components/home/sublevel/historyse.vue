@@ -228,6 +228,7 @@ export default {
           if (index == 0) {
             clearInterval(timer);
             _this.flag = true;
+            _this.distance = 0;
           }
           index--;
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
@@ -256,7 +257,7 @@ export default {
       this.scrollMode = "touch";
     }
     this.ind = this.$route.params.ind;
-     this.getdata();
+    this.getdata();
   }
 };
 </script>

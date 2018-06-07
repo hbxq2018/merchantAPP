@@ -40,8 +40,8 @@
                 <span class="stleft">选择起始时间</span>
             </div>
             <div class="date">
-                <div @click.stop="openPicker(1)">开始时间：<span>{{start}}</span></div>
-                <div @click.stop="openPicker(2)">结束时间：<span>{{end}}</span></div>
+                <div @click.stop="openPicker(1)">开始时间：<span>{{temstart}}</span></div>
+                <div @click.stop="openPicker(2)">结束时间：<span>{{temend}}</span></div>
             </div>
             <div class="selbut">
                 <div class="close">取消</div>
@@ -100,6 +100,8 @@ export default {
     return {
       start: "",
       end: "",
+      temstart:"",
+      temend:"",
       actval: "",
       total: "",
       pickerValue: "",
@@ -123,7 +125,7 @@ export default {
       ],
       votes: [],
       totalPrice: "",
-      pag:1,
+      page:1,
       allLoaded: true,
       scrollMode: "auto",
       touchStartY: 0,
@@ -154,18 +156,20 @@ export default {
 
     this.start = _start;
     this.end = _end;
-    this.oldstart = _start;
-    this.oldend = _end;
-    this.pag = 1;
-    this.getdata(_start, _end,this.pag);
+    this.temstart = _start; 
+    this.temend = _end;
+    // this.oldstart = _start;
+    // this.oldend = _end;
+    this.getdata();
     this.actday = this.days[0].title;
   },
+  components:{
+      newtime:function(){
+        return newtime = this.start  + this.end
+      }
+  },
   watch:{
-      start:function(){
-        this.page = 1;
-        this.getdata();
-      },
-      end:function(){
+      newtime:function(){
         this.page = 1;
         this.getdata();
       }
@@ -183,9 +187,9 @@ export default {
       this.allLoaded = false;
       let _this = this,date = _this.$UTILS.dateConv(this.pickerValue);
       if (this.actval == 1) {
-        this.start = date;
+        this.temstart = date;
       } else if (this.actval == 2) {
-        this.end = date;
+        this.temend = date;
       }
     },
     setdate: function(val) {
@@ -195,20 +199,24 @@ export default {
       }
     },
     cfrm: function() {
-      if (this.start && this.end) {
-        let _start = new Date(this.start);
-        let _end = new Date(this.end);
-        this.pag = 1;
+      if (this.temstart && this.temend) {
+        let _start = new Date(this.temstart);
+        let _end = new Date(this.temend);
+        this.page = 1;
         _start = _start.getTime();
         _end = _end.getTime();
-        this.oldstart = this.start;
-        this.oldend =this.end;
+        // this.oldstart = this.start;
+        // this.oldend =this.end;
         if (_end > _start) {
-          this.getdata(this.start, this.end,this.pag);
+          this.end = this.temend;
+          this.start = this.temstart;
+          this.getdata(this.start, this.end);
         } else {
           Toast("结束时间不能小于开始时间");
+          this.temend=this.end;
+          this.temstart=this.start;
         }
-      } else if (!this.start || !this.end) {
+      } else if (!this.temstart || !this.temend) {
         Toast("请选择开始时间或结束时间");
       }
     },
@@ -238,33 +246,29 @@ export default {
       let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + _deff * 1;
       _end = _this.$UTILS.dateConv(new Date(_end));
       this.end = _end; 
-      this.pag=1;
-      this.allLoaded = false;
-      this.oldend = _end;
+      this.page=1;
+      // this.oldend = _end;
       if (this.actday == "今日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
-        this.oldstart = _start;
-        this.getdata(_start, _end,this.pag);
+        // this.oldstart = _start;
+        this.getdata();
       } else if (this.actday == "7日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 7;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
-        this.oldstart = _start;
-        this.getdata(_start, _end,this.pag);
+        // this.oldstart = _start;
+        this.getdata();
       } else if (this.actday == "15日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 15;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
-        this.oldstart = _start;
-        this.getdata(_start, _end,this.pag);
+        // this.oldstart = _start;
+        this.getdata();
       }
     },
     getdata: function(start, end,val,type) {
-      // if(this.oldstart != start || this.oldend != end || val == 1){
-      //   this.votes = [];
-      // }
       if(this.page == 1){
         this.votes = [];
       }
@@ -275,8 +279,8 @@ export default {
         page:val?val:this.page,
         rows:10
       };
-      this.oldstart == start;
-      this.oldend == end;
+      // this.oldstart == start;
+      // this.oldend == end;
       let _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
@@ -290,13 +294,9 @@ export default {
           if (_data.list) {
             this.totalPrice = _data.list[0].totalPrice;
             let arr = _data.list.splice(0, 1);
-            console.log('_data.list:',_data.list)
-              console.log('_data.list:',_data.list.length)
             if(_data.list.length>0){
               for(let j=0;j<_data.list.length;j++){
                 this.votes.push(_data.list[j])
-                 console.log('votes:',this.votes)
-              console.log('votes:',this.votes.length)
               }
              
             }else{
@@ -308,7 +308,6 @@ export default {
         }
       });
     },
-
     getScrollTop() {
       //获取顶部卷去高度
       var scrollTop = 0,
@@ -367,12 +366,14 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
+      console.log('this.allLoaded:',this.allLoaded)
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
         ) < 5 &&
         this.allLoaded
       ) {
+        console.log("bottomFlag=====  true")
         this.bottomFlag = true;
       } else {
         this.bottomFlag = false;
@@ -406,6 +407,7 @@ export default {
           if (index == 0) {
             clearInterval(timer);
             _this.flag = true;
+            _this.distance = 0;
           }
           index--;
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
@@ -424,6 +426,7 @@ export default {
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
         }, 5);
         ++this.page;
+        console.log('page:',this.page)
         this.getdata();
       }
     }
