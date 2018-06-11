@@ -1,19 +1,19 @@
 <template>
     <div class="ihatetheqrcode">
-        <mt-header title="店铺二维码"><router-link slot="left" :to="{path:'home',query:{'ind':index}}">
+        <mt-header fixed title="店铺二维码"><router-link slot="left" :to="{path:'home',query:{'ind':index}}">
         <mt-button icon="back"></mt-button></router-link></mt-header>
         <div class="Standing one">
             <div class="homepage">
                 <div><span>店铺主页</span></div>
-                <img src="https://xq-1256079679.file.myqcloud.com/shopcode_ShopInfo242542.jpg" alt="">
-                <div><a href="#" id="dainija" @click="preservess"><button class="preserve">保存图片</button></a></div>
+                <img @touchstart="savepage(1)" @touchend="clearLoop" :src="imgs.商家详情无背景图" alt="店铺主页二维码图片">
+                <div>长按保存二维码</div>
             </div>
         </div>
         <div class="Standing eventual">
             <div class="homepage">
                 <div><span>支付二维码</span></div>
-                <img src="https://xq-1256079679.file.myqcloud.com/shopcode_ShopInfo242542.jpg" alt="">
-                <div><a href=""><button  class="preserve">保存图片</button></a></div>
+                <img @touchstart="savepage(2)" :src="imgs.商家买单无背景图" alt="支付二维码图片">
+                <div>长按保存二维码</div>
             </div>
         </div>
     </div>
@@ -27,18 +27,16 @@ export default {
   data() {
     return {
       index: 2,
-      msg: "Manual"
+      msg: "Manual",
+      imgs:{}
     };
   },
+  store,
   computed: {
     ...mapState(["userInfo", "shopInfo"])
   },
   methods: {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
-    // preservess: function(e) {
-    //   document.getElementsById("dainija").href =
-    //     "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528092487640&di=74fd26c701c600238645d08c3954c4e0&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01635d571ed29832f875a3994c7836.png%40900w_1l_2o_100sh.jpg";
-    // }
     getshopinfo: function() {
       //获取商家信息
       this.$axios.get("/app/shop/CreateCode" + this.shopId).then(res => {
@@ -47,23 +45,63 @@ export default {
           this.setuserInfo(data);
         }
       });
+    },
+    getshopimgs:function(){
+      this.$axios.get("/api/app/shop/CreateCode?id=" + this.userInfo.id+'&shopCode='+this.userInfo.shopCode).then(res => {
+        if(res.data.code == 0){
+            this.imgs = res.data.data;
+        }
+      });
+    },
+    savepage: function(val) {
+      let _this = this;
+      clearInterval(this.Loop); //再次清空定时器，防止重复注册定时器
+      this.Loop = setTimeout(function() {
+        _this.downloadIamge("canvas", name,val);
+      }, 1000);
+    },
+    clearLoop() {
+      clearInterval(this.Loop);
+    },
+    downloadIamge(selector, name,val) {
+      // 通过选择器获取img元素
+      var img = document.querySelector(selector),url = '';
+      // 将图片的src属性作为URL地址
+      if(val ==1){
+        url = this.imgs.商家详情有背景图;
+      }else if(val ==2){
+        url = this.imgs.商家买单有背景图;
+      }
+      var a = document.createElement("a");
+      var event = new MouseEvent("click");
+
+      a.download = name || name;
+      a.href = url;
+
+      a.dispatchEvent(event);
     }
+  },
+   created() {
+    this.getshopimgs();
   }
+
 };
 </script>
 <style lang="less">
 .ihatetheqrcode {
   width: 100%;
   height: auto;
+  padding-top: 100px;
   background-color: #fc5e2d;
   .Standing {
-    height: 640px;
+    height: 540px;
     display: flex;
+    margin-top: 60px;
     align-items: center;
     justify-content: center;
     .homepage {
-      width: 614px;
-      height: 614px;
+      width: 514px;
+      height: 514px;
       background-color: #fff;
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
@@ -94,8 +132,8 @@ export default {
       }
     }
     .homepage div {
-      height: 90px;
-      line-height: 90px;
+      height: 80px;
+      line-height: 80px;
     }
   }
   .one {
