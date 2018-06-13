@@ -58,10 +58,10 @@ export default {
       this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
-          if (_this.page == 1) {
-            _this.list = [];
-          }
           if (lists && lists.length > 0) {
+            if (_this.page == 1) {
+              _this.list = [];
+            }
             for (let i = 0; i < lists.length; i++) {
               _this.list.push(lists[i]);
             }

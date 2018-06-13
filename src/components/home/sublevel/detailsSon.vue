@@ -105,9 +105,14 @@ export default {
               for (let i = 0; i < _data.length; i++) {
                 this.writedata.push(_data[i]);
               }
+              if (_data.length < 9) {
+                this.allLoaded = false;
+              }
             } else {
-              this.allLoaded = true;
+              this.allLoaded = false;
             }
+          } else {
+              this.allLoaded = false;
           }
         }
       });

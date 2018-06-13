@@ -125,8 +125,11 @@ export default {
           for (let i = 0; i < lists.length; i++) {
             this.totalQuantity.push(lists[i]);
           }
+          if (lists.length < 9) {
+            this.allLoaded = false;
+          }
         } else {
-          this.allLoaded = true;
+          this.allLoaded = false;
         }
 
       });
