@@ -46,13 +46,14 @@ export default {
       verifyCode: "", //验证码
       timeFlag: true,
       _type: "2", //来源   1小程序 2H5 3安卓 4IOS
-      openId: "",   //微信openId
-      unionId: "",  //微信unionId
-      sex: 0,      //微信用户性别
-      nickName: "",     //昵称
-      iconUrl: "",      //头像
-      isSignWX: false,   //是否登陆微信
-      wxType: 0    //微信返回信息的格式
+      openId: "", //微信openId
+      unionId: "", //微信unionId
+      sex: 0, //微信用户性别
+      nickName: "", //昵称
+      iconUrl: "", //头像
+      isSignWX: false, //是否登陆微信
+      wxType: 0, //微信返回信息的格式
+      isinme:false
     };
   },
   store,
@@ -86,14 +87,15 @@ export default {
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+              "/api/app/sms/sendForShopAppRegister?shopMobile=" +
+              this.telephone
           )
           .then(res => {
             let data = res.data;
             if (data.code == 0) {
               let minutes = "",
                 senconds = "",
-                countdown = 600;
+                countdown = 60;
               _this.timeFlag = false;
               _this.verifyCode = data.data.verifyId;
               let timer = setInterval(() => {
@@ -137,10 +139,13 @@ export default {
       }
       value = value.substring(0, value.length - 1);
       this.$axios
-        .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+        .get(
+          "/api/app/sms/isVerifyForShopApp?" + value,
+          qs.stringify(_parms)
+        )
         .then(res => {
           if (res.data.code == 0) {
-            if(_this.wxType == 0) {
+            if (_this.wxType == 0) {
               _this.signIn();
             } else {
               _this.addWXInfo();
@@ -156,7 +161,7 @@ export default {
     signIn(val) {
       //商家注册
       let _this = this;
-      let mobile = val?val:this.telephone;
+      let mobile = val ? val : this.telephone;
       this.$axios
         .get("/api/app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
@@ -164,7 +169,7 @@ export default {
           if (res.data.code == 0) {
             if (res.data.data == null) {
               //新用户为null
-              _this.addShop();   //商家注册
+              _this.addShop(); //商家注册
             } else if (
               res.data.data.userType == 1 &&
               !_this.isNull(res.data.data.mobile)
@@ -175,10 +180,14 @@ export default {
               !_this.isNull(res.data.data.mobile)
             ) {
               //商家
-              localStorage.setItem("userId",res.data.data.id);
+              localStorage.setItem("userId", res.data.data.id);
+              mui.plusReady(function() {  
+                  var tool = new igexinTool();  
+                  tool.bindAlias(res.data.data.id);  
+              });
               _this.setshopId(res.data.data.shopId);
               _this.getshopinfo(res.data.data.shopId);
-              if(!val){
+              if (!val) {
                 _this.$router.push({ name: "Home" });
               }
             }
@@ -191,20 +200,20 @@ export default {
     addWXInfo() {
       let _this = this;
       let _parms = {
-          mobile: this.telephone,
-          openId: this.openId,
-          unionId: this.unionId    //微信unionId
-      }
+        mobile: this.telephone,
+        openId: this.openId,
+        unionId: this.unionId //微信unionId
+      };
       this.$axios
-      .post("/api/app/user/addAppUser", qs.stringify(_parms))
-      .then(res => {
-        if(res.data.code == 0) {
-          _this.upDateUserInfo();
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+        .post("/api/app/user/addAppUser", qs.stringify(_parms))
+        .then(res => {
+          if (res.data.code == 0) {
+            _this.upDateUserInfo();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     upDateUserInfo() {
       let _this = this;
@@ -217,24 +226,30 @@ export default {
         sex: this.sex
       };
       this.$axios
-      .post("/api/app/user/updateByMobile", qs.stringify(_parms))
-      .then(res => {
-        console.log(res);
-        if(res.data.code == 0) {
-          _this.signIn();
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+        .post(
+          "/api/app/user/updateByMobile",
+          qs.stringify(_parms)
+        )
+        .then(res => {
+          console.log(res);
+          if (res.data.code == 0) {
+            _this.signIn();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     addShop() {
-      //获取到微信用户信息后，先用openId去查询是否有信息，如果没有就调添加用户接口addAppUser  
+      //获取到微信用户信息后，先用openId去查询是否有信息，如果没有就调添加用户接口addAppUser
       //添加商户
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
+        .post(
+          "/api/app/user/addShopAppUser",
+          qs.stringify(_parms)
+        )
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -291,68 +306,96 @@ export default {
         });
     },
     weixinLogin() {
-      if(window.plus){
-          this.plusFunc();
-      }else{
-          document.addEventListener( "plusready", this.plusFunc(), false );
+      if (window.plus) {
+        this.plusFunc();
+      } else {
+        document.addEventListener("plusready", this.plusFunc(), false);
       }
     },
-    plusFunc() {     //微信获取用户信息
+    plusFunc() {
+      //微信获取用户信息
       let _this = this;
       let auths = [];
-      plus.oauth.getServices(function(services) {
+      plus.oauth.getServices(
+        function(services) {
           auths = services;
           var s;
           for (var i = 0; i < auths.length; i++) {
-              if (auths[i].id == "weixin") {
-                  s = auths[i];
-                  break;
-              }
+            if (auths[i].id == "weixin") {
+              s = auths[i];
+              break;
+            }
           }
           if (!s.authResult) {
-              s.login(function(e) {
-                  console.log("登陆认证成功！");
-                  s.getUserInfo(function(e) {
-                      var josnStr = JSON.stringify(s.userInfo);
-                      var jsonObj = s.userInfo;
-                      console.log("获取用户信息成功：" + josnStr);
-                      //通过openId查询用户信息
-                      _this.sex = s.userInfo.sex;
-                      _this.nickName = s.userInfo.nickname;
-                      _this.iconUrl = s.userInfo.headimgurl;
-                      _this.openId = s.userInfo.openid;
-                      _this.unionId = s.userInfo.unionid ? s.userInfo.unionid : "";
-                      _this.isSignWX = true;
-                      // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
-                      _this.$axios.get("/api/app/user/findByOpIdAndUnId/?openId=" + _this.openId + "&unionId=" + _this.unionId, {})
+            s.login(
+              function(e) {
+                console.log("登陆认证成功！");
+                s.getUserInfo(
+                  function(e) {
+                    var josnStr = JSON.stringify(s.userInfo);
+                    var jsonObj = s.userInfo;
+                    console.log("获取用户信息成功：" + josnStr);
+                    //通过openId查询用户信息
+                    _this.sex = s.userInfo.sex;
+                    _this.nickName = s.userInfo.nickname;
+                    _this.iconUrl = s.userInfo.headimgurl;
+                    _this.openId = s.userInfo.openid;
+                    _this.unionId = s.userInfo.unionid
+                      ? s.userInfo.unionid
+                      : "";
+                    _this.isSignWX = true;
+                    // _this.$axios.get(this.$GLOBAL.API+"app/user/findByOpenId/" + _this.openId, {})
+                    _this.$axios
+                      .get(
+                          "/api/app/user/findByOpIdAndUnId/?openId=" +
+                          _this.openId +
+                          "&unionId=" +
+                          _this.unionId,
+                        {}
+                      )
                       .then(res => {
-                        let data = res.data, type = 0;    //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
+                        let data = res.data,
+                          type = 0; //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
                         console.log(data);
-                        if(data.code == 0) {
-                            if(data.data == null || data.data == "" || data.data == undefined || !data.data.mobile) {
-                              _this.wxType = 1;
-                              Toast("微信授权成功,请绑定手机号");
-                            } else {
-                              Toast("微信登陆成功");
-                              _this.telephone = data.data.mobile
-                              _this.upDateUserInfo();
-                            }
+                        if (data.code == 0) {
+                          if (
+                            data.data == null ||
+                            data.data == "" ||
+                            data.data == undefined ||
+                            !data.data.mobile
+                          ) {
+                            _this.wxType = 1;
+                            Toast("微信授权成功,请绑定手机号");
+                          } else {
+                            Toast("微信登陆成功");
+                            _this.telephone = data.data.mobile;
+                            _this.upDateUserInfo();
+                          }
                         }
-                      }).catch(err => {
-                          console.log(err);
+                      })
+                      .catch(err => {
+                        console.log(err);
                       });
-                  }, function(e) {
-                      console.log("获取用户信息失败：" + e.message + " - " + e.code);
-                  });
-              }, function(e) {
-                  console.log("登陆认证失败！");
-              });
+                  },
+                  function(e) {
+                    console.log(
+                      "获取用户信息失败：" + e.message + " - " + e.code
+                    );
+                  }
+                );
+              },
+              function(e) {
+                console.log("登陆认证失败！");
+              }
+            );
           } else {
-              console.log("已经登陆认证！");
+            console.log("已经登陆认证！");
           }
-      }, function(e) {
+        },
+        function(e) {
           console.log("获取登陆服务列表失败：" + e.message + " - " + e.code);
-      });
+        }
+      );
     },
     setScroll() {
       const ua = navigator.userAgent.toLowerCase();
@@ -368,16 +411,44 @@ export default {
     }
   },
   created() {
+    console.log("ispush:", ispush);
+    let _this = this,_arr=[];
     this.setScroll();
-    let userId = localStorage.getItem("userId"); 
-    if(userId){
-        this.$axios.get("/api/app/user/get/" + userId).then(res => {
-        if (res.data.code == "0" && res.data.data != null && res.data.data != "null") {
-          this.signIn(res.data.data.mobile)
+    let userId = localStorage.getItem("userId");
+    if (userId) {
+      mui.plusReady(function() {
+        var tool = new igexinTool();
+        tool.bindAlias(userId);
+        plus.push.addEventListener("receive", function (msg) {
+          console.log('login_receive_msg:',msg)
+          if (msg.aps) {  // Apple APNS message
+            console.log("接收到在线APNS消息：");
+          } else {
+            console.log("接收到在线透传消息login：");
+            _arr = msg.payload.split(",")
+            if(_arr[0] == 1){ 
+              _this.$router.push({ path: '/income'})
+            }else if(_arr[0] ==2){
+              _this.$router.push({ path: '/historyse'})
+            }else{
+              _this.$router.push({ path: '/income'})
+            }
+            
+          }
+        }, false);
+      });
+      
+      this.$axios.get("/api/app/user/get/" + userId).then(res => {
+        if (
+          res.data.code == "0" &&
+          res.data.data != null &&
+          res.data.data != "null"
+        ) {
+          this.signIn(res.data.data.mobile);
         }
       });
-    }else{
-       console.log("oh no!")
+    } else {
+      console.log("no Id");
     }
   }
 };

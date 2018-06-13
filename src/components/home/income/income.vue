@@ -136,6 +136,8 @@ export default {
     };
   },
   created: function() {
+
+    ispush = false;
     let _this = this;
     const ua = navigator.userAgent.toLowerCase();
       if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
@@ -426,7 +428,6 @@ export default {
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
         }, 5);
         ++this.page;
-        console.log('page:',this.page)
         this.getdata();
       }
     }

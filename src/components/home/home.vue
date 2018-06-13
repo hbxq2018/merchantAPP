@@ -37,6 +37,13 @@ export default {
   computed: {
     ...mapState(["userInfo", "shopId"])
   },
+  watch:{
+    ispush:function(){
+      if(ispush){
+        this.$router.push({ path: '/income'})
+      }
+    }
+  },
   methods: {
     ...mapMutations(["setuserInfo"]),
     gomenu: function() {
@@ -47,12 +54,14 @@ export default {
     },
     getshopinfo: function() {
       //获取商家信息
-      this.$axios.get("/api/shop/get/" + this.shopId).then(res => {
-        if (res.data.code == "0") {
-          let data = res.data.data;
-          this.setuserInfo(data);
-        }
-      });
+      this.$axios
+        .get("/api/shop/get/" + this.shopId)
+        .then(res => {
+          if (res.data.code == "0") {
+            let data = res.data.data;
+            this.setuserInfo(data);
+          }
+        });
     }
   },
   created: function() {
@@ -61,6 +70,11 @@ export default {
     if (this.$route.query.ind == "2") {
       this.ismenu = false;
     }
+
+    // if (ispush) {
+    //   console.log("ispush:", ispush);
+    //   this.$router.push({ path: '/income'})
+    // }
   }
 };
 </script>

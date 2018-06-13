@@ -74,6 +74,11 @@ export default {
   computed:{
     ...mapState(['userInfo']),
   },
+  ispush:function(){
+    if(ispush){
+      this.$router.push({ path: '/income'})
+    }
+  },
   methods:{
     ...mapMutations(['setuserInfo']),
     clickli:function(e){
@@ -94,8 +99,13 @@ export default {
               this.$router.push({ path: '/Promotion'})
         }
     }
+  },
+  mounted:function(){
+    if (ispush) {
+      console.log("ispush:", ispush);
+      this.$router.push({ path: '/income'})
+    }
   }
-  
 };
 </script>
 
