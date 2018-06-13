@@ -344,7 +344,7 @@ export default {
                       ? s.userInfo.unionid
                       : "";
                     _this.isSignWX = true;
-                    // _this.$axios.get(this.$GLOBAL.API+"app/user/findByOpenId/" + _this.openId, {})
+                    // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
                           "/api/app/user/findByOpIdAndUnId/?openId=" +
