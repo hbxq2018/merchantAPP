@@ -5,6 +5,7 @@ import Login from '@/components/login/login'
 import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
 import Writeoff from '@/components/home/income/writeoff'
+import Bill from '@/components/home/income/bill'
 import Process from '@/components/login/process'
 import Settlein from '@/components/login/settlein'
 import ShopMap from '@/components/login/shopMap'
@@ -116,6 +117,11 @@ export default new Router({
       path: '/writeoff',
       name: 'Writeoff',
       component: Writeoff
+    },
+    {
+      path: '/bill',
+      name: 'Bill',
+      component: Bill
     },
     { //我的页面-->关于我们
       path: '/aboutUs',

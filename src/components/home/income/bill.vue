@@ -1,94 +1,81 @@
 <template>
-    <div class="income">
-		<div class="income_top">
-        <mt-header fixed title="营业数据" class="income_header">
-            <router-link to="/home" slot="left">
-                <mt-button icon="back"></mt-button>
-            </router-link>
-            <mt-button @click="turnmore(1)" slot="right" class="income_header_date">{{actday}}</mt-button>
-        </mt-header>
-        <div class="income_banner">
-            <div class="income_banner_data">
-                <p class="income_data_num">￥{{totalPrice}}</p>
-                <p>营业额</p>
-            </div>
-            <div class="income_banner_data" @click="bill">
-                <p class="income_data_num">{{total}}</p>
-                <p>核销券数</p>
-            </div>
-        </div>
-        <div class="income_operate">
-            <div class="income_operate_result">
-                <p>{{start}} -- {{end}}</p>
-                <p>
-                    <span>营业额：￥{{totalPrice}}元</span>
-                    <span>订单数：{{orderNum}}张</span>
-                </p>
-            </div>
-            <div class="income_operate_time" @click="turnmore(2)">
-                <img src="../../../../static/images/calendar.png" alt="">
+    <div class="bill">
+		<div class="bill_top">
+            <mt-header fixed title="营业数据" class="bill_header">
+                <router-link to="/income" slot="left">
+                    <mt-button icon="back"></mt-button>
+                </router-link>
+                <mt-button @click="turnmore(1)" slot="right" class="bill_header_date">{{actday}}</mt-button>
+            </mt-header>
+            <div class="bill_operate">
+                <div class="bill_operate_result">
+                    <p>{{start}} -- {{end}}</p>
+                    <p>
+                        <span>核销券数：{{orderNum}}张</span>
+                        <span>服务费：￥{{totalCost}}元</span>
+                    </p>
+                </div>
+                <div class="bill_operate_time" @click="turnmore(2)">
+                    <img src="../../../../static/images/calendar.png" alt="">
+                </div>
             </div>
         </div>
-    </div>
-    <div class="mobox" @click="closemore" v-show="ismore">
-        <div class="triangle" v-show="isselectday"></div>
-        <ul class="moreday" v-show="isselectday">
-            <li class="adays" v-for="(item,index) in days" :key='index' :id='item.title' @click="selectday">{{item.title}}</li>
-        </ul>
-        <div class="select" v-show="isselecttime">
-            <div class="select_top">
-                <span class="stleft">选择起始时间</span>
-            </div>
-            <div class="date">
-                <div @click.stop="openPicker(1)">开始时间：<span>{{temstart}}</span></div>
-                <div @click.stop="openPicker(2)">结束时间：<span>{{temend}}</span></div>
-            </div>
-            <div class="selbut">
-                <div class="close">取消</div>
-                <div class="cfrm" @click="cfrm">确定</div>
+        <div class="mobox" @click="closemore" v-show="ismore">
+            <div class="triangle" v-show="isselectday"></div>
+            <ul class="moreday" v-show="isselectday">
+                <li class="adays" v-for="(item,index) in days" :key='index' :id='item.title' @click="selectday">{{item.title}}</li>
+            </ul>
+            <div class="select" v-show="isselecttime">
+                <div class="select_top">
+                    <span class="stleft">选择起始时间</span>
+                </div>
+                <div class="date">
+                    <div @click.stop="openPicker(1)">开始时间：<span>{{temstart}}</span></div>
+                    <div @click.stop="openPicker(2)">结束时间：<span>{{temend}}</span></div>
+                </div>
+                <div class="selbut">
+                    <div class="close">取消</div>
+                    <div class="cfrm" @click="cfrm">确定</div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="filling" id="filling"></div>
-    <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-        <div class="income_list">
-          <ul id="income" class="income" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-              <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
-                  <div class="income_li_l">
-                      <div class="income_li_l_date">{{item.createTime}}</div>
-                      <div class="income_li_l_money">￥{{item.soAmount}}</div>
-                  </div>
-                  <div class="income_li_r">
-                      <div class="left">
-                          <p>付款单号</p>
-                          <p>付款人</p>
-                          <p v-if="item.skuName">代金券</p>
-                      </div>
-                      <div class="right">
-                        <p>{{item.id}}</p>
-                        <p>{{item.userName}}</p>
-                        <p v-if="item.skuName">{{item.skuName}}</p>
-                      </div>
-                  </div>
-              </li>
-              <li class="loadingBox" v-if="loadFlag">加载中..</li>
-          </ul>
+        <div class="filling" id="filling"></div>
+        <div class="loadBottom billbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+            <div class="bill_list">
+                <ul id="bill" class="bill" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+                    <li class="bill_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
+                        <div class="bill_li_name">{{item.couponAmount}}元代金券</div>
+                        <div class="bill_li_info">
+                            <div class="left">
+                                <p>券码</p>
+                                <p>券状态</p>
+                                <p>服务费</p>
+                                <p>核销时间</p>
+                            </div>
+                            <div class="right">
+                                <p>{{item.couponCode}}</p>
+                                <p>{{item.userName}}</p>
+                                <p>{{item.couponAmount/10}}</p>
+                                <p>{{item.updateTime}}</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="loadingBox" v-if="loadFlag">加载中..</li>
+                </ul>
+            </div>
         </div>
-  
-    </div>
-
-    <mt-datetime-picker
-            ref="picker"
-            type="date"
-            year-format="{value} 年"
-            month-format="{value} 月"
-            date-format="{value} 日"
-            v-model="pickerValue"
-            :startDate = 'mindata'
-            :endDate = 'maxdata'
-            @confirm="handleConfirm"
-        >
-    </mt-datetime-picker>
+        <mt-datetime-picker
+                ref="picker"
+                type="date"
+                year-format="{value} 年"
+                month-format="{value} 月"
+                date-format="{value} 日"
+                v-model="pickerValue"
+                :startDate = 'mindata'
+                :endDate = 'maxdata'
+                @confirm="handleConfirm"
+            >
+        </mt-datetime-picker>
     </div>
 </template>
 
@@ -100,7 +87,7 @@ Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 export default {
-  name: "Income",
+  name: "Bill",
   data() {
     return {
       start: "",
@@ -108,8 +95,8 @@ export default {
       temstart:"",
       temend:"",
       actval: "",
-      total: "",
       orderNum: "0",
+      totalCost: 0,
       pickerValue: "",
       Visible: true,
       ismore: false,
@@ -130,7 +117,6 @@ export default {
         }
       ],
       votes: [],
-      totalPrice: 0,
       page:1,
       allLoaded: true,
       scrollMode: "auto",
@@ -165,10 +151,6 @@ export default {
     this.end = _end;
     this.temstart = _start; 
     this.temend = _end;
-    // this.oldstart = _start;
-    // this.oldend = _end;
-    this.getAmount();
-    this.getTicketList();
     this.getdata();
     this.actday = this.days[0].title;
   },
@@ -181,8 +163,6 @@ export default {
       newtime:function(){
         this.page = 1;
         this.getdata();
-        this.getAmount();
-        this.getTicketList();
       }
   },
   store,
@@ -222,8 +202,6 @@ export default {
         if (_end > _start) {
           this.end = this.temend;
           this.start = this.temstart;
-          this.getAmount(this.start, this.end);
-          this.getTicketList(this.start, this.end);
           this.getdata(this.start, this.end);
         } else {
           Toast("结束时间不能小于开始时间");
@@ -270,88 +248,45 @@ export default {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
-        // this.oldstart = _start;
-        this.getAmount();
-        this.getTicketList();
         this.getdata();
       } else if (this.actday == "7日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 7;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
-        // this.oldstart = _start;
-        this.getAmount();
-        this.getTicketList();
         this.getdata();
       } else if (this.actday == "15日") {
         _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 15;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
-        // this.oldstart = _start;
-        this.getAmount();
-        this.getTicketList();
         this.getdata();
       }
     },
-    // 获取营业总额
-    getAmount(start, end) {
-      let obj = {
-        shopId: this.shopId,
-        beginTime: start?start:this.start,
-        endTime: end?end:this.end
-      }, _value = "";
-      for (var key in obj) {
-        _value += key + "=" + obj[key] + "&";
-      }
-      this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
-        console.log(res);
-        if (res.data.code == 0 && res.data.data) {
-          this.totalPrice = res.data.data;
-        } else {
-          this.totalPrice = 0;
-        }
-      });
-    },
-    // 获取核销券数
-    getTicketList(start, end) {
+    //获取列表数据
+    getdata: function(start,end,val) {
       let obj = {
         shopId: this.shopId,
         begainTime: start?start:this.start,
-        endTime: end?end:this.end
-      }, _value = "";
-      for (var key in obj) {
-        _value += key + "=" + obj[key] + "&";
-      }
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
-        this.total = res.data.data.total;
-      });
-    },
-    //获取列表数据
-    getdata: function(start, end,val,type) {
-      let obj = {
-        shopId: this.shopId,
-        soStatus: 2,
-        beginTime: start?start:this.start,
         endTime: end?end:this.end,
         page:val?val:this.page,
         rows:10
-      };
-      // this.oldstart == start;
-      // this.oldend == end;
-      let _value = "";
+      }, _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/so/myorderForShop?" + _value).then(res => {
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         if (res.data.code == "0") {
           this.loadFlag = false;
           let _data = res.data.data;
           this.orderNum = _data.total ? _data.total : 0;
           if (_data.list) {
-            if(this.page == 1){
-              this.votes = [];
-            }
             if(_data.list.length>0){
+              if(this.page == 1) {
+                  this.votes = [];
+                  this.totalCost = _data.list[0].totalService;
+              }
+              _data.list = _data.list.slice(1, _data.list.length);
+              console.log(_data.list);
               for(let j=0;j<_data.list.length;j++){
                 if(/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
                   _data.list[j].userName = _data.list[j].userName.substring(0,3) + "******" + _data.list[j].userName.substring(9,11);
@@ -415,7 +350,7 @@ export default {
       return windowHeight;
     },
     touchStart(e) {
-      let dishesUl = document.getElementById("income");
+      let dishesUl = document.getElementById("bill");
       let bottomH =
         document.getElementById("filling").clientHeight;
       this.touchStartY = e.targetTouches[0].pageY;
@@ -435,7 +370,7 @@ export default {
       }
     },
     touchMove(e) {
-      let dishesUl = document.getElementById("income");
+      let dishesUl = document.getElementById("bill");
       this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
       if (this.distance > 0 && this.topFlag == true && this.flag) {
         if (this.distance > 100) {
@@ -453,7 +388,7 @@ export default {
       }
     },
     touchEnd() {
-      let dishesUl = document.getElementById("income"),
+      let dishesUl = document.getElementById("bill"),
         _this = this;
       if (this.distance > 0 && this.topFlag == true && this.flag) {
         this.flag = false;
@@ -485,24 +420,20 @@ export default {
         console.log('page:',this.page)
         this.getdata();
       }
-    },
-    //跳转至核销列表页面
-    bill() {
-      this.$router.push({name: 'Bill', params: {}});
     }
   }
 };
 </script>
 
 <style lang="less">
-.income {
-  .income_top {
+.bill {
+    background-color: #EBEBEB;
+  .bill_top {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       z-index: 1000;
-      background-color: #fc5e2d;
   }
   p {
     margin: 0;
@@ -517,28 +448,8 @@ export default {
     transform: rotate(90deg);
     border: 1px solid red;
   }
-  .income_banner {
+  .bill_operate {
     margin-top: 82px;
-    background-color: #fc5e2d;
-    display: flex;
-    height: 264px;
-    color: #fff;
-    .income_banner_data {
-      flex: direction-flex;
-      width: 50%;
-      height: 100%;
-      padding-top: 60px;
-      box-sizing: border-box;
-      p {
-        font-size: 30px;
-      }
-      .income_data_num {
-        margin-bottom: 20px;
-        font-size: 54px;
-      }
-    }
-  }
-  .income_operate {
     height: 120px;
     padding: 20px 41px;
     box-sizing: border-box;
@@ -548,7 +459,7 @@ export default {
       flex: direction-flex;
       justify-content: space-between;
     }
-    .income_operate_result {
+    .bill_operate_result {
       text-align: left;
       width: 90%;
       p:first-child {
@@ -563,7 +474,7 @@ export default {
         }
       }
     }
-    .income_operate_time {
+    .bill_operate_time {
       text-align: right;
       width: 10%;
       img {
@@ -573,7 +484,7 @@ export default {
       }
     }
   }
-  .income_list {
+  .bill_list {
     ul {
       padding: 0;
       padding-top: 30px;
@@ -588,47 +499,47 @@ export default {
         width: 100%;
       }
       li {
-        display: flex;
         margin: 0 30px 20px 30px;
         padding: 30px;
         box-sizing: border-box;
         text-align: left;
         background-color: #fff;
-        color: #B1B1B1;
+        color: #555555;
         font-size: 22px;
-        & > div {
-          flex: direction-flex;
-          justify-content: space-between;
-        }
-        .income_li_l {
-          width: 50%;
-          .income_li_l_money {
-            font-size: 50px;
+        .bill_li_name {
+            font-size: 30px;
             color: #191919;
-          }
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 20px;
         }
-        .income_li_r {
-          width: 50%;
-          .left {
-            float: left;
-            p:nth-child(1) {
-              margin-bottom: 5px;
+        .bill_li_info {
+            width: 100%;
+            clear: both;
+            content: "";
+            display: block;
+            overflow: hidden;
+            .left {
+                float: left;
+                p {
+                    margin-bottom: 10px;
+                }
+                p:last-child {
+                    margin-bottom: 0;
+                }
             }
-            p:nth-child(2) {
-              margin-bottom: 5px;
+            .right {
+                float: left;
+                margin-left: 20px;
+                p {
+                    margin-bottom: 10px;
+                }
+                p:last-child {
+                    margin-bottom: 0;
+                }
             }
-          }
-          .right {
-            float: left;
-            margin-left: 20px;
-            p:nth-child(1) {
-              margin-bottom: 5px;
-            }
-            p:nth-child(2) {
-              margin-bottom: 5px;
-            }
-          }
         }
+        
       }
       .loadingBox {
           background-color: #EBEBEB;
@@ -688,14 +599,11 @@ export default {
   }
   .filling{
     width: 100%;
-    height: 460px;
+    height: 200px;
   }
-  .inbox{
-    position: absolute;
-    top: 460px;
-    width: 100%;
-    height: 870px;
+  .billbox{
     background-color: #EBEBEB;
+    min-height: 1130px;
   }
   .select {
     width: 672px;
