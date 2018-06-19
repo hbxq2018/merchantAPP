@@ -13,6 +13,10 @@ import Category from '@/components/login/category'
 import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
+import Actlist from '@/components/activity/actlist'
+import Dishlist from '@/components/activity/dishlist'
+import Actsign from '@/components/activity/actsign'
+import Actdetails from '@/components/activity/actdetails'
 import Manage from '@/components/home/manage/manage'
 import Scan from '@/components/home/scan/scan'
 import Write from '@/components/home/scan/writeoff'
@@ -207,6 +211,27 @@ export default new Router({
       path:'/addDishes',
       name:'AddDishes',
       component:AddDishes
+    },
+    {
+      path:'/actlist',
+      name:'Actlist',
+      component:Actlist
+    },
+    {
+      path:'/actdetails',
+      name:'Actdetails',
+      component:Actdetails
+    },
+    {
+      path:'/actsign',
+      name:'Actsign',
+      component:Actsign
+    },
+    {
+      path:'/dishlist',
+      name:'Dishlist',
+      component:Dishlist
     }
   ]
 })
+

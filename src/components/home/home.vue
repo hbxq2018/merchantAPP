@@ -70,7 +70,7 @@ export default {
     if (this.$route.query.ind == "2") {
       this.ismenu = false;
     }
-
+    
     // if (ispush) {
     //   console.log("ispush:", ispush);
     //   this.$router.push({ path: '/income'})

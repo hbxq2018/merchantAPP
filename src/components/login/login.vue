@@ -411,8 +411,7 @@ export default {
     }
   },
   created() {
-    console.log("ispush:", ispush);
-    let _this = this,_arr=[];
+    let _this = this,_arr=[],_audio=null;
     this.setScroll();
     let userId = localStorage.getItem("userId");
     if (userId) {
@@ -423,6 +422,14 @@ export default {
           console.log('login_receive_msg:',msg)
           if (msg.aps) {  // Apple APNS message
             console.log("接收到在线APNS消息：");
+            _arr = msg.payload.split(",")
+            if(_arr[0] == 1){ 
+              _this.$router.push({ path: '/income'})
+            }else if(_arr[0] ==2){
+              _this.$router.push({ path: '/historyse'})
+            }else{
+              _this.$router.push({ path: '/income'})
+            }
           } else {
             console.log("接收到在线透传消息login：");
             _arr = msg.payload.split(",")

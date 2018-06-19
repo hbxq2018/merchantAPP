@@ -19,7 +19,7 @@
                   <p>&yen;{{item?item.totalPrice:'0'}}</p>
               </div>
               <div class="roder-right">
-                  <span>详情</span>
+                  <span :class="!item.isBill?'actspan':''">{{item.isBill?'已缴清':'待打款'}}</span>
                   <img src="../../../../static/images/home_arrow.png" alt="账单详情图标">
               </div>
             </div>
@@ -56,8 +56,13 @@ export default {
   },
   methods: {
     particularsDetails: function(ind) {
-      let _ind = this.data.length-ind
-      let obj = {ind:_ind}
+      let _ind = this.data.length-ind,isbill = this.data[ind].isBill,money= this.data[ind].totalPrice,totalNoService=this.data[ind].totalNoService;
+      let obj = {
+        ind:_ind,
+        isBill:isbill,
+        money:money,
+        totalNoService:totalNoService
+        }
       this.$router.push({ name: "DetailsSon", params: obj });
     },
     moreyear:function(){
@@ -164,6 +169,11 @@ export default {
         color: #b1b1b1;
         span {
           vertical-align: margin;
+          font-size: 28px;
+          color: #B1B1B1;
+        }
+        .actspan{
+          color: #FC5E2D;
         }
         img {
           width: 12px;

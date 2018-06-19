@@ -26,6 +26,14 @@
               </li>
           </ul>
       </div>
+      <div class="activity">
+        
+      <div class="actleft" @click="clickact">
+          <p>享7活动</p>
+          <p>活动新玩法、提高客流量</p>
+        </div>
+        <img :src="actimg" alt="">
+      </div>
   </div>
 </template>
 
@@ -37,6 +45,7 @@ export default {
   data() {
     return {
       msg: "menu",
+      actimg:require('../../../static/images/balloon.png'),
       lidata:[
           {
               // src:'../../../static/images/scan.png',
@@ -84,25 +93,27 @@ export default {
     clickli:function(e){
         const ind = e.currentTarget.id;
         if(ind ==1){
-            this.$router.push({ path: '/scan'})
+          this.$router.push({ path: '/scan'})
         }else if(ind == 2){
             // console.log("bbb")
+          this.$router.push({ path: '/income'})
         }else if(ind == 3){
           //三种跳转方式
           // 字符串
-            // this.$router.push('/manage')
+            this.$router.push('/manage')
           // 对象
-          this.$router.push({ path: '/manage'})
           // 命名的路由   (有待研究)
           // this.$router.push({ name: '/home/manage', params: {}})
         }else if(ind == 4){
-              this.$router.push({ path: '/Promotion'})
+          this.$router.push({ path: '/Promotion'})
         }
+    },
+    clickact:function(){
+      this.$router.push({ path: '/Actdetails'})
     }
   },
   mounted:function(){
     if (ispush) {
-      console.log("ispush:", ispush);
       this.$router.push({ path: '/income'})
     }
   }
@@ -224,6 +235,40 @@ export default {
       text-decoration: none;
       text-align: center;
       line-height: 98px;
+    }
+  }
+  .activity{
+    width: 672px;
+    height: 160px;
+    box-shadow: 0px 0px 14px rgba(36, 36, 36, 0.28);
+    border-radius: 30px;
+    margin-left: 31.5px;
+    margin-top: 740px;
+    &>img{
+      float: right;
+      margin-top: 10px;
+      margin-right: 20px;
+      width: 140px;
+      height: 120px;
+    }
+    .actleft{
+      float: left;
+      width: 500px;
+      height: 160px;
+      padding-top: 40px;
+      &>p{
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        text-align: left;
+        padding-left: 40px;
+        color: #B1B1B1;
+        font-size: 20px;
+      }
+      &>p:nth-child(1){
+        color: #FC5E2D;
+        font-size: 30px;
+      }
     }
   }
 }

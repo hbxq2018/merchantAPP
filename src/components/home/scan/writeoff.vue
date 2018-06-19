@@ -96,8 +96,8 @@ export default {
             _value += key + '=' + obj[key] + '&';
         }
         _value = _value.substring(0, _value.length-1);
-        console.log("_value:",_value)
-        this.$axios.post(this.$GLOBAL.API+'app/hx/add?'+_value)
+
+        this.$axios.post('/api/app/hx/add?'+_value)
             .then((res) => {
               console.log('res:',res)
               if(res.data.code == '0'){

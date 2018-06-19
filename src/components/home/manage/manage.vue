@@ -353,8 +353,6 @@ export default {
   },
   created: function() {
     this.account();
-    console.log("userInfo:", this.userInfo);
-    console.log("shotInfo:", this.shopInfo);
     if (this.writedata.length < 1) {
       this.getWritelist();
     }

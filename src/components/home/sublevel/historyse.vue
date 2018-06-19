@@ -99,12 +99,13 @@ export default {
 
       let _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
       _end = this.$UTILS.dateConv(new Date(_end));
+      
       let obj = {
         shopId: this.shopId,
         begainTime: _begainTime,
         endTime: _end,
         page: val?val:this.page,
-        isBill: 1, //0未对账  1已对账
+        // isBill: 1, //0未对账  1已对账
         rows: 10
       };
       let parms = "",
@@ -131,7 +132,6 @@ export default {
         } else {
           this.allLoaded = false;
         }
-
       });
     },
     //获取顶部卷去高度

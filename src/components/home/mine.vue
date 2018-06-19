@@ -86,7 +86,7 @@ export default {
           }else if(listBoxID ==0){
               this.$router.push('/historyse')
           }else if(listBoxID ==2){
-              window.location.href="tel:027-59728120"
+              window.location.href="tel:027-59728176"
           }else if(listBoxID ==1){
               this.$router.push('/serviceManual')
           }else if(listBoxID ==4){

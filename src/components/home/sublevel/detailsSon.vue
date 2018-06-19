@@ -6,17 +6,20 @@
             <mt-button icon="back"></mt-button>
         </router-link>
       </mt-header>
-      <div v-if="!first.totalService" class="nodata">本月没有产生服务费</div>
-      <div class="detailsSon_top"  v-if="first.totalService">
-        <p>{{payment}}</p>
-        <span>本月服务费：<em>&yen;{{first.totalService}}</em></span>
-          <!-- <img src="../../../../static/images/murcielagoimg.png" alt="赞图标"> -->
+      <div v-if="isbill == 1" class="nodata">
+        <p>本月服务已缴清</p>
+        <p>本月服务费：¥{{money}}</p>
+      </div>
+      <div class="detailsSon_top"  v-if="isbill != 1">
+        <p>4月剩余应缴服务费</p>
+        <p>¥{{money}}</p>
+        <p>本月总服务费¥{{money}}，已缴¥{{money*1-totalNoService*1}}</p>
       </div>
       <div class="murcielago" v-if="first.totalService">
-          <p>本月已核销<span>{{total}}</span>张代金券，总额度<span>{{first.totalPrice}}</span>元</p>
+          <p>本月已核销<span>{{total}}</span>张代金券</p>
       </div>
     </div>
-    <!-- <div class="songe"></div> -->
+
     <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode}">
       <ul id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
         <li class="order_history" v-for="(item,index) in writedata" :key="index">
@@ -26,13 +29,12 @@
                     <p>{{item.updateTime}}</p>
                 </div>
                 <div class="roder-right">
-                    <span>&yen;{{item.couponAmount/10}}</span>
+                    <span>&yen;{{item.servicePrice}}</span>
                 </div>
             </div>
         </li>
       </ul>
     </div>
-     
   </div>
 </template>
 
@@ -51,6 +53,8 @@ export default {
       writedata: [],
       ind: 1,
       page: 1,
+      totalNoService:0,
+      isbill:0,
       allLoaded: true,
       scrollMode: "auto",
       touchStartY: 0,
@@ -88,6 +92,9 @@ export default {
         page: this.page,
         rows: 10
       };
+      if(this.isbill ==1){
+        obj.isBill=1;
+      }
       let parms = "",
         _value = "";
       for (var key in obj) {
@@ -242,6 +249,10 @@ export default {
       this.scrollMode = "touch";
     }
     this.ind = this.$route.params.ind;
+    this.isbill = this.$route.params.isBill;
+    this.money = this.$route.params.money;
+    this.totalNoService = this.$route.params.totalNoService;
+    
     this.getdata(this.pag);
   }
 };
@@ -253,34 +264,40 @@ export default {
   height: 100%;
   background: #ebebeb;
   .nodata {
-    margin-top: 80px;
+    width: 100%;
+    height: 224px;
+    padding-top: 80px;
     text-align: center;
-    color: red;
     font-size: 35px;
+    background: #fff;
+    p{margin: 16px 0;}
+    p:nth-child(1){
+      color: #FC5E2D;
+      font-size: 40px;
+      margin-top: 40px;
+    }
+    p:nth-child(2){
+      color: #191919;
+      font-size: 30px;
+    }
   }
   .detailsSon_top {
     width: 100%;
     height: 224px;
     background: #fff;
-    letter-spacing: 2px;
-    line-height: 60px;
-    position: fixed;
-    overflow: hidden;
-    top: 80px;
-    p {
-      font-size: 40px;
-      color: #fc5e2d;
-      padding-top: 60px;
-    }
-    span {
+    padding-top: 80px;
+    p{margin: 20px 0;}
+    p:nth-child(1){
+      color: #191919;
       font-size: 30px;
     }
-    img {
-      width: 183px;
-      height: 183px;
-      position: absolute;
-      top: 108px;
-      right: -10px;
+    p:nth-child(2){
+      color: #191919;
+      font-size: 56px;
+    }
+    p:nth-child(3){
+      color:#FC5E2D;
+      font-size: 24px;
     }
   }
   .details {
