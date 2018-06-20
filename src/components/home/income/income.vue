@@ -253,7 +253,8 @@ export default {
     // 跳转至详情
     getliid: function(e) {
       let id = e.currentTarget.id;
-      this.$router.push({ name: "Writeoff", params: { id: id } });
+
+      this.$router.push({ name: "Writeoff", params: { id: id,type:1} });
     },
     // 选择日期
     selectday: function(e) {

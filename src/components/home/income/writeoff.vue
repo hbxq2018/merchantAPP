@@ -1,6 +1,6 @@
 <template>
   <div class="awriteoff">
-        <mt-header title="核销记录" class="income_header">
+        <mt-header :title="title" class="income_header">
             <router-link to="/income" slot="left">
                 <mt-button icon="back"></mt-button>
             </router-link>
@@ -18,6 +18,7 @@ export default {
   name:'Writeoff',
   data(){
       return{
+          title:'订单记录',
           data:[
               {
                   title:'10元代金券',
@@ -51,15 +52,19 @@ export default {
       }
   },
   methods:{
-
-  },
-  created:function(){
-    //   app/so/getForOrder/
-      if(this.$route.params.id){
-        let id = this.$route.params.id;
-      this.$axios.get("/api/app/hx/get/"+id)
+      getdata:function(id,type){
+          let url='';
+          if(type == 1){
+            url='/api/app/so/get/';
+            this.title='订单记录';
+          }else if(type ==2){
+            url='/api/app/hx/get/';
+            this.title='核销记录';
+          }
+      this.$axios.get(url+id)
         .then((res) => {
             if(res.data.code ==  '0'){
+                console.log('res:',res)
                let _data = res.data.data;
                this.data[0].title = _data.couponAmount+'元代金券';
                this.data[1].value = '¥ '+_data.shopAmount;
@@ -78,6 +83,15 @@ export default {
                this.data[6].value = _data.cashierName;
             }
         })
+
+      }
+  },
+  created:function(){
+    //   app/so/getForOrder/
+    if(this.$route.params.id){
+      let id = this.$route.params.id,type= this.$route.params.type;
+
+      this.getdata(id,type);
     }
   }
 }
@@ -85,7 +99,6 @@ export default {
 </script>
 
 <style lang="less">
-    
     .awriteoff{
         width:100%;
         height:100%;

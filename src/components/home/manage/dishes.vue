@@ -1,23 +1,27 @@
 <template>
   <div class="dishes">
-    <mt-header :title="name">
-        <router-link to="/manage" slot="left">
+    <mt-header :title="title">
+        <router-link :to="backpath" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
     </mt-header>
     <div class="dishesBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
 			<ul id="dishesUl" class="dishesUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(item.id)">
+				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(index,item.skuName,item.id,item.isSign)">
 					<img class="icon fl" :src="item.picUrl" alt="">
 					<div class="text fl">
 						<p>{{item.skuName}}</p>
 						<p>{{item.skuInfo}}</p>
 					</div>
-					<div class="arrow fr"></div>
+          <span class="issign" v-if="item.isSign">已报名</span>
+          <div v-if="type == 2 && !item.isSign" :class="index == ind?'dishsel actdishsel':'dishsel'">
+                    <span></span>
+                </div>
+					<div v-if="type == 1" class="arrow fr"></div>
 				</li>
 			</ul>
     </div>
-    <div id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
+    <div v-show="type == 1" id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
         <span>+</span>
         <span>添加推荐菜</span>
     </div>
@@ -33,9 +37,12 @@ export default {
   name: "dishes",
   data() {
     return {
-      name: "推荐菜管理",
+      title: "推荐菜管理",
       list: [],
+      type: 1, //1 推荐菜管理   2推荐菜列表  2是在活动（37）中使用
+      backpath: "/manage",
       page: 1,
+      ind: -1,
       allLoaded: true,
       scrollMode: "auto",
       touchStartY: 0,
@@ -53,8 +60,12 @@ export default {
     ...mapMutations(["setuserInfo"]),
     getDishList() {
       let _this = this,
-      _param = "";
-      _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
+        _param = "";
+        if(this.type == 1){
+          _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
+        }else if(this.type == 2){
+          _param = "shopId=" + this.userInfo.id +"&actId=37"+ "&page=" + this.page + "&rows=8";
+        }
       this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
@@ -77,8 +88,15 @@ export default {
         }
       });
     },
-    toAddDishes(id) {
-      this.$router.push({ name: "AddDishes", params: { id: id } });
+    toAddDishes(val, name, id,isSign) {
+      if(this.type == 1){
+        this.$router.push({ name: "AddDishes", params: { id: id } });
+      }else if(this.type ==2){
+        if(!isSign){
+            this.ind = val;
+          this.$router.push({ name: "Actsign", params: { name: name, id: id } });
+        }
+      }
     },
     getScrollTop() {
       //获取顶部卷去高度
@@ -138,6 +156,7 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
+      
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
@@ -201,6 +220,14 @@ export default {
     }
   },
   created: function() {
+    this.type = this.$route.query.type;
+    if (this.type == 1) {
+      this.backpath = "/manage";
+      this.title = '推荐菜管理';
+    } else if (this.type == 2) {
+      this.backpath = "/actsign";
+      this.title = '推荐菜列表';
+    }
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -242,6 +269,10 @@ export default {
         padding: 20px 30px;
         box-sizing: border-box;
         margin-bottom: 20px;
+        .issign{
+          position: relative;
+          top: 50px;
+        }
         .icon {
           width: 130px;
           height: 130px;
@@ -320,6 +351,19 @@ export default {
     span:first-child {
       font-size: 60px;
     }
+  }
+  .dishsel {
+    float: right;
+    margin-top: 50px;
+    margin-right: 20px;
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid #fc5e2d;
+  }
+  .actdishsel {
+    background: #fc5e2d;
   }
 }
 </style>

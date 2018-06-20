@@ -8,7 +8,7 @@
         </mt-header>
         <div class="signcell">
             <!-- <mt-cell title="标题文字" icon="more" value="带 icon"></mt-cell> -->
-            <mt-cell title="招牌菜" is-link :value="fascia" to="dishlist"></mt-cell>
+            <mt-cell title="招牌菜" is-link :value="fascia" :to="{path:'/dishes',query:{type:2}}"></mt-cell>
             <mt-cell title="原价" :value="Original"><input type="number" :placeholder="Original" v-model="Original"></mt-cell>
             <mt-cell title="活动价" :value="Activity"><input type="number" :placeholder="Activity" v-model="Activity"></mt-cell>
             <mt-cell title="平台售价" :value="platform"></mt-cell>
@@ -69,9 +69,6 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
-    clickdish: function() {
-      this.$router.push({ name: "Dishlist", params: {} });
-    },
     //生成券
     savesign: function() {
       let obj = {},

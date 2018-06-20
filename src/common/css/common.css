@@ -160,10 +160,10 @@ ol {
     color: #808080;
 }
 
-.mint-cell-allow-right::after {
+/* .mint-cell-allow-right::after {
     width: 2px;
     height: 2px;
-}
+} */
 
 .mint-cell-value.is-link {
     margin-right: 30px;

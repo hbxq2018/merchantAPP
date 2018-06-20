@@ -14,7 +14,6 @@ import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
 import Actlist from '@/components/activity/actlist'
-import Dishlist from '@/components/activity/dishlist'
 import Actsign from '@/components/activity/actsign'
 import Actdetails from '@/components/activity/actdetails'
 import Manage from '@/components/home/manage/manage'
@@ -226,11 +225,6 @@ export default new Router({
       path:'/actsign',
       name:'Actsign',
       component:Actsign
-    },
-    {
-      path:'/dishlist',
-      name:'Dishlist',
-      component:Dishlist
     }
   ]
 })
