@@ -34,7 +34,7 @@
 </template>
 <script>
 import store from "@/vuex/store";
-import { Toast } from "mint-ui";
+import { Toast,Indicator } from "mint-ui";
 import { mapState, mapMutations, mapGetters } from "vuex";
 import qs from "qs";
 import { formatDate } from "../../../untils/util";
@@ -58,6 +58,9 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
     getactdata: function() {
+      Indicator.open({
+        spinnerType: 'triple-bounce'
+      });
       let _parms = {
           id: 37,
           userId: this.shopInfo.id,
@@ -69,14 +72,15 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/act/detail?" + _value).then(res => {
+      this.$axios.get("api/app/act/detail?" + _value).then(res => {
         if (res.data.code == 0) {
+          Indicator.close();
           this.actdata = res.data.data;
         }
       });
     },
     getdishdata: function() {
-      console.log("API:", this.API.API);
+      // console.log("API:", this.API.API);
       let date = new Date(),
         begain = "",
         _end = "",
@@ -89,6 +93,7 @@ export default {
         actId: 37,
         beginTime: begain,
         endTime: _end,
+        shopId:this.userInfo.id,
         voteUserId: this.shopInfo.id,
         isLuoxuan: 0,
         flag: "1"
@@ -97,19 +102,23 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get("api/app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
           this.dishdata = res.data.data.list;
         }
       });
     },
     clickdetails: function() {
-      console.log("clickdetails");
+      let obj = {
+        acturl:this.actdata.actUrl,
+        type:1
+      }
+      this.$router.push({ name: "Aboutthefood", params: obj });
     },
     clicksign: function() {
       if (this.dishdata && this.dishdata.length) {
         let len = this.dishdata.length;
-        if (len > 5) {
+        if (len > 4) {
           Toast("每家商家最多只能报名五道菜参赛，您已报名有五道菜了");
         } else {
           this.$router.push({ name: "Actsign", params: {} });
@@ -120,9 +129,6 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.id) {
-      console.log("id:", this.$route.query.id);
-    }
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this._type = 4;

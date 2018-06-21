@@ -81,7 +81,7 @@
 
 <script>
 import Vue from "vue";
-import { DatetimePicker, Toast,Loadmore } from "mint-ui";
+import { DatetimePicker, Toast,Loadmore,Indicator} from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker);
 Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
@@ -263,6 +263,7 @@ export default {
     },
     //获取列表数据
     getdata: function(start,end,val) {
+      Indicator.open('数据加载中...');
       let obj = {
         shopId: this.shopId,
         begainTime: start?start:this.start,
@@ -274,7 +275,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("api/app/hx/list?" + _value).then(res => {
         if (res.data.code == "0") {
           this.loadFlag = false;
           let _data = res.data.data;
@@ -286,20 +287,22 @@ export default {
                   this.totalCost = _data.list[0].totalService;
               }
               _data.list = _data.list.slice(1, _data.list.length);
-              console.log(_data.list);
               for(let j=0;j<_data.list.length;j++){
                 if(/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
                   _data.list[j].userName = _data.list[j].userName.substring(0,3) + "******" + _data.list[j].userName.substring(9,11);
                 }
+                Indicator.close();
                 this.votes.push(_data.list[j])
               }
               if (_data.list.length < 10) {
                 this.allLoaded = false;
               }
             }else{
-                this.allLoaded = false;
+              Indicator.close();
+              this.allLoaded = false;
             }
           }else{
+            Indicator.close();
             this.allLoaded = false;
           }
         }
@@ -417,7 +420,6 @@ export default {
           dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
         }, 5);
         ++this.page;
-        console.log('page:',this.page)
         this.getdata();
       }
     }

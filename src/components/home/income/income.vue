@@ -94,7 +94,7 @@
 
 <script>
 import Vue from "vue";
-import { DatetimePicker, Toast,Loadmore } from "mint-ui";
+import { DatetimePicker, Toast,Loadmore,Indicator  } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker);
 Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
@@ -252,6 +252,7 @@ export default {
     },
     // 跳转至详情
     getliid: function(e) {
+      return false;
       let id = e.currentTarget.id;
 
       this.$router.push({ name: "Writeoff", params: { id: id,type:1} });
@@ -305,8 +306,7 @@ export default {
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
-      this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
-        console.log(res);
+      this.$axios.get("api/app/so/totalAmount?" + _value).then(res => {
         if (res.data.code == 0 && res.data.data) {
           this.totalPrice = res.data.data;
         } else {
@@ -324,12 +324,13 @@ export default {
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("api/app/hx/list?" + _value).then(res => {
         this.total = res.data.data.total;
       });
     },
     //获取列表数据
     getdata: function(start, end,val,type) {
+      Indicator.open('数据加载中...');
       let obj = {
         shopId: this.shopId,
         soStatus: 2,
@@ -345,8 +346,9 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/so/myorderForShop?" + _value).then(res => {
-        if (res.data.code == "0") {
+      this.$axios.get("api/app/so/myorderForShop?" + _value).then(res => {
+        Indicator.close();
+        if (res.data.code == 0) {
           this.loadFlag = false;
           let _data = res.data.data;
           this.orderNum = _data.total ? _data.total : 0;
@@ -368,6 +370,7 @@ export default {
                 this.allLoaded = false;
             }
           }else{
+            
             this.allLoaded = false;
           }
         }

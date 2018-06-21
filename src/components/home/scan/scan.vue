@@ -54,6 +54,9 @@ export default {
       that.startScan();
       function onmarked(type, result, file) {
         //二维码type=0;  条形码type=1
+        console.log('type:',type)
+        console.log('result:',result)
+        console.log('file:',file)
         if (type == 0) {
           if(result.indexOf("www.hbxq001.cn") > 0 ){
             let arr = result.split("/");
@@ -78,10 +81,12 @@ export default {
       }
     },
     getbycode: function(val) { //获取票券信息
+    console.log('getbycode:')
       this.$axios
-        .get("/api/app/cp/getByCode/" + val)
+        .get("api/app/cp/getByCode/" + val)
         .then(res => {
           let data = res.data;
+          console.log("getbycode_res:",res)
           if (data.code == 0) {
             if(data.data.isUsed == 1){
               Toast("券不存在或者已经被使用");

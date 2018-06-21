@@ -5,7 +5,7 @@
         <mt-button slot="right"  @click="save">保存</mt-button>
       </mt-header> 
       <div class="edit_content">
-        <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="手机号" placeholder="请输入新手机号" ref="phone" type="tel" ></mt-field>
+        <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="联系电话" placeholder="请输入新联系电话" ref="phone" type="tel" ></mt-field>
         <!-- <mt-checklist  
             v-if="ind == '1' || ind == '2'" 
             :max="_max"
@@ -248,7 +248,7 @@ export default {
             _value += key + "=" + obj[key] + "&";
           }
           _value = _value.substring(0, _value.length - 1);
-          this.$axios.post("/api/app/shop/update?" + _value).then(res => {
+          this.$axios.post("api/app/shop/update?" + _value).then(res => {
             if (res.data.code == "0") {
               Toast({
                 message: '保存成功',
@@ -322,7 +322,7 @@ export default {
 
     .mint-cell-title,
     .mint-cell-text {
-      width: 100px;
+      width: 130px;
     }
     .indleft input{
      text-align: right;

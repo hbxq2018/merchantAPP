@@ -36,7 +36,7 @@ export default {
                 synopsis:'简介',
                 arrowDiagrams:require("../../../../static/images/home_arrow.png")
               },{
-                order:'02.如何入住',
+                order:'02.如何入驻',
                 synopsis:'如何注册、提交资质',
                 arrowDiagrams:require("../../../../static/images/home_arrow.png"),
               },{

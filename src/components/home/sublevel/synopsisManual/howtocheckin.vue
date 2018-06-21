@@ -1,10 +1,10 @@
 <template>
     <div class="aboutFood">
-        <mt-header title="如何入住"><router-link slot="left" :to="{path:'serviceManual'}">
+        <mt-header title="如何入驻" fixed><router-link slot="left" :to="{path:'serviceManual'}">
         <mt-button icon="back"></mt-button></router-link></mt-header>
 
         <div class="about">
-            <img src="https://xq-1256079679.file.myqcloud.com/test_如何入驻abc_0.8.jpg" alt="">
+            <img src="https://xq-1256079679.file.myqcloud.com/test_微信图片_20180621103750_0.8.jpg" alt="">
         </div>
     </div>
 </template>
@@ -24,6 +24,7 @@ export default {
     .about{
         width: 100%;
         height: 100%;
+        padding-top: 80px;
         img{
             width: 100%;
             height: 100;

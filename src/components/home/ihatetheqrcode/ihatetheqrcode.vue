@@ -5,14 +5,14 @@
         <div class="Standing one">
             <div class="homepage">
                 <div><span>店铺主页</span></div>
-                <img @touchstart="savepage(1)" @touchend="clearLoop" :src="imgs.商家详情无背景图" alt="店铺主页二维码图片">
+                <img v-if='imgs.商家详情无背景图' @touchstart="savepage(1)" @touchend="clearLoop" :src="imgs.商家详情无背景图" alt="店铺主页二维码图片">
                 <div>长按保存二维码</div>
             </div>
         </div>
         <div class="Standing eventual">
             <div class="homepage">
                 <div><span>支付二维码</span></div>
-                <img @touchstart="savepage(2)" :src="imgs.商家买单无背景图" alt="支付二维码图片">
+                <img v-if='imgs.商家买单无背景图' @touchstart="savepage(2)" :src="imgs.商家买单无背景图" alt="支付二维码图片">
                 <div>长按保存二维码</div>
             </div>
         </div>
@@ -21,7 +21,8 @@
 
 <script>
 import store from "@/vuex/store";
-import { mapState, mapMutations, mapGetters } from "vuex";
+import { mapState, mapMutations, mapGetters} from "vuex";
+import {Indicator} from "mint-ui";
 export default {
   name: "Ihatetheqrcode",
   data() {
@@ -47,8 +48,13 @@ export default {
       });
     },
     getshopimgs:function(){
-      this.$axios.get("/api/app/shop/CreateCode?id=" + this.userInfo.id+'&shopCode='+this.userInfo.shopCode).then(res => {
+      Indicator.open({
+  text: '图片加载中...',
+  spinnerType: 'fading-circle'
+})
+      this.$axios.get("api/app/shop/CreateCode?id=" + this.userInfo.id+'&shopCode='+this.userInfo.shopCode).then(res => {
         if(res.data.code == 0){
+            Indicator.close();
             this.imgs = res.data.data;
         }
       });

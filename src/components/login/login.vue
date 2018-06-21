@@ -87,7 +87,7 @@ export default {
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-              "/api/app/sms/sendForShopAppRegister?shopMobile=" +
+              "api/app/sms/sendForShopAppRegister?shopMobile=" +
               this.telephone
           )
           .then(res => {
@@ -140,7 +140,7 @@ export default {
       value = value.substring(0, value.length - 1);
       this.$axios
         .get(
-          "/api/app/sms/isVerifyForShopApp?" + value,
+          "api/app/sms/isVerifyForShopApp?" + value,
           qs.stringify(_parms)
         )
         .then(res => {
@@ -163,7 +163,7 @@ export default {
       let _this = this;
       let mobile = val ? val : this.telephone;
       this.$axios
-        .get("/api/app/user/findUserByMobile?mobile=" + mobile)
+        .get("api/app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
           _this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -205,7 +205,7 @@ export default {
         unionId: this.unionId //微信unionId
       };
       this.$axios
-        .post("/api/app/user/addAppUser", qs.stringify(_parms))
+        .post("api/app/user/addAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.upDateUserInfo();
@@ -227,7 +227,7 @@ export default {
       };
       this.$axios
         .post(
-          "/api/app/user/updateByMobile",
+          "api/app/user/updateByMobile",
           qs.stringify(_parms)
         )
         .then(res => {
@@ -247,7 +247,7 @@ export default {
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
         .post(
-          "/api/app/user/addShopAppUser",
+          "api/app/user/addShopAppUser",
           qs.stringify(_parms)
         )
         .then(res => {
@@ -265,7 +265,7 @@ export default {
     getshopinfo: function(id) {
       //获取商家信息
       let _this = this;
-      this.$axios.get("/api/shop/get/" + id).then(res => {
+      this.$axios.get("api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.$router.push({ name: "Home" });
@@ -277,7 +277,7 @@ export default {
       //判断商家是否在审核中
       let _this = this;
       this.$axios
-        .get("/api/app/shopEnter/searchByUserId?userId=" + id)
+        .get("api/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
@@ -344,10 +344,10 @@ export default {
                       ? s.userInfo.unionid
                       : "";
                     _this.isSignWX = true;
-                    // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
+                    // _this.$axios.get("api/app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
-                          "/api/app/user/findByOpIdAndUnId/?openId=" +
+                          "api/app/user/findByOpIdAndUnId/?openId=" +
                           _this.openId +
                           "&unionId=" +
                           _this.unionId,
@@ -445,7 +445,7 @@ export default {
         }, false);
       });
       
-      this.$axios.get("/api/app/user/get/" + userId).then(res => {
+      this.$axios.get("api/app/user/get/" + userId).then(res => {
         if (
           res.data.code == "0" &&
           res.data.data != null &&

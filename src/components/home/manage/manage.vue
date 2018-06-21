@@ -82,7 +82,7 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       this.$axios
-        .get("/api/app/shopCashier/adminByShopId?" + _value)
+        .get("api/app/shopCashier/adminByShopId?" + _value)
         .then(res => {
           if (res.data.code == "0") {
             if (res.data.data && res.data.data.id) {
@@ -97,7 +97,6 @@ export default {
     },
     //返回home页面
     clickback: function() {
-      console.log('issave:',this.issave)
       if (this.issave) {
         this.$router.push({ name: "Home", params: {} });
       } else {
@@ -140,7 +139,7 @@ export default {
             _value += key + "=" + obj[key] + "&";
           }
           _value = _value.substring(0, _value.length - 1);
-          this.$axios.post("/api/app/shop/update?" + _value).then(res => {
+          this.$axios.post("api/app/shop/update?" + _value).then(res => {
             if (res.data.code == "0") {
               MessageBox("提示", "保存成功");
               this.issave = true;
@@ -155,7 +154,7 @@ export default {
     },
     //获取商家信息
     getshopinfo: function() {
-      this.$axios.get("/api/shop/get/" + this.shopId).then(res => {
+      this.$axios.get("api/shop/get/" + this.shopId).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.setuserInfo(data);
@@ -164,7 +163,6 @@ export default {
     },
     //进入修改页面
     clickformli: function(e) {
-       console.log("issave2:",this.issave)
       const ind = e.currentTarget.id;
       let obj = {};
       this.issave = false;
@@ -206,10 +204,9 @@ export default {
         _value1 += key + "=" + obj1[key] + "&";
       }
       _value1 = _value1.substring(0, _value1.length - 1);
-      this.$axios.get("/api/app/user/findUserByMobile?" + _value1).then(res => {
+      this.$axios.get("api/app/user/findUserByMobile?" + _value1).then(res => {
         if (res.data.code == "0") {
           hxdata = res.data.data;
-          console.log("hxdata:", hxdata);
           if (hxdata.userType == 2 && hxdata.shopId) {
             if (type == "del") {
               this.deleteHxUser(value);
@@ -238,7 +235,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post("/api/app/user/addHxUser?" + _value).then(res => {
+      this.$axios.post("api/app/user/addHxUser?" + _value).then(res => {
         if (res.data.code == "0") {
           this.getWritelist(1);
         } else {
@@ -264,7 +261,7 @@ export default {
       } else if (type == 2) {
         url = "app/shopCashier/delete?";
       }
-      this.$axios.post("/api/" + url + _value).then(res => {
+      this.$axios.post("api/" + url + _value).then(res => {
         if (res.data.code == "0") {
           console.log("操作成功");
         } else {
@@ -275,7 +272,6 @@ export default {
     clickdel: function(e) {
       const ind = e.currentTarget.id;
       let [...arr] = this.writedata;
-      console.log("arr:", arr);
 
       if (arr[ind].mobile == this.shopInfo.mobile) {
         MessageBox("提示", "不可以删除主账号");
@@ -302,7 +298,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post("/api/app/user/deleteHxUser?" + _value).then(res => {
+      this.$axios.post("api/app/user/deleteHxUser?" + _value).then(res => {
         if (res.data.code == "0") {
           this.getWritelist(2);
         }
@@ -319,7 +315,7 @@ export default {
     getWritelist: function(val) {
       //获取核销员列表
       this.$axios
-        .post("/api/app/user/listForShopId?shopId=" + this.shopId)
+        .post("api/app/user/listForShopId?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == "0") {
             this.writedata = res.data.data;

@@ -16,7 +16,7 @@
         <div class="directions">
             <div class="direleft">例：</div>
             <div class="direright">
-            原价40元、活动价20元、售价21元；<br>
+            原价40元、活动价20元、平台售价21元；<br>
                 结算商家收20元、享7平台收取消费者1元。<br>
             </div>
         </div>
@@ -35,6 +35,7 @@ export default {
     return {
       skugId: "",
       len: "",
+      isfirst:true,
       fascia: "选择招牌菜",
       Original: "请输入原价(元)",
       Activity: "请输入活动价(元)",
@@ -46,12 +47,33 @@ export default {
     ...mapState(["userInfo", "shopInfo"])
   },
   watch: {
+    fascia:function(){
+      this.isfirst= true;
+    },
     Original: function() {
+      this.isfirst= true;
+      if(this.Original == 0){
+        this.Original = "请输入原价(元)"
+      }
       if (this.Original != "请输入原价(元)") {
         this.Original = Math.round(this.Original);
+        if(!isNaN(this.Activity * 1) && !isNaN(this.Original * 1)){
+          if (this.Activity * 1 > this.Original * 1) {
+            Toast("活动价不能高于原价");
+            // this.Original = "请输入原价(元)"
+            this.Activity = "请输入活动价(元)";
+            this.platform = "享7平台价格";
+          } else {
+            this.platform = this.Activity * 1 + 1;
+          }
+        }
       }
     },
     Activity: function() {
+      this.isfirst= true;
+      if(this.Activity ==0){
+        this.Activity = "请输入活动价(元)"
+      }
       if (this.Activity != "请输入活动价(元)") {
         this.Activity = Math.round(this.Activity);
         if (this.Activity * 1 > this.Original * 1) {
@@ -71,6 +93,10 @@ export default {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
     //生成券
     savesign: function() {
+      if(!this.isfirst){
+        return false
+      }
+      this.isfirst= false;
       let obj = {},
         _value = "";
       if (this.checkdata()) {
@@ -88,7 +114,7 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("/api/app/sku/addSku?" + _value).then(res => {
+        this.$axios.post("api/app/sku/addSku?" + _value).then(res => {
           if (res.data.code == 0) {
             this.skuupdata();
             this.skugId = res.data.data;
@@ -117,7 +143,7 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("/api/app/sku/update?" + _value).then(res => {
+        this.$axios.post("api/app/sku/update?" + _value).then(res => {
           if (res.data.code == 0) {
             this.insertByRules();
           }
@@ -142,7 +168,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post("/api/app/actSku/insertByRules?" + _value).then(res => {
+      this.$axios.post("api/app/actSku/insertByRules?" + _value).then(res => {
         if (res.data.code == 0) {
           Toast("报名成功！");
           this.resetdata();
@@ -168,7 +194,7 @@ export default {
         this.fascia == "选择招牌菜";
       }
       if (this.Original == "请输入原价(元)" || !this.Original) {
-        Toast("请输入此菜品原价(元)");
+        Toast("请输入菜品原价(元)");
         this.fascia == "请输入原价(元)";
       }
       if (this.Activity == "请输入活动价(元)" || !this.Activity) {
@@ -200,7 +226,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get("api/app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
           if(res.data.data.list.length>5){
               this.$router.push({ name: "Actdetails", params: {} });
@@ -212,6 +238,7 @@ export default {
   created: function() {
     if (this.$route.params.name) {
       this.fascia = this.$route.params.name;
+      this.isfirst= true;
     }
     if (this.$route.params.id) {
       this.dishid = this.$route.params.id;

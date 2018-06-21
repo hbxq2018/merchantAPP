@@ -31,7 +31,7 @@
 
 <script>
 import { formatDate } from "../../../../untils/util";
-import { InfiniteScroll } from "mint-ui";
+import { InfiniteScroll,Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -56,7 +56,7 @@ export default {
   },
   methods: {
     particularsDetails: function(ind) {
-      let _ind = this.data.length-ind,isbill = this.data[ind].isBill,money= this.data[ind].totalPrice,totalNoService=this.data[ind].totalNoService;
+      let _ind = this.data.length-ind,isbill = this.data[ind].isBill,money= this.data[ind].totalService,totalNoService=this.data[ind].totalNoService;
       let obj = {
         ind:_ind,
         isBill:isbill,
@@ -70,6 +70,7 @@ export default {
     }
   },
   created: function() {
+    Indicator.open('数据加载中...');
     let _this = this;
     let _date = new Date();
     let _start =_this.$UTILS.dateConv(_date);
@@ -89,13 +90,14 @@ export default {
       value += key + '=' + obj[key] + '&';
     }
     value = value.substring(0, value.length-1);
-    this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
+    this.$axios.get("api/app/hx/listAmount?" + value).then(res => {
       if (res.data.code == 0) {
         let _data =[];
          for(key in res.data.data){
            _data.push(res.data.data[key])
          }
         _data.reverse();
+        Indicator.close();
         _this.data = _data;
       }
     });

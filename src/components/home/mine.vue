@@ -123,7 +123,6 @@ export default {
         .list_ontrol{
             width: 100%;
             height: 100px;
-            
             background: #fff;
             display: flex;
             flex-direction: row;
@@ -161,6 +160,7 @@ export default {
         }
         .list_ontrol:nth-child(2){margin: 20px 0px;}
         .list_ontrol:nth-child(3){border-bottom: 1px solid #E0E0E0;}
+        .list_ontrol:nth-child(4){border-bottom: 1px solid #E0E0E0;}
         .list_ontrol:nth-last-child(2){margin: 20px 0px;}
         button{
             width: 100%;

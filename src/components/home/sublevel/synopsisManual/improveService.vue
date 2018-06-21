@@ -1,6 +1,6 @@
 <template>
     <div class="aboutFood">
-        <mt-header title="如何提高客流量"><router-link slot="left" :to="{path:'serviceManual'}">
+        <mt-header title="如何提高客流量" fixed><router-link slot="left" :to="{path:'serviceManual'}">
         <mt-button icon="back"></mt-button></router-link></mt-header>
 
         <div class="about">
@@ -24,6 +24,7 @@ export default {
     .about{
         width: 100%;
         height: 100%;
+        padding-top: 80px;
         img{
             width: 100%;
             height: 100;

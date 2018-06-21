@@ -25,96 +25,99 @@
                 </router-link>
               </li>
           </ul>
-      </div>
-      <div class="activity">
-        
-      <div class="actleft" @click="clickact">
-          <p>享7活动</p>
-          <p>活动新玩法、提高客流量</p>
+        <div class="activity">
+          <div class="actleft" @click="clickact">
+            <p>享7活动</p>
+            <p>活动新玩法、提高客流量</p>
+          </div>
+          <img :src="actimg" alt="">
         </div>
-        <img :src="actimg" alt="">
       </div>
   </div>
+      
 </template>
 
 <script>
-import store from '@/vuex/store'
-import {mapState,mapMutations,mapGetters} from 'vuex'
+import store from "@/vuex/store";
+import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "Menu",
   data() {
     return {
       msg: "menu",
-      actimg:require('../../../static/images/balloon.png'),
-      lidata:[
-          {
-              // src:'../../../static/images/scan.png',
-              src:require('../../../static/images/scan.png'),
-              id:'1',
-              name:'扫码验证',
-              con:'核销券票',
-              href: '#'
-          },{
-              // src:'../../../static/images/orders.png',
-              src:require('../../../static/images/orders.png'),
-              id:'2',
-              name:'营业数据',
-              con:'核销记录、数据统计',
-              href: 'income'
-          },{
-              // src:'../../../static/images/stores.png',
-              src:require('../../../static/images/stores.png'),
-              id:'3',
-              name:'店铺管理',
-              con:'更改店铺信息、员工管理',
-              href: '#'
-          },{
-              // src:'../../../static/images/voucher.png',
-              src:require('../../../static/images/voucher.png'),
-              id:'4',
-              name:'优化推广',
-              con:'自定义满减额度',
-              href: '#'
-          }
+      actimg: require("../../../static/images/balloon.png"),
+      lidata: [
+        {
+          // src:'../../../static/images/scan.png',
+          src: require("../../../static/images/scan.png"),
+          id: "1",
+          name: "扫码验证",
+          con: "核销券票",
+          href: "#"
+        },
+        {
+          // src:'../../../static/images/orders.png',
+          src: require("../../../static/images/orders.png"),
+          id: "2",
+          name: "营业数据",
+          con: "核销记录、数据统计",
+          href: "income"
+        },
+        {
+          // src:'../../../static/images/stores.png',
+          src: require("../../../static/images/stores.png"),
+          id: "3",
+          name: "店铺管理",
+          con: "更改店铺信息、员工管理",
+          href: "#"
+        },
+        {
+          // src:'../../../static/images/voucher.png',
+          src: require("../../../static/images/voucher.png"),
+          id: "4",
+          name: "优化推广",
+          con: "自定义满减额度",
+          href: "#"
+        }
       ]
     };
   },
   store,
-  computed:{
-    ...mapState(['userInfo']),
+  computed: {
+    ...mapState(["userInfo"])
   },
-  ispush:function(){
-    if(ispush){
-      this.$router.push({ path: '/income'})
-    }
-  },
-  methods:{
-    ...mapMutations(['setuserInfo']),
-    clickli:function(e){
-        const ind = e.currentTarget.id;
-        if(ind ==1){
-          this.$router.push({ path: '/scan'})
-        }else if(ind == 2){
-            // console.log("bbb")
-          this.$router.push({ path: '/income'})
-        }else if(ind == 3){
-          //三种跳转方式
-          // 字符串
-            this.$router.push('/manage')
-          // 对象
-          // 命名的路由   (有待研究)
-          // this.$router.push({ name: '/home/manage', params: {}})
-        }else if(ind == 4){
-          this.$router.push({ path: '/Promotion'})
-        }
-    },
-    clickact:function(){
-      this.$router.push({ path: '/Actdetails'})
-    }
-  },
-  mounted:function(){
+  ispush: function() {
     if (ispush) {
-      this.$router.push({ path: '/income'})
+      this.$router.push({ path: "/income" });
+    }
+  },
+  methods: {
+    ...mapMutations(["setuserInfo"]),
+    clickli: function(e) {
+      const ind = e.currentTarget.id;
+      if (ind == 1) {
+        this.$router.push({ path: "/scan" });
+      } else if (ind == 2) {
+        // console.log("bbb")
+        this.$router.push({ path: "/income" });
+      } else if (ind == 3) {
+        //三种跳转方式
+        // 字符串
+        this.$router.push("/manage");
+        // 对象
+        // 命名的路由   (有待研究)
+        // this.$router.push({ name: '/home/manage', params: {}})
+      } else if (ind == 4) {
+        this.$router.push({ path: "/Promotion" });
+      }
+    },
+    clickact: function() {
+      this.$router.push({ path: "/Actdetails" });
+    }
+  },
+  mounted: function() {
+    if (ispush) {
+      this.$router.push({ path: "/income" });
     }
   }
 };
@@ -124,7 +127,10 @@ export default {
 .menu {
   .menu_top {
     width: 100%;
-    height: 80%;
+    height: 310px;
+    position: fixed;
+    left: 0;
+    top: 0;
     background: #fc5e2d;
     & > .eaves {
       position: absolute;
@@ -132,7 +138,7 @@ export default {
       left: 0;
       width: 100%;
       height: 111px;
-      -webkit-touch-callout:default;
+      -webkit-touch-callout: default;
     }
     & > .info {
       height: 133px;
@@ -177,15 +183,17 @@ export default {
     }
   }
   .menu_content {
+    overflow: hidden;
+    margin-top: 310px;
     & > .conul {
       padding: 0;
       margin: 0;
-      margin-top: 50px;
-      padding: 0 31.5px;
+      margin-top: 40px;
+      padding-left: 55px;
       float: left;
       & > .conli {
-        width: 322px;
-        height: 322px;
+        width: 300px;
+        height: 300px;
         padding: 0;
         margin: 0;
         float: left;
@@ -237,36 +245,36 @@ export default {
       line-height: 98px;
     }
   }
-  .activity{
-    width: 672px;
+  .activity {
+    width: 632px;
     height: 160px;
     box-shadow: 0px 0px 14px rgba(36, 36, 36, 0.28);
     border-radius: 30px;
-    margin-left: 31.5px;
-    margin-top: 740px;
-    &>img{
+    margin-left: 50px;
+    margin-top: 700px;
+    margin-bottom: 10px;
+    & > img {
       float: right;
       margin-top: 10px;
       margin-right: 20px;
       width: 140px;
       height: 120px;
     }
-    .actleft{
+    .actleft {
       float: left;
-      width: 500px;
-      height: 160px;
+      width: 400px;
       padding-top: 40px;
-      &>p{
+      & > p {
         width: 100%;
         height: 40px;
         line-height: 40px;
         text-align: left;
         padding-left: 40px;
-        color: #B1B1B1;
+        color: #b1b1b1;
         font-size: 20px;
       }
-      &>p:nth-child(1){
-        color: #FC5E2D;
+      & > p:nth-child(1) {
+        color: #fc5e2d;
         font-size: 30px;
       }
     }

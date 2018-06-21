@@ -13,7 +13,7 @@
       <div class="detailsSon_top"  v-if="isbill != 1">
         <p>4月剩余应缴服务费</p>
         <p>¥{{money}}</p>
-        <p>本月总服务费¥{{money}}，已缴¥{{money*1-totalNoService*1}}</p>
+        <p>本月总服务费¥{{money}}，已缴¥{{service}}</p>
       </div>
       <div class="murcielago" v-if="first.totalService">
           <p>本月已核销<span>{{total}}</span>张代金券</p>
@@ -41,7 +41,7 @@
 <script>
 import store from "@/vuex/store";
 import Vue from "vue";
-import { Loadmore } from "mint-ui";
+import { Loadmore ,Indicator} from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -53,6 +53,7 @@ export default {
       writedata: [],
       ind: 1,
       page: 1,
+      service:0,
       totalNoService:0,
       isbill:0,
       allLoaded: true,
@@ -74,6 +75,7 @@ export default {
   methods: {
     //獲取核銷數據
     getdata: function( type) {
+      Indicator.open('数据加载中...');
       if (this.page == 1) {
         this.writedata = [];
       }
@@ -101,7 +103,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("api/app/hx/list?" + _value).then(res => {
         if (res.data.code == 0) {
           this.total = res.data.data.total;
           if (res.data.data.list) {
@@ -112,6 +114,7 @@ export default {
               for (let i = 0; i < _data.length; i++) {
                 this.writedata.push(_data[i]);
               }
+              Indicator.close();
               if (_data.length < 9) {
                 this.allLoaded = false;
               }
@@ -119,8 +122,11 @@ export default {
               this.allLoaded = false;
             }
           } else {
-              this.allLoaded = false;
+            Indicator.close();
+            this.allLoaded = false;
           }
+        }else{
+          Indicator.close();
         }
       });
     },
@@ -252,7 +258,7 @@ export default {
     this.isbill = this.$route.params.isBill;
     this.money = this.$route.params.money;
     this.totalNoService = this.$route.params.totalNoService;
-    
+    this.service=(this.money*1-this.totalNoService*1).toFixed(2);
     this.getdata(this.pag);
   }
 };

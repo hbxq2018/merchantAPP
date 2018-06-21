@@ -55,10 +55,10 @@ export default {
       getdata:function(id,type){
           let url='';
           if(type == 1){
-            url='/api/app/so/get/';
+            url="api/app/so/get/";
             this.title='订单记录';
           }else if(type ==2){
-            url='/api/app/hx/get/';
+            url="api/app/hx/get/";
             this.title='核销记录';
           }
       this.$axios.get(url+id)

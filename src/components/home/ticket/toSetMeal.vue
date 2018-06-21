@@ -145,7 +145,7 @@ export default {
         this.userInfo.id +
         "&zanUserId=" +
         this.shopInfo.id;
-      this.$axios.get("/api/app/sku/getAgio?" + _param).then(res => {
+      this.$axios.get("api/app/sku/getAgio?" + _param).then(res => {
         if (res.data.code != 0) {
           Toast("系统繁忙请稍后再试");
           _this.id = "";
@@ -185,7 +185,7 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
       this.$axios
-        .post("/api/app/img/upload", form)
+        .post("api/app/img/upload", form)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
@@ -246,7 +246,7 @@ export default {
       MessageBox.confirm("确定删除?").then(
         action => {
           this.$axios
-          .post("/api/app/sku/delete?id=" + this.id)
+          .post("api/app/sku/delete?id=" + this.id)
           .then(res => {
             if (res.data.code != 0) {
               Toast("系统繁忙请稍后再试");
@@ -312,7 +312,7 @@ export default {
       }
       _param = _param.substring(0, _param.length - 1);
       this.$axios
-        .post("/api/app/sku/" + saveUrl + _param)
+        .post("api/app/sku/" + saveUrl + _param)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");

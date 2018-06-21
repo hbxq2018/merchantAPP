@@ -38,7 +38,7 @@
 <script>
 import { formatDate } from "../../../../untils/util";
 import Vue from "vue";
-import { MessageBox, Loadmore, Header } from "mint-ui";
+import { MessageBox, Loadmore, Header,Indicator } from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import axios from "axios";
 import qs from "qs";
@@ -88,6 +88,7 @@ export default {
     },
     //獲取核銷數據
     getdata: function(val, type) {
+      Indicator.open('数据加载中...');
       if (val == 1 || this.page ==1) {
         this.totalQuantity = [];
       }
@@ -114,7 +115,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("api/app/hx/list?" + _value).then(res => {
         let _data = res.data.data;
         let lists = [];
         if (_data.list) {
@@ -126,10 +127,12 @@ export default {
           for (let i = 0; i < lists.length; i++) {
             this.totalQuantity.push(lists[i]);
           }
+          Indicator.close();
           if (lists.length < 9) {
             this.allLoaded = false;
           }
         } else {
+          Indicator.close();
           this.allLoaded = false;
         }
       });

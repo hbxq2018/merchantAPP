@@ -21,7 +21,7 @@
 				</li>
 			</ul>
     </div>
-    <div v-show="type == 1" id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
+    <div v-show="type == 1 || !type" id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
         <span>+</span>
         <span>添加推荐菜</span>
     </div>
@@ -30,7 +30,7 @@
 
 <script>
 import Vue from "vue";
-import { Picker, Toast } from "mint-ui";
+import { Picker, Toast ,Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -59,14 +59,15 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo"]),
     getDishList() {
+      Indicator.open('数据加载中...');
       let _this = this,
         _param = "";
-        if(this.type == 1){
-          _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
-        }else if(this.type == 2){
+        if(this.type == 2){
           _param = "shopId=" + this.userInfo.id +"&actId=37"+ "&page=" + this.page + "&rows=8";
+        }else{
+          _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
         }
-      this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
+      this.$axios.get("api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
           if (lists && lists.length > 0) {
@@ -76,10 +77,12 @@ export default {
             for (let i = 0; i < lists.length; i++) {
               _this.list.push(lists[i]);
             }
+            Indicator.close();
             if (lists.length < 8) {
               _this.allLoaded = false;
             }
           } else {
+            Indicator.close();
             _this.allLoaded = false;
             Toast("暂无数据");
           }
@@ -89,13 +92,13 @@ export default {
       });
     },
     toAddDishes(val, name, id,isSign) {
-      if(this.type == 1){
-        this.$router.push({ name: "AddDishes", params: { id: id } });
-      }else if(this.type ==2){
+      if(this.type ==2){
         if(!isSign){
             this.ind = val;
           this.$router.push({ name: "Actsign", params: { name: name, id: id } });
         }
+      }else{
+        this.$router.push({ name: "AddDishes", params: { id: id } });
       }
     },
     getScrollTop() {
@@ -272,6 +275,7 @@ export default {
         .issign{
           position: relative;
           top: 50px;
+          color: #fc5e2d;
         }
         .icon {
           width: 130px;
@@ -291,6 +295,7 @@ export default {
           }
           p:nth-child(2) {
             width: 460px;
+            height: 70px;
             margin-top: 12px;
             color: #b1b1b1;
             font-size: 22px;
