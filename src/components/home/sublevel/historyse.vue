@@ -8,12 +8,12 @@
     </mt-header>
 
     <div class="history_money">
-        <b><em>{{time | formatDate}}</em>月应缴服务费</b>
+        <b><em>{{time}}</em>月应缴服务费</b>
         <span>&yen;{{dataarr.totalService}}</span>
         <!-- <P>打款日:次月5号</P> -->
     </div>
     <div class="data_statistics">
-        <p><span>{{time | formatDate}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
+        <p><span>{{time}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
     </div>
     <div id="hisbeijin" class="hisbeijin"></div>
     <div class="hisbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
@@ -36,9 +36,8 @@
 </template>
 
 <script>
-import { formatDate } from "../../../../untils/util";
 import Vue from "vue";
-import { MessageBox, Loadmore, Header,Indicator } from "mint-ui";
+import { MessageBox, Loadmore, Header,Indicator,Toast } from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import axios from "axios";
 import qs from "qs";
@@ -64,14 +63,6 @@ export default {
       flag: true //节流阀
     };
   },
-  filters: {
-    formatDate() {
-      var date = new Date();
-      let mon = date.getMonth() + 1;
-      let _data = formatDate(date, "yyyy-MM-dd hh:mm");
-      return mon;
-    }
-  },
   store,
   components: {
     "v-loadmore": Loadmore
@@ -92,13 +83,18 @@ export default {
       if (val == 1 || this.page ==1) {
         this.totalQuantity = [];
       }
-      let date = new Date(),_this=this;
-      let begain = formatDate(date, "yyyy/MM/dd");
-      let _arr = begain.split("/");
-      _arr[2] = "1";
-      let _begainTime = _arr.join("/");
+      let date = this.today,_this=this,begain='';
 
-      let _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
+      let _arr = date.split(" ");
+      begain = _arr[0].replace(/-/g,'/');
+
+      let _arr2 = begain.split("/");
+      _arr2[1]=_arr2[1].replace(/0/g,'');
+      this.time =_arr2[1];
+      _arr2[2] = "1";
+      let _begainTime = _arr2.join("/");
+
+      let _end = new Date(this.$UTILS.dateConv(new Date(date))).getTime() + 86400000;
       _end = this.$UTILS.dateConv(new Date(_end));
       
       let obj = {
@@ -132,6 +128,7 @@ export default {
             this.allLoaded = false;
           }
         } else {
+          Toast("没有更多数据了");
           Indicator.close();
           this.allLoaded = false;
         }
@@ -262,8 +259,12 @@ export default {
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
     }
+    this.$axios.get("/api/app/act/getDate").then(res => {
+      this.today = res.data.data;
+      this.getdata();
+    })
     this.ind = this.$route.params.ind;
-    this.getdata();
+    
   }
 };
 </script>

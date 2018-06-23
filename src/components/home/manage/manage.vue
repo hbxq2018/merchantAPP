@@ -154,7 +154,7 @@ export default {
     },
     //获取商家信息
     getshopinfo: function() {
-      this.$axios.get("/api/shop/get/" + this.shopId).then(res => {
+      this.$axios.get("/api/app/shop/get/" + this.shopId).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.setuserInfo(data);
@@ -177,7 +177,7 @@ export default {
       }
     },
     clickadd: function() {
-      MessageBox.prompt("添加核销员").then(
+      MessageBox.prompt("输入要添加核销员的注册电话").then(
         ({ value, action }) => {
           if (action == "confirm") {
             if (value) {

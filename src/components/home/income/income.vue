@@ -44,7 +44,7 @@
                 <div @click.stop="openPicker(2)">结束时间：<span>{{temend}}</span></div>
             </div>
             <div class="selbut">
-                <div class="close">取消</div>
+                <div class="close" @click="closemore">取消</div>
                 <div class="cfrm" @click="cfrm">确定</div>
             </div>
         </div>
@@ -80,6 +80,7 @@
     <mt-datetime-picker
             ref="picker"
             type="date"
+            v-if="mindata"
             year-format="{value} 年"
             month-format="{value} 月"
             date-format="{value} 日"
@@ -94,7 +95,7 @@
 
 <script>
 import Vue from "vue";
-import { DatetimePicker, Toast,Loadmore,Indicator  } from "mint-ui";
+import { DatetimePicker, Toast, Loadmore, Indicator } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker);
 Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
@@ -105,8 +106,8 @@ export default {
     return {
       start: "",
       end: "",
-      temstart:"",
-      temend:"",
+      temstart: "",
+      temend: "",
       actval: "",
       total: "",
       orderNum: "0",
@@ -131,7 +132,7 @@ export default {
       ],
       votes: [],
       totalPrice: 0,
-      page:1,
+      page: 1,
       allLoaded: true,
       scrollMode: "auto",
       touchStartY: 0,
@@ -139,71 +140,85 @@ export default {
       topFlag: false, //是否到顶部
       bottomFlag: false, //是否到底部
       flag: true, //节流阀
-      loadFlag: false
+      loadFlag: false,
+      today:''
     };
   },
   created: function() {
-
     ispush = false;
     let _this = this;
     const ua = navigator.userAgent.toLowerCase();
-      if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
-        this.scrollMode = 'touch';
-      }
-    let _date = new Date();
-    let _mindata =
-      new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000 * 365;
-    this.mindata = new Date(_mindata);
-    let _maxdata =
-      new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000 * 365 * 3;
-    this.maxdata = new Date(_maxdata);
+    if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+      this.scrollMode = "touch";
+    }
 
-    let _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
-    _start = _this.$UTILS.dateConv(new Date(_start));
-    let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
-    _end = _this.$UTILS.dateConv(new Date(_end));
-    if(this.$route.query.start){
-      _start=this.$route.query.start
-    }
-    if(this.$route.query.end){
-      _end=this.$route.query.end
-    }
-    this.start = _start;
-    this.end = _end;
-    this.temstart = _start; 
-    this.temend = _end;
-    // this.oldstart = _start;
-    // this.oldend = _end;
-    this.getAmount();
-    this.getTicketList();
-    this.getdata();
-    this.actday = this.days[0].title;
-  },
-  components:{
-      newtime:function(){
-        return newtime = this.start  + this.end
+    this.$axios.get("/api/app/act/getDate").then(res => {
+      res.data.data =res.data.data.replace(/(-)/g, '/');
+      this.today =res.data.data;
+      let _date =this.today;
+      let _mindata =
+        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
+      this.mindata = new Date(_mindata);
+      let _maxdata =
+        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
+      this.maxdata = new Date(_maxdata);
+
+
+   
+      let _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime();
+      _start = _this.$UTILS.dateConv(new Date(_start));
+      let _end = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000;
+      _end = _this.$UTILS.dateConv(new Date(_end));
+
+      if (this.$route.query.start) {
+        _start = this.$route.query.start;
+        _end = this.$route.query.end;
+        this.actday = this.$route.query.actday;
       }
-  },
-  watch:{
-      newtime:function(){
-        this.page = 1;
-        this.getdata();
-        this.getAmount();
-        this.getTicketList();
+
+      this.start = _start;
+      this.end = _end;
+      this.temstart = _start;
+      this.temend = _end;
+      // this.oldstart = _start;
+      // this.oldend = _end;
+      this.getAmount();
+      this.getTicketList();
+      this.getdata();
+      if(!this.actday){
+        this.actday = this.days[0].title;
       }
+    });
+  },
+  components: {
+    newtime: function() {
+      return (newtime = this.start + this.end);
+    }
+  },
+  watch: {
+    newtime: function() {
+      this.page = 1;
+      this.getdata();
+      this.getAmount();
+      this.getTicketList();
+    }
   },
   store,
   computed: {
     ...mapState(["shopId"])
   },
   methods: {
+    init: function(val) {
+      
+    },
     openPicker(val) {
       this.actval = val;
       this.$refs.picker.open();
     },
     handleConfirm() {
       this.allLoaded = true;
-      let _this = this,date = _this.$UTILS.dateConv(this.pickerValue);
+      let _this = this,
+        date = _this.$UTILS.dateConv(this.pickerValue);
       if (this.actval == 1) {
         this.temstart = date;
       } else if (this.actval == 2) {
@@ -217,6 +232,10 @@ export default {
       }
     },
     // 时间判断
+    closemore:function(){
+      this.temend = this.end;
+      this.temstart = this.start;
+    },
     cfrm: function() {
       if (this.temstart && this.temend) {
         let _start = new Date(this.temstart);
@@ -234,8 +253,8 @@ export default {
           this.getdata(this.start, this.end);
         } else {
           Toast("结束时间不能小于开始时间");
-          this.temend=this.end;
-          this.temstart=this.start;
+          this.temend = this.end;
+          this.temstart = this.start;
         }
       } else if (!this.temstart || !this.temend) {
         Toast("请选择开始时间或结束时间");
@@ -260,23 +279,23 @@ export default {
       return false;
       let id = e.currentTarget.id;
 
-      this.$router.push({ name: "Writeoff", params: { id: id,type:1} });
+      this.$router.push({ name: "Writeoff", params: { id: id, type: 1 } });
     },
     // 选择日期
     selectday: function(e) {
       this.allLoaded = true;
-      let _this = this;
+      let _this = this,_date = this.today;;
       this.actday = e.currentTarget.id;
-      let _date = new Date();
-      let _start = "",_deff = 60 * 60 * 24 * 1000;
-      let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + _deff * 1;
+      let _start = "",
+        _deff = 60 * 60 * 24 * 1000;
+      let _end = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + _deff * 1;
       _end = _this.$UTILS.dateConv(new Date(_end));
-      this.end = _end; 
-      this.page=1;
+      this.end = _end;
+      this.page = 1;
       // this.oldend = _end;
       this.votes = [];
       if (this.actday == "今日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
+        _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime();
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
         // this.oldstart = _start;
@@ -284,7 +303,7 @@ export default {
         this.getTicketList();
         this.getdata();
       } else if (this.actday == "7日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 7;
+        _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - _deff * 7;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
         // this.oldstart = _start;
@@ -292,7 +311,7 @@ export default {
         this.getTicketList();
         this.getdata();
       } else if (this.actday == "15日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 15;
+        _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - _deff * 15;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
         // this.oldstart = _start;
@@ -304,10 +323,11 @@ export default {
     // 获取营业总额
     getAmount(start, end) {
       let obj = {
-        shopId: this.shopId,
-        beginTime: start?start:this.start,
-        endTime: end?end:this.end
-      }, _value = "";
+          shopId: this.shopId,
+          beginTime: start ? start : this.start,
+          endTime: end ? end : this.end
+        },
+        _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
@@ -322,10 +342,11 @@ export default {
     // 获取核销券数
     getTicketList(start, end) {
       let obj = {
-        shopId: this.shopId,
-        begainTime: start?start:this.start,
-        endTime: end?end:this.end
-      }, _value = "";
+          shopId: this.shopId,
+          begainTime: start ? start : this.start,
+          endTime: end ? end : this.end
+        },
+        _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
@@ -334,15 +355,15 @@ export default {
       });
     },
     //获取列表数据
-    getdata: function(start, end,val,type) {
-      Indicator.open('数据加载中...');
+    getdata: function(start, end, val, type) {
+      Indicator.open("数据加载中...");
       let obj = {
         shopId: this.shopId,
         soStatus: 2,
-        beginTime: start?start:this.start,
-        endTime: end?end:this.end,
-        page:val?val:this.page,
-        rows:10
+        beginTime: start ? start : this.start,
+        endTime: end ? end : this.end,
+        page: val ? val : this.page,
+        rows: 10
       };
       // this.oldstart == start;
       // this.oldend == end;
@@ -358,24 +379,26 @@ export default {
           let _data = res.data.data;
           this.orderNum = _data.total ? _data.total : 0;
           if (_data.list) {
-            if(this.page == 1){
+            if (this.page == 1) {
               this.votes = [];
             }
-            if(_data.list.length>0){
-              for(let j=0;j<_data.list.length;j++){
-                if(/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
-                  _data.list[j].userName = _data.list[j].userName.substring(0,3) + "******" + _data.list[j].userName.substring(9,11);
+            if (_data.list.length > 0) {
+              for (let j = 0; j < _data.list.length; j++) {
+                if (/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
+                  _data.list[j].userName =
+                    _data.list[j].userName.substring(0, 3) +
+                    "******" +
+                    _data.list[j].userName.substring(9, 11);
                 }
-                this.votes.push(_data.list[j])
+                this.votes.push(_data.list[j]);
               }
               if (_data.list.length < 10) {
                 this.allLoaded = false;
               }
-            }else{
-                this.allLoaded = false;
+            } else {
+              this.allLoaded = false;
             }
-          }else{
-            
+          } else {
             this.allLoaded = false;
           }
         }
@@ -427,8 +450,7 @@ export default {
     },
     touchStart(e) {
       let dishesUl = document.getElementById("income");
-      let bottomH =
-        document.getElementById("filling").clientHeight;
+      let bottomH = document.getElementById("filling").clientHeight;
       this.touchStartY = e.targetTouches[0].pageY;
       if (this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
@@ -439,7 +461,12 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
-      if (Math.abs(this.getScrollHeight()-this.getScrollTop()-this.getWindowHeight())<5&&this.allLoaded) {
+      if (
+        Math.abs(
+          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
+        ) < 5 &&
+        this.allLoaded
+      ) {
         this.bottomFlag = true;
       } else {
         this.bottomFlag = false;
@@ -501,8 +528,9 @@ export default {
       let obj = {
         start: this.start,
         end: this.end,
-      }
-      this.$router.push({name: 'Bill', params: obj});
+        actday:this.actday
+      };
+      this.$router.push({ name: "Bill", params: obj });
     }
   }
 };
@@ -511,12 +539,12 @@ export default {
 <style lang="less">
 .income {
   .income_top {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-      background-color: #fc5e2d;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fc5e2d;
   }
   p {
     margin: 0;
@@ -608,7 +636,7 @@ export default {
         box-sizing: border-box;
         text-align: left;
         background-color: #fff;
-        color: #B1B1B1;
+        color: #b1b1b1;
         font-size: 22px;
         & > div {
           flex: direction-flex;
@@ -645,17 +673,17 @@ export default {
         }
       }
       .loadingBox {
-          background-color: #EBEBEB;
-          text-align: center;
-          height: 30px;
-          line-height: 30px;
-          width: 100%;
-          padding: 0;
-          margin: 0;
-          display: block;
-          position: absolute;
-          bottom: -30px;
-          left: 0;
+        background-color: #ebebeb;
+        text-align: center;
+        height: 30px;
+        line-height: 30px;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        display: block;
+        position: absolute;
+        bottom: -30px;
+        left: 0;
       }
     }
   }
@@ -695,21 +723,21 @@ export default {
         font-style: normal;
         border-bottom: 1px solid #b1b1b1;
       }
-      .adays:nth-last-child(1){
+      .adays:nth-last-child(1) {
         border: none;
       }
     }
   }
-  .filling{
+  .filling {
     width: 100%;
     height: 460px;
   }
-  .inbox{
+  .inbox {
     position: absolute;
     top: 460px;
     width: 100%;
     height: 870px;
-    background-color: #EBEBEB;
+    background-color: #ebebeb;
   }
   .select {
     width: 672px;
@@ -736,7 +764,7 @@ export default {
         text-align: left;
         width: 80%;
         margin-left: 10%;
-        span{
+        span {
           color: #fc5e2d;
         }
       }

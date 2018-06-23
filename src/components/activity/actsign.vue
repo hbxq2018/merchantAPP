@@ -9,8 +9,8 @@
         <div class="signcell">
             <!-- <mt-cell title="标题文字" icon="more" value="带 icon"></mt-cell> -->
             <mt-cell title="招牌菜" is-link :value="fascia" :to="{path:'/dishes',query:{type:2}}"></mt-cell>
-            <mt-cell title="原价" :value="Original"><input type="number" :placeholder="Original" v-model="Original"></mt-cell>
-            <mt-cell title="活动价" :value="Activity"><input type="number" :placeholder="Activity" v-model="Activity"></mt-cell>
+            <mt-cell title="原价" :value="Original"><input type="number" :placeholder="Original" v-on:blur="changeOriginal" v-model="Original"></mt-cell>
+            <mt-cell title="活动价" :value="Activity"><input type="number" :placeholder="Activity" v-on:blur="changeActivity" v-model="Activity"></mt-cell>
             <mt-cell title="平台售价" :value="platform"></mt-cell>
         </div>
         <div class="directions">
@@ -28,7 +28,6 @@ import { Field, Toast } from "mint-ui";
 Vue.component(Field.name, Field);
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
-import { formatDate } from "../../../untils/util";
 export default {
   name: "actsign",
   data() {
@@ -39,7 +38,8 @@ export default {
       fascia: "选择招牌菜",
       Original: "请输入原价(元)",
       Activity: "请输入活动价(元)",
-      platform: "享7平台价格"
+      platform: "享7平台价格",
+      today:''
     };
   },
   store,
@@ -57,7 +57,7 @@ export default {
       }
       if (this.Original != "请输入原价(元)") {
         this.Original = Math.round(this.Original);
-        if(!isNaN(this.Activity * 1) && !isNaN(this.Original * 1)){
+         if(!isNaN(this.Activity * 1) && !isNaN(this.Original * 1)){
           if (this.Activity * 1 > this.Original * 1) {
             Toast("活动价不能高于原价");
             // this.Original = "请输入原价(元)"
@@ -92,6 +92,19 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo", "setshopId", "setshopInfo"]),
     //生成券
+    changeOriginal:function(){
+      console.log(this.Original)
+      if(this.Original*1<2){
+          Toast("原价应不少于2元");
+          this.Original = "请输入原价(元)";
+      }
+    },
+    changeActivity:function(){
+      if(this.Activity*1<1){
+        Toast("原价应不少于1元");
+        this.Activity = "请输入活动价(元)";
+      }
+    },
     savesign: function() {
       if(!this.isfirst){
         return false
@@ -115,9 +128,9 @@ export default {
           stockNum: 9999,
           opreatorId: this.shopInfo.id,
           opreatorName: this.shopInfo.userName,
-          sellPrice: this.Original,
+          sellPrice: this.platform,
           inPrice: 20,
-          agioPrice: this.Activity
+          agioPrice: this.platform
         };
         for (var key in obj) {
           _value += key + "=" + obj[key] + "&";
@@ -125,9 +138,10 @@ export default {
         _value = _value.substring(0, _value.length - 1);
         this.$axios.post("/api/app/sku/addSku?" + _value).then(res => {
           if (res.data.code == 0) {
+            this.skugId = res.data.data;
             this.skuupdata();
             this.getdishdata();
-            this.skugId = res.data.data;
+            
           }
         });
       }
@@ -172,13 +186,14 @@ export default {
     //查询已报名菜品数量
     getdishdata: function() {
       // console.log("API:", this.API.API);
-      let date = new Date(),
+      let date = this.today,
         begain = "",
         _end = "",
         _value = "",
         _parms = {};
-      begain = formatDate(date, "yyyy/MM/dd");
-      _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
+        let _arr = date.split(" ");
+      begain = _arr[0].replace(/-/g,'/');
+      _end = new Date(this.$UTILS.dateConv(new Date(date))).getTime() + 86400000;
       _end = this.$UTILS.dateConv(new Date(_end));
       _parms = {
         actId: 37,
@@ -261,13 +276,14 @@ export default {
     },
     //查询已报名菜品
     getdishdata: function() {
-      let date = new Date(),
+      let date = this.today,
         begain = "",
         _end = "",
         _value = "",
         _parms = {};
-      begain = formatDate(date, "yyyy/MM/dd");
-      _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
+      let _arr = date.split(" ");
+      begain = _arr[0].replace(/-/g,'/');
+      _end = new Date(this.$UTILS.dateConv(new Date(date))).getTime() + 86400000;
       _end = this.$UTILS.dateConv(new Date(_end));
       _parms = {
         actId: 37,
@@ -287,7 +303,6 @@ export default {
           let _list = res.data.data.list;
           console.log('list:',_list)
           if( _list && _list.length>4){
-            console.log('111111111')
               this.$router.push({ name: "Actdetails", params: {} });
           }
         }
@@ -295,6 +310,10 @@ export default {
     }
   },
   created: function() {
+    this.$axios.get("/api/app/act/getDate").then(res => {
+      res.data.data =res.data.data.replace(/(-)/g, '/');
+      this.today = res.data.data;
+    })
     if (this.$route.params.name) {
       this.fascia = this.$route.params.name;
       this.isfirst= true;

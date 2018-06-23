@@ -12,7 +12,7 @@
       </div>
       <div class="detailsSon_top"  v-if="isbill != 1">
         <p>4月剩余应缴服务费</p>
-        <p>¥{{money}}</p>
+        <p>¥{{diff}}</p>
         <p>本月总服务费¥{{money}}，已缴¥{{service}}</p>
       </div>
       <div class="murcielago" v-if="first.totalService">
@@ -41,13 +41,14 @@
 <script>
 import store from "@/vuex/store";
 import Vue from "vue";
-import { Loadmore ,Indicator} from "mint-ui";
+import { Loadmore ,Indicator ,Toast} from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   data() {
     return {
       payment: "",
+      diff:'',
       total: "",
       first: {},
       writedata: [],
@@ -119,6 +120,8 @@ export default {
                 this.allLoaded = false;
               }
             } else {
+              Toast("没有更多数据了");
+              Indicator.close();
               this.allLoaded = false;
             }
           } else {
@@ -259,6 +262,7 @@ export default {
     this.money = this.$route.params.money;
     this.totalNoService = this.$route.params.totalNoService;
     this.service=(this.money*1-this.totalNoService*1).toFixed(2);
+     this.diff = (this.money*1-this.service*1).toFixed(2);
     this.getdata(this.pag);
   }
 };

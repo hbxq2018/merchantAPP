@@ -23,7 +23,7 @@
                     <div class="dishinfo">
                         <p>{{item.actSkuName}}</p>
                         <p>{{item.skuCode}}号</p>
-                        <p><span>活动价: ¥{{item.agioPrice}}</span><span><s>原价：¥{{item.sellPrice}}</s></span></p>
+                        <p><span>活动价: ¥{{item.jianAmount}}</span><span><s>原价：¥{{item.manAmount}}</s></span></p>
                     </div>
                     <div class="dishticket">
                         {{item.voteNum}}票
@@ -39,7 +39,6 @@ import store from "@/vuex/store";
 import { Toast,Indicator } from "mint-ui";
 import { mapState, mapMutations, mapGetters } from "vuex";
 import qs from "qs";
-import { formatDate } from "../../../untils/util";
 import GLOBAL from "../../../untils/config/config";
 export default {
   name: "actdetails",
@@ -50,7 +49,8 @@ export default {
       _type: "",
       morebj: require("../../../static/images/notsign.png"),
       actdata: {},
-      dishdata: []
+      dishdata: [],
+      today:''
     };
   },
   store,
@@ -83,13 +83,14 @@ export default {
     },
     getdishdata: function() {
       // console.log("API:", this.API.API);
-      let date = new Date(),
+      let date = this.today,
         begain = "",
         _end = "",
         _value = "",
         _parms = {};
-      begain = formatDate(date, "yyyy/MM/dd");
-      _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
+      let _arr = date.split(" ");
+      begain = _arr[0].replace(/-/g,'/');
+      _end = new Date(this.$UTILS.dateConv(new Date(date))).getTime() + 86400000;
       _end = this.$UTILS.dateConv(new Date(_end));
       _parms = {
         actId: 37,
@@ -131,6 +132,12 @@ export default {
     }
   },
   created() {
+    this.$axios.get("/api/app/act/getDate").then(res => {
+      res.data.data =res.data.data.replace(/(-)/g, '/');
+      this.today = res.data.data;
+      this.getactdata();
+      this.getdishdata();
+    })
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this._type = 4;
@@ -141,8 +148,7 @@ export default {
     } else {
       this._type = 2;
     }
-    this.getactdata();
-    this.getdishdata();
+    
   }
 };
 </script>

@@ -13,15 +13,15 @@
                 <p>添加菜品图片</p>
             </div>
             <img v-if="picUrl"  class="uploadPic" :src="picUrl" alt="" >
-            <input type="file" ref="foodsPic" @change="getFile">
+            <input v-if="this.isSign != 1" type="file" ref="foodsPic" @change="getFile">
         </div>
 
         <div class="form_item clearfix">
             <span class="fl">推荐菜名</span>
-            <input class="fr" type="text" placeholder="例:红烧肉" v-model="skuName" maxlength="13">
+            <input class="fr" type="text" :disabled="isSign == 1" placeholder="例:红烧肉" v-model="skuName" maxlength="13">
         </div>
         <div class="form_area">
-            <textarea name="" id="" cols="30" rows="6" placeholder="推荐菜简介..." v-model="skuInfo" maxlength="300"></textarea>
+            <textarea name="" id="" cols="30" :disabled="isSign == 1" rows="6" placeholder="推荐菜简介..." v-model="skuInfo" maxlength="300"></textarea>
         </div>
     </div>
     <div class="addDish_bot" v-if="id">
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { MessageBox, Toast,Indicator } from "mint-ui";
+import { MessageBox, Toast, Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -43,7 +43,9 @@ export default {
       id: "",
       picUrl: "",
       skuName: "",
-      skuInfo: ""
+      skuInfo: "",
+      isSign: "0",
+      isdisabled:false
     };
   },
   store,
@@ -74,9 +76,13 @@ export default {
       });
     },
     getFile: function(e) {
+      if (this.isSign == 1) {
+        Toast("已报名菜品不可修改编辑！");
+        return false
+      } 
       Indicator.open({
-        text: '图片上传中...',
-        spinnerType: 'triple-bounce'
+        text: "图片上传中...",
+        spinnerType: "triple-bounce"
       });
       //上传图片
       let _this = this,
@@ -112,34 +118,43 @@ export default {
           Toast("系统繁忙请稍后再试");
         });
     },
-    deleteMeal() {      //删除该推荐菜
-      let _this = this;          
-      MessageBox.confirm("确定删除?").then(
-        action => {
-          this.$axios
-          .post("/api/app/sku/delete?id=" + this.id)
-          .then(res => {
-            if (res.data.code != 0) {
-              Toast("系统繁忙请稍后再试");
-              return false;
-            }
-            Toast("该商品已删除");
-            _this.$router.push({path: '/dishes'})
-          })
-          .catch(err => {
-            Toast("系统繁忙请稍后再试");
-          });
-        },
-        () => {
-          
-        }
-      );
+    deleteMeal() {
+      //删除该推荐菜
+      let _this = this;
+      if (this.isSign == 1) {
+        Toast("已报名菜品不可修改和删除！");
+      } else {
+        MessageBox.confirm("确定删除?").then(
+          action => {
+            this.$axios
+              .post("/api/app/sku/delete?id=" + this.id)
+              .then(res => {
+                if (res.data.code != 0) {
+                  Toast("系统繁忙请稍后再试");
+                  return false;
+                }
+                Toast("该商品已删除");
+                _this.$router.push({ path: "/dishes" });
+              })
+              .catch(err => {
+                Toast("系统繁忙请稍后再试");
+              });
+          },
+          () => {}
+        );
+      }
     },
-    getBack() {     //返回
-        this.$router.push({ path: "/dishes" });
+    getBack() {
+      //返回
+      this.$router.push({ path: "/dishes" });
     },
     save() {
-      let _this = this,  saveUrl = "add/?", _param = "";
+      if(this.isSign == 1){
+        return false
+      }
+      let _this = this,
+        saveUrl = "add/?",
+        _param = "";
       if (!this.picUrl) {
         Toast("请上传推荐菜图片!");
         return false;
@@ -153,18 +168,18 @@ export default {
         return false;
       }
       let data = {
-            skuType: "2",
-            stockNum: "9999",
-            opreatorId: this.shopInfo.id,
-            shopId: this.userInfo.id,
-            opreatorName: this.shopInfo.userName,
-            skuName: this.skuName,
-            picUrl: this.picUrl,
-            skuInfo: this.skuInfo
+        skuType: "2",
+        stockNum: "9999",
+        opreatorId: this.shopInfo.id,
+        shopId: this.userInfo.id,
+        opreatorName: this.shopInfo.userName,
+        skuName: this.skuName,
+        picUrl: this.picUrl,
+        skuInfo: this.skuInfo
       };
-      if(_this.id) {
-          data.id = _this.id;
-          saveUrl = "update/?"
+      if (_this.id) {
+        data.id = _this.id;
+        saveUrl = "update/?";
       }
       for (var key in data) {
         _param += key + "=" + data[key] + "&";
@@ -187,9 +202,16 @@ export default {
   },
   created: function() {
     if (this.$route.params.id) {
+      this.isSign = this.$route.params.isSign;
+      if(this.isSign == 1){
+        this.isdisabled = true;
+      }else{
+        this.isdisabled= false;
+      }
       this.id = this.$route.params.id;
       this.getDishes();
     }
+   
   }
 };
 </script>
@@ -199,7 +221,7 @@ export default {
   background-color: #ebebeb;
   height: 100%;
   .addDishesBox {
-     padding-top: 90px;
+    padding-top: 90px;
     .addPicBox {
       padding-top: 60px;
       // min-height: 300px;
@@ -208,7 +230,7 @@ export default {
       background-color: #fff;
       margin-bottom: 20px;
       position: relative;
-      overflow:hidden;
+      overflow: hidden;
       .placeHolder {
         img {
           height: 135px;
@@ -234,8 +256,8 @@ export default {
       .uploadPic {
         max-width: 750px;
         background-color: #fff;
-        background-repeat: no-repeat;  
-        background-size: 100% 100%; 
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
         position: relative;
         left: 0;
         top: -60px;
@@ -261,6 +283,7 @@ export default {
         color: #b1b1b1;
         text-align: right;
         font-size: 28px;
+        background: #fff;
       }
     }
     .form_area {
@@ -272,6 +295,7 @@ export default {
         box-sizing: border-box;
         border: 0;
         color: #b1b1b1;
+        background: #fff;
       }
     }
   }

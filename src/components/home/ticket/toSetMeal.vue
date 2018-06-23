@@ -160,9 +160,6 @@ export default {
         _this.mainObj = JSON.parse(skuInfo[0]);
         _this.otherObj = JSON.parse(skuInfo[1]);
         _this.remarkObj = JSON.parse(skuInfo[2]);
-        console.log(_this.mainObj)
-        console.log(_this.otherObj)
-        console.log(_this.remarkObj)
       });
     },
     getFile: function(e) {

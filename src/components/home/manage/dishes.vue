@@ -13,7 +13,7 @@
 						<p>{{item.skuName}}</p>
 						<p>{{item.skuInfo}}</p>
 					</div>
-          <span class="issign" v-if="item.isSign">已报名</span>
+          <span class="issign" v-if="type == 2 && item.isSign">已报名</span>
           <div v-if="type == 2 && !item.isSign" :class="index == ind?'dishsel actdishsel':'dishsel'">
                     <span></span>
                 </div>
@@ -62,11 +62,11 @@ export default {
       Indicator.open('数据加载中...');
       let _this = this,
         _param = "";
-        if(this.type == 2){
+        // if(this.type == 2){
           _param = "shopId=" + this.userInfo.id +"&actId=37"+ "&page=" + this.page + "&rows=8";
-        }else{
-          _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
-        }
+        // }else{
+        //   _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
+        // }
       this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
@@ -98,7 +98,7 @@ export default {
           this.$router.push({ name: "Actsign", params: { name: name, id: id } });
         }
       }else{
-        this.$router.push({ name: "AddDishes", params: { id: id } });
+        this.$router.push({ name: "AddDishes", params: { id: id ,isSign:isSign} });
       }
     },
     getScrollTop() {

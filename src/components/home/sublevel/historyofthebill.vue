@@ -31,7 +31,7 @@
 
 <script>
 import { formatDate } from "../../../../untils/util";
-import { InfiniteScroll,Indicator } from "mint-ui";
+import { InfiniteScroll, Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -39,12 +39,13 @@ export default {
   data() {
     return {
       time: "",
-      data: []
+      data: [],
+      today:''
     };
   },
   filters: {
     formatDate() {
-      var date = new Date();
+      let date = this.today;
       let mon = date.getFullYear();
       let _data = formatDate(date, "yyyy-MM-dd hh:mm");
       return mon;
@@ -56,50 +57,59 @@ export default {
   },
   methods: {
     particularsDetails: function(ind) {
-      let _ind = this.data.length-ind,isbill = this.data[ind].isBill,money= this.data[ind].totalService,totalNoService=this.data[ind].totalNoService;
+      let _ind = this.data.length - ind,
+        isbill = this.data[ind].isBill,
+        money = this.data[ind].totalService,
+        totalNoService = this.data[ind].totalNoService;
       let obj = {
-        ind:_ind,
-        isBill:isbill,
-        money:money,
-        totalNoService:totalNoService
-        }
+        ind: _ind,
+        isBill: isbill,
+        money: money,
+        totalNoService: totalNoService
+      };
       this.$router.push({ name: "DetailsSon", params: obj });
     },
-    moreyear:function(){
-      console.log('moreyear')
+    moreyear: function() {
+      console.log("moreyear");
     }
   },
   created: function() {
-    Indicator.open('数据加载中...');
+    Indicator.open("数据加载中...");
     let _this = this;
-    let _date = new Date();
-    let _start =_this.$UTILS.dateConv(_date);
-    let arr = _start.split("/");
-    arr[1]= '01';
-    arr[2] = "01";
-    _start = arr.join("/");
-    let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
-    _end = _this.$UTILS.dateConv(new Date(_end));
-    let obj = {
-      shopId: this.shopId,
-      begainTime: _start,
-      endTime: _end
-    };
-    let parms = "",value = "";
-    for (var key in obj) {
-      value += key + '=' + obj[key] + '&';
-    }
-    value = value.substring(0, value.length-1);
-    this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
-      if (res.data.code == 0) {
-        let _data =[];
-         for(key in res.data.data){
-           _data.push(res.data.data[key])
-         }
-        _data.reverse();
-        Indicator.close();
-        _this.data = _data;
+    this.$axios.get("/api/app/act/getDate").then(res => {
+      res.data.data =res.data.data.replace(/(-)/g, '/');
+      this.today = res.data.data;
+      let _date = new Date(res.data.data);
+      
+      let _start = _this.$UTILS.dateConv(_date);
+      let arr = _start.split("/");
+      arr[1] = "01";
+      arr[2] = "01";
+      _start = arr.join("/");
+      let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
+      _end = _this.$UTILS.dateConv(new Date(_end));
+      let obj = {
+        shopId: this.shopId,
+        begainTime: _start,
+        endTime: _end
+      };
+      let parms = "",
+        value = "";
+      for (var key in obj) {
+        value += key + "=" + obj[key] + "&";
       }
+      value = value.substring(0, value.length - 1);
+      this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
+        if (res.data.code == 0) {
+          let _data = [];
+          for (key in res.data.data) {
+            _data.push(res.data.data[key]);
+          }
+          _data.reverse();
+          Indicator.close();
+          _this.data = _data;
+        }
+      });
     });
   }
 };
@@ -108,10 +118,10 @@ export default {
 <style lang="less">
 .billCheck {
   width: 100%;
-  height:94%;
+  height: 94%;
   padding-top: 10%;
   background: #ebebeb;
- 
+
   .check_top {
     width: 100%;
     height: 80px;
@@ -121,10 +131,10 @@ export default {
     align-items: center;
     letter-spacing: 2px;
     .check_top_time {
-       width: 90%;
+      width: 90%;
       height: 80px;
       text-align: left;
-      margin-left:5%;
+      margin-left: 5%;
       line-height: 80px;
       font-size: 30px;
       color: #808080;
@@ -172,10 +182,10 @@ export default {
         span {
           vertical-align: margin;
           font-size: 28px;
-          color: #B1B1B1;
+          color: #b1b1b1;
         }
-        .actspan{
-          color: #FC5E2D;
+        .actspan {
+          color: #fc5e2d;
         }
         img {
           width: 12px;

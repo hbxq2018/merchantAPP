@@ -1,7 +1,7 @@
 <template>
   <div class="awriteoff">
         <mt-header :title="title" class="income_header">
-            <router-link to="/income" slot="left">
+            <router-link :to="{path:'/bill',query:{start:start,end:end,actday:actday}}" slot="left">
                 <mt-button icon="back"></mt-button>
             </router-link>
 		</mt-header>
@@ -19,6 +19,9 @@ export default {
   data(){
       return{
           title:'订单记录',
+          start: '',
+          end: '',
+          actday:'',
           data:[
               {
                   title:'10元代金券',
@@ -64,7 +67,6 @@ export default {
       this.$axios.get(url+id)
         .then((res) => {
             if(res.data.code ==  '0'){
-                console.log('res:',res)
                let _data = res.data.data;
                this.data[0].title = _data.couponAmount+'元代金券';
                this.data[1].value = '¥ '+_data.shopAmount;
@@ -90,7 +92,9 @@ export default {
     //   app/so/getForOrder/
     if(this.$route.params.id){
       let id = this.$route.params.id,type= this.$route.params.type;
-
+      this.start= this.$route.params.start;
+      this.end= this.$route.params.end;
+      this.actday= this.$route.params.actday;
       this.getdata(id,type);
     }
   }

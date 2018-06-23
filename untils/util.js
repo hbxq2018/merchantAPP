@@ -121,6 +121,14 @@ function dateConv(dateStr) {
   return year + "/" + month + "/" + today;
 }
 
+
+
+
+
+
+
+
+
 const methods = {
   calcDistance: calcDistance,
   transformLength: transformLength,

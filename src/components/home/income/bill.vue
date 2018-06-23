@@ -2,7 +2,7 @@
     <div class="bill">
 		<div class="bill_top">
             <mt-header fixed title="营业数据" class="bill_header">
-                <router-link :to="{path:'/income',query:{start:start,end:end,}}" slot="left">
+                <router-link :to="{path:'/income',query:{start:start,end:end,actday:actday}}" slot="left">
                     <mt-button icon="back"></mt-button>
                 </router-link>
                 <mt-button @click="turnmore(1)" slot="right" class="bill_header_date">{{actday}}</mt-button>
@@ -34,7 +34,7 @@
                     <div @click.stop="openPicker(2)">结束时间：<span>{{temend}}</span></div>
                 </div>
                 <div class="selbut">
-                    <div class="close">取消</div>
+                    <div class="close"  @click="closemore">取消</div>
                     <div class="cfrm" @click="cfrm">确定</div>
                 </div>
             </div>
@@ -67,6 +67,7 @@
         <mt-datetime-picker
                 ref="picker"
                 type="date"
+                v-if="maxdata"
                 year-format="{value} 年"
                 month-format="{value} 月"
                 date-format="{value} 日"
@@ -81,7 +82,7 @@
 
 <script>
 import Vue from "vue";
-import { DatetimePicker, Toast,Loadmore,Indicator} from "mint-ui";
+import { DatetimePicker, Toast, Loadmore, Indicator } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker);
 Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
@@ -92,8 +93,8 @@ export default {
     return {
       start: "",
       end: "",
-      temstart:"",
-      temend:"",
+      temstart: "",
+      temend: "",
       actval: "",
       orderNum: "0",
       totalCost: 0,
@@ -117,7 +118,7 @@ export default {
         }
       ],
       votes: [],
-      page:1,
+      page: 1,
       allLoaded: true,
       scrollMode: "auto",
       touchStartY: 0,
@@ -125,51 +126,67 @@ export default {
       topFlag: false, //是否到顶部
       bottomFlag: false, //是否到底部
       flag: true, //节流阀
-      loadFlag: false
+      loadFlag: false,
+      today:''
     };
   },
   created: function() {
     let _this = this;
     const ua = navigator.userAgent.toLowerCase();
-      if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
-        this.scrollMode = 'touch';
-      }
-    let _date = new Date();
-    let _mindata =
-      new Date(_this.$UTILS.dateConv(_date)).getTime() - 86400000 * 365;
-    this.mindata = new Date(_mindata);
-    let _maxdata =
-      new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000 * 365 * 3;
-    this.maxdata = new Date(_maxdata);
-
-    let _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
-    _start = _this.$UTILS.dateConv(new Date(_start));
-    let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
-    _end = _this.$UTILS.dateConv(new Date(_end));
-    if(this.$route.params.start){
-       _start=this.$route.params.start;
+    if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+      this.scrollMode = "touch";
     }
-    if(this.$route.params.end){
-       _end=this.$route.params.end;
-    }
-    this.start = _start;
-    this.end = _end;
-    this.temstart = _start; 
-    this.temend = _end;
 
-    this.getdata();
-    this.actday = this.days[0].title;
-  },
-  components:{
-      newtime:function(){
-        return newtime = this.start  + this.end
+    this.$axios.get("/api/app/act/getDate").then(res => {
+      res.data.data =res.data.data.replace(/(-)/g, '/');
+       this.today =res.data.data;
+      let _date = new Date(this.today);
+      // this.today =_date;
+      let _mindata =
+        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
+      this.mindata = new Date(_mindata);
+      let _maxdata =
+        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
+      this.maxdata = new Date(_maxdata);
+
+      let _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime();
+      _start = _this.$UTILS.dateConv(new Date(_start));
+      let _end = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000;
+      _end = _this.$UTILS.dateConv(new Date(_end));
+
+
+      if (this.$route.query.start) {
+        _start = this.$route.query.start;
+        _end = this.$route.query.end;
+        this.actday = this.$route.params.actday;
       }
-  },
-  watch:{
-      newtime:function(){
-        this.page = 1;
-        this.getdata();
+      if (this.$route.params.start) {
+        _start = this.$route.params.start;
+        _end = this.$route.params.end;
+        this.actday = this.$route.params.actday;
       }
+      this.start = _start;
+      this.end = _end;
+      this.temstart = _start;
+      this.temend = _end;
+
+      this.getdata();
+      if(!this.actday){
+        this.actday = this.days[0].title;
+      }
+      
+    });
+  },
+  components: {
+    newtime: function() {
+      return (newtime = this.start + this.end);
+    }
+  },
+  watch: {
+    newtime: function() {
+      this.page = 1;
+      this.getdata();
+    }
   },
   store,
   computed: {
@@ -182,7 +199,8 @@ export default {
     },
     handleConfirm() {
       this.allLoaded = true;
-      let _this = this,date = _this.$UTILS.dateConv(this.pickerValue);
+      let _this = this,
+        date = _this.$UTILS.dateConv(this.pickerValue);
       if (this.actval == 1) {
         this.temstart = date;
       } else if (this.actval == 2) {
@@ -196,6 +214,10 @@ export default {
       }
     },
     // 时间判断
+    closemore:function(){
+      this.temend = this.end;
+      this.temstart = this.start;
+    },
     cfrm: function() {
       if (this.temstart && this.temend) {
         let _start = new Date(this.temstart);
@@ -211,8 +233,8 @@ export default {
           this.getdata(this.start, this.end);
         } else {
           Toast("结束时间不能小于开始时间");
-          this.temend=this.end;
-          this.temstart=this.start;
+          this.temend = this.end;
+          this.temstart = this.start;
         }
       } else if (!this.temstart || !this.temend) {
         Toast("请选择开始时间或结束时间");
@@ -235,48 +257,56 @@ export default {
     // 跳转至详情
     getliid: function(e) {
       let id = e.currentTarget.id;
-      this.$router.push({ name: "Writeoff", params: { id: id,type:2 } });
+      let obj = {
+         id: id, 
+         type: 2,
+        start: this.start,
+        end: this.end,
+        actday: this.actday
+      };
+      this.$router.push({ name: "Writeoff", params: obj });
     },
     // 选择日期
     selectday: function(e) {
       this.allLoaded = true;
-      let _this = this;
+      let _this = this,_date = this.today;
       this.actday = e.currentTarget.id;
-      let _date = new Date();
-      let _start = "",_deff = 60 * 60 * 24 * 1000;
-      let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + _deff * 1;
-      _end = _this.$UTILS.dateConv(new Date(_end));
-      this.end = _end; 
-      this.page=1;
+      let _start = "",
+        _deff = 60 * 60 * 24 * 1000;
+      let _end = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + _deff * 1;
+      _end = _this.$UTILS.dateConv(new Date(new Date(_date)));
+      this.end = _end;
+      this.page = 1;
       // this.oldend = _end;
       this.votes = [];
       if (this.actday == "今日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime();
+        _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime();
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
         this.getdata();
       } else if (this.actday == "7日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 7;
+        _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - _deff * 7;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
         this.getdata();
       } else if (this.actday == "15日") {
-        _start = new Date(_this.$UTILS.dateConv(_date)).getTime() - _deff * 15;
+        _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - _deff * 15;
         _start = _this.$UTILS.dateConv(new Date(_start));
         this.start = _start;
         this.getdata();
       }
     },
     //获取列表数据
-    getdata: function(start,end,val) {
-      Indicator.open('数据加载中...');
+    getdata: function(start, end, val) {
+      Indicator.open("数据加载中...");
       let obj = {
-        shopId: this.shopId,
-        begainTime: start?start:this.start,
-        endTime: end?end:this.end,
-        page:val?val:this.page,
-        rows:10
-      }, _value = "";
+          shopId: this.shopId,
+          begainTime: start ? start : this.start,
+          endTime: end ? end : this.end,
+          page: val ? val : this.page,
+          rows: 10
+        },
+        _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
@@ -287,27 +317,30 @@ export default {
           let _data = res.data.data;
           this.orderNum = _data.total ? _data.total : 0;
           if (_data.list) {
-            if(_data.list.length>0){
-              if(this.page == 1) {
-                  this.votes = [];
-                  this.totalCost = _data.list[0].totalService;
+            if (_data.list.length > 0) {
+              if (this.page == 1) {
+                this.votes = [];
+                this.totalCost = _data.list[0].totalService;
               }
               _data.list = _data.list.slice(1, _data.list.length);
-              for(let j=0;j<_data.list.length;j++){
-                if(/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
-                  _data.list[j].userName = _data.list[j].userName.substring(0,3) + "******" + _data.list[j].userName.substring(9,11);
+              for (let j = 0; j < _data.list.length; j++) {
+                if (/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
+                  _data.list[j].userName =
+                    _data.list[j].userName.substring(0, 3) +
+                    "******" +
+                    _data.list[j].userName.substring(9, 11);
                 }
                 Indicator.close();
-                this.votes.push(_data.list[j])
+                this.votes.push(_data.list[j]);
               }
               if (_data.list.length < 10) {
                 this.allLoaded = false;
               }
-            }else{
+            } else {
               Indicator.close();
               this.allLoaded = false;
             }
-          }else{
+          } else {
             Indicator.close();
             this.allLoaded = false;
           }
@@ -360,8 +393,7 @@ export default {
     },
     touchStart(e) {
       let dishesUl = document.getElementById("bill");
-      let bottomH =
-        document.getElementById("filling").clientHeight;
+      let bottomH = document.getElementById("filling").clientHeight;
       this.touchStartY = e.targetTouches[0].pageY;
       if (this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
@@ -372,7 +404,12 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
-      if (Math.abs(this.getScrollHeight()-this.getScrollTop()-this.getWindowHeight())<5&&this.allLoaded) {
+      if (
+        Math.abs(
+          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
+        ) < 5 &&
+        this.allLoaded
+      ) {
         this.bottomFlag = true;
       } else {
         this.bottomFlag = false;
@@ -435,13 +472,13 @@ export default {
 
 <style lang="less">
 .bill {
-    background-color: #EBEBEB;
+  background-color: #ebebeb;
   .bill_top {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
   }
   p {
     margin: 0;
@@ -515,52 +552,51 @@ export default {
         color: #555555;
         font-size: 22px;
         .bill_li_name {
-            font-size: 30px;
-            color: #191919;
-            font-weight: 600;
-            width: 100%;
-            margin-bottom: 20px;
+          font-size: 30px;
+          color: #191919;
+          font-weight: 600;
+          width: 100%;
+          margin-bottom: 20px;
         }
         .bill_li_info {
-            width: 100%;
-            clear: both;
-            content: "";
-            display: block;
-            overflow: hidden;
-            .left {
-                float: left;
-                p {
-                    margin-bottom: 10px;
-                }
-                p:last-child {
-                    margin-bottom: 0;
-                }
+          width: 100%;
+          clear: both;
+          content: "";
+          display: block;
+          overflow: hidden;
+          .left {
+            float: left;
+            p {
+              margin-bottom: 10px;
             }
-            .right {
-                float: left;
-                margin-left: 20px;
-                p {
-                    margin-bottom: 10px;
-                }
-                p:last-child {
-                    margin-bottom: 0;
-                }
+            p:last-child {
+              margin-bottom: 0;
             }
+          }
+          .right {
+            float: left;
+            margin-left: 20px;
+            p {
+              margin-bottom: 10px;
+            }
+            p:last-child {
+              margin-bottom: 0;
+            }
+          }
         }
-        
       }
       .loadingBox {
-          background-color: #EBEBEB;
-          text-align: center;
-          height: 30px;
-          line-height: 30px;
-          width: 100%;
-          padding: 0;
-          margin: 0;
-          display: block;
-          position: absolute;
-          bottom: -30px;
-          left: 0;
+        background-color: #ebebeb;
+        text-align: center;
+        height: 30px;
+        line-height: 30px;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        display: block;
+        position: absolute;
+        bottom: -30px;
+        left: 0;
       }
     }
   }
@@ -600,17 +636,17 @@ export default {
         font-style: normal;
         border-bottom: 1px solid #b1b1b1;
       }
-      .adays:nth-last-child(1){
+      .adays:nth-last-child(1) {
         border: none;
       }
     }
   }
-  .filling{
+  .filling {
     width: 100%;
     height: 200px;
   }
-  .billbox{
-    background-color: #EBEBEB;
+  .billbox {
+    background-color: #ebebeb;
     min-height: 1130px;
   }
   .select {
@@ -638,7 +674,7 @@ export default {
         text-align: left;
         width: 80%;
         margin-left: 10%;
-        span{
+        span {
           color: #fc5e2d;
         }
       }

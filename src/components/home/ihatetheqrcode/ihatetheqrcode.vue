@@ -80,17 +80,14 @@ export default {
       }
       var a = document.createElement("a");
       var event = new MouseEvent("click");
-
       a.download = name || name;
       a.href = url;
-
       a.dispatchEvent(event);
     }
   },
    created() {
     this.getshopimgs();
   }
-
 };
 </script>
 <style lang="less">
@@ -150,4 +147,3 @@ export default {
   }
 }
 </style>
-
