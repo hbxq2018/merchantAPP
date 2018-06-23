@@ -7,11 +7,11 @@
 			</div>
 			<form class="login_form">
 				<div class="login_form_tele">
-					<input type="number" class="login_form_inp" maxlength="11" placeholder="请输入手机号" v-model="telephone">
+					<input type="number" class="login_form_inp" max="11" placeholder="请输入手机号" v-model="telephone">
 					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
 				</div>
 				<div class="login_form_code">
-					<input type="number" class="login_form_inp" maxlength="4" placeholder="请输入验证码" v-model="password" @keyup.enter="verification">
+					<input type="number" class="login_form_inp" max="4" placeholder="请输入验证码" v-model="password" @keyup.enter="verification">
 				</div>
 				<div class="login_form_btn">
 					<button type="button" @click="verification"></button>
@@ -38,6 +38,7 @@ export default {
     return {
       API: GLOBAL.GLOBAL_API_DOMAIN,
       screenHeight: document.body.clientHeight,
+      isfrist: true,
       movieArr: [],
       veridyBtn: "获取验证码",
       telephone: "", //手机号
@@ -53,7 +54,7 @@ export default {
       iconUrl: "", //头像
       isSignWX: false, //是否登陆微信
       wxType: 0, //微信返回信息的格式
-      isinme:false
+      isinme: false
     };
   },
   store,
@@ -81,14 +82,14 @@ export default {
       if (!this.timeFlag) {
         return false;
       }
+      _this.timeFlag = false;
       let RegExp = /^(1[3584]\d{9})$/;
       if (RegExp.test(this.telephone)) {
         // this.$GLOBAL.API  <==> /api/    上线时所有替换
         console.log("this.telephone:", this.telephone);
         this.$axios
           .post(
-              "api/app/sms/sendForShopAppRegister?shopMobile=" +
-              this.telephone
+            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
           )
           .then(res => {
             let data = res.data;
@@ -96,7 +97,6 @@ export default {
               let minutes = "",
                 senconds = "",
                 countdown = 60;
-              _this.timeFlag = false;
               _this.verifyCode = data.data.verifyId;
               let timer = setInterval(() => {
                 countdown--;
@@ -122,48 +122,53 @@ export default {
             console.log(err);
           });
       } else {
+        _this.timeFlag = true;
         this.telephone = "";
         Toast("请填写正确的手机号");
       }
     },
     verification() {
       //判断输入验证码是否正确
-      let _parms = {
+      let _parms = {},
+        _this = this,
+        value = "";
+      if (!this.telephone) {
+        Toast("请输入电话号码");
+      } else if (!this.password) {
+        Toast("请输入短信验证码");
+      } else {
+        _parms = {
           shopMobile: this.telephone,
           smsContent: this.password
-        },
-        value = "",
-        _this = this;
-      for (var key in _parms) {
-        value += key + "=" + _parms[key] + "&";
-      }
-      value = value.substring(0, value.length - 1);
-      this.$axios
-        .get(
-          "api/app/sms/isVerifyForShopApp?" + value,
-          qs.stringify(_parms)
-        )
-        .then(res => {
-          if (res.data.code == 0) {
-            if (_this.wxType == 0) {
-              _this.signIn();
+        };
+        for (var key in _parms) {
+          value += key + "=" + _parms[key] + "&";
+        }
+        value = value.substring(0, value.length - 1);
+        this.$axios
+          .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+          .then(res => {
+            if (res.data.code == 0) {
+              if (_this.wxType == 0) {
+                _this.signIn();
+              } else {
+                _this.addWXInfo();
+              }
             } else {
-              _this.addWXInfo();
+              Toast("输入信息有误");
             }
-          } else {
-            Toast("输入信息有误");
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     },
     signIn(val) {
       //商家注册
       let _this = this;
       let mobile = val ? val : this.telephone;
       this.$axios
-        .get("api/app/user/findUserByMobile?mobile=" + mobile)
+        .get("/api/app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
           _this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -181,9 +186,9 @@ export default {
             ) {
               //商家
               localStorage.setItem("userId", res.data.data.id);
-              mui.plusReady(function() {  
-                  var tool = new igexinTool();  
-                  tool.bindAlias(res.data.data.id);  
+              mui.plusReady(function() {
+                var tool = new igexinTool();
+                tool.bindAlias(res.data.data.id);
               });
               _this.setshopId(res.data.data.shopId);
               _this.getshopinfo(res.data.data.shopId);
@@ -205,7 +210,7 @@ export default {
         unionId: this.unionId //微信unionId
       };
       this.$axios
-        .post("api/app/user/addAppUser", qs.stringify(_parms))
+        .post("/api/app/user/addAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.upDateUserInfo();
@@ -226,10 +231,7 @@ export default {
         sex: this.sex
       };
       this.$axios
-        .post(
-          "api/app/user/updateByMobile",
-          qs.stringify(_parms)
-        )
+        .post("/api/app/user/updateByMobile", qs.stringify(_parms))
         .then(res => {
           console.log(res);
           if (res.data.code == 0) {
@@ -246,10 +248,7 @@ export default {
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post(
-          "api/app/user/addShopAppUser",
-          qs.stringify(_parms)
-        )
+        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -265,7 +264,7 @@ export default {
     getshopinfo: function(id) {
       //获取商家信息
       let _this = this;
-      this.$axios.get("api/shop/get/" + id).then(res => {
+      this.$axios.get("/api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.$router.push({ name: "Home" });
@@ -277,7 +276,7 @@ export default {
       //判断商家是否在审核中
       let _this = this;
       this.$axios
-        .get("api/app/shopEnter/searchByUserId?userId=" + id)
+        .get("/api/app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
@@ -326,6 +325,7 @@ export default {
               break;
             }
           }
+          console.log("ssss:",s)
           if (!s.authResult) {
             s.login(
               function(e) {
@@ -344,10 +344,10 @@ export default {
                       ? s.userInfo.unionid
                       : "";
                     _this.isSignWX = true;
-                    // _this.$axios.get("api/app/user/findByOpenId/" + _this.openId, {})
+                    // _this.$axios.get("/api/"app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
-                          "api/app/user/findByOpIdAndUnId/?openId=" +
+                        "/api/app/user/findByOpIdAndUnId/?openId=" +
                           _this.openId +
                           "&unionId=" +
                           _this.unionId,
@@ -390,6 +390,67 @@ export default {
             );
           } else {
             console.log("已经登陆认证！");
+             s.login(
+              function(e) {
+                console.log("登陆认证成功！");
+                s.getUserInfo(
+                  function(e) {
+                    var josnStr = JSON.stringify(s.userInfo);
+                    var jsonObj = s.userInfo;
+                    console.log("获取用户信息成功：" + josnStr);
+                    //通过openId查询用户信息
+                    _this.sex = s.userInfo.sex;
+                    _this.nickName = s.userInfo.nickname;
+                    _this.iconUrl = s.userInfo.headimgurl;
+                    _this.openId = s.userInfo.openid;
+                    _this.unionId = s.userInfo.unionid
+                      ? s.userInfo.unionid
+                      : "";
+                    _this.isSignWX = true;
+                    // _this.$axios.get("/api/"app/user/findByOpenId/" + _this.openId, {})
+                    _this.$axios
+                      .get(
+                        "/api/app/user/findByOpIdAndUnId/?openId=" +
+                          _this.openId +
+                          "&unionId=" +
+                          _this.unionId,
+                        {}
+                      )
+                      .then(res => {
+                        let data = res.data,
+                          type = 0; //type为1是表示无数据，2表示有数据无手机号/昵称/头像，3数据完整
+                        console.log(data);
+                        if (data.code == 0) {
+                          if (
+                            data.data == null ||
+                            data.data == "" ||
+                            data.data == undefined ||
+                            !data.data.mobile
+                          ) {
+                            _this.wxType = 1;
+                            Toast("微信授权成功,请绑定手机号");
+                          } else {
+                            Toast("微信登陆成功");
+                            _this.telephone = data.data.mobile;
+                            _this.upDateUserInfo();
+                          }
+                        }
+                      })
+                      .catch(err => {
+                        console.log(err);
+                      });
+                  },
+                  function(e) {
+                    console.log(
+                      "获取用户信息失败：" + e.message + " - " + e.code
+                    );
+                  }
+                );
+              },
+              function(e) {
+                console.log("登陆认证失败！");
+              }
+            );
           }
         },
         function(e) {
@@ -411,41 +472,47 @@ export default {
     }
   },
   created() {
-    let _this = this,_arr=[],_audio=null;
+    let _this = this,
+      _arr = [],
+      _audio = null;
     this.setScroll();
     let userId = localStorage.getItem("userId");
     if (userId) {
       mui.plusReady(function() {
         var tool = new igexinTool();
         tool.bindAlias(userId);
-        plus.push.addEventListener("receive", function (msg) {
-          console.log('login_receive_msg:',msg)
-          if (msg.aps) {  // Apple APNS message
-            console.log("接收到在线APNS消息：");
-            _arr = msg.payload.split(",")
-            if(_arr[0] == 1){ 
-              _this.$router.push({ path: '/income'})
-            }else if(_arr[0] ==2){
-              _this.$router.push({ path: '/historyse'})
-            }else{
-              _this.$router.push({ path: '/income'})
+        plus.push.addEventListener(
+          "receive",
+          function(msg) {
+            console.log("login_receive_msg:", msg);
+            if (msg.aps) {
+              // Apple APNS message
+              console.log("接收到在线APNS消息：");
+              _arr = msg.payload.split(",");
+              if (_arr[0] == 1) {
+                _this.$router.push({ path: "/income" });
+              } else if (_arr[0] == 2) {
+                _this.$router.push({ path: "/historyse" });
+              } else {
+                _this.$router.push({ path: "/income" });
+              }
+            } else {
+              console.log("接收到在线透传消息login：");
+              _arr = msg.payload.split(",");
+              if (_arr[0] == 1) {
+                _this.$router.push({ path: "/income" });
+              } else if (_arr[0] == 2) {
+                _this.$router.push({ path: "/historyse" });
+              } else {
+                _this.$router.push({ path: "/income" });
+              }
             }
-          } else {
-            console.log("接收到在线透传消息login：");
-            _arr = msg.payload.split(",")
-            if(_arr[0] == 1){ 
-              _this.$router.push({ path: '/income'})
-            }else if(_arr[0] ==2){
-              _this.$router.push({ path: '/historyse'})
-            }else{
-              _this.$router.push({ path: '/income'})
-            }
-            
-          }
-        }, false);
+          },
+          false
+        );
       });
-      
-      this.$axios.get("api/app/user/get/" + userId).then(res => {
+
+      this.$axios.get("/api/app/user/get/" + userId).then(res => {
         if (
           res.data.code == "0" &&
           res.data.data != null &&

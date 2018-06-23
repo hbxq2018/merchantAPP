@@ -48,6 +48,7 @@ export default {
         }
       ],
       money: "",
+      jianAmount:'',
       skulist: [],
       ticketlist: [],
       actvalue: {}
@@ -65,6 +66,9 @@ export default {
   methods: {
      ...mapMutations(['setuserInfo']),
     onValuesChange(picker, values) {
+      console.log('picker:',picker)
+      console.log('values:',values[0])
+      this.jianAmount = values[0];
       if (values[0] > values[1]) {
         picker.setSlotValue(1, values[0]);
       }
@@ -87,6 +91,8 @@ export default {
         Toast("请输入金额");
       }else if(!this.actvalue.id){
         Toast("请选择满减金额");
+      }else if(this.money*1 < this.jianAmount*1){
+        Toast("满额应该比减额大");
       }else if(this.money && this.actvalue.id) {
         let desc = "满" + this.money + "减" + this.actvalue.inPrice + "元";
         let obj = {
@@ -95,6 +101,8 @@ export default {
           skuName: this.actvalue.skuName,
           ruleType: 1,
           ruleDesc: desc,
+          manAmount:this.money,
+          jianAmount:this.jianAmount,
           shopId: this.shopId
         };
         let _value = "";
@@ -102,7 +110,7 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("api/app/pnr/add?" + _value).then(res => {
+        this.$axios.post("/api/app/pnr/add?" + _value).then(res => {
           if (res.data.code == "0") {
             this.money = '';
             this.actvalue = {};
@@ -115,7 +123,7 @@ export default {
     },
     delticket: function(e) {
       const ind = e.currentTarget.id;
-      this.$axios.get("api/app/pnr/delete/" + ind).then(res => {
+      this.$axios.get("/api/app/pnr/delete/" + ind).then(res => {
         if (res.data.code == "0") {
           Toast("删除成功");
           this.getticketlist();
@@ -123,7 +131,7 @@ export default {
       });
     },
     getticketlist: function() {
-      this.$axios.get("api/app/pnr/selectByShopId?shopId=" + this.shopId)
+      this.$axios.get("/api/app/pnr/selectByShopId?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == "0") {
             let data = res.data.data;
@@ -137,7 +145,7 @@ export default {
         });
     },
     getskulist: function() {
-      this.$axios.get("api/app/sku/list").then(res => {
+      this.$axios.get("/api/app/sku/list").then(res => {
         if (res.data.code == "0") {
           let data = res.data.data.list.slice(1);
           let _arr = [];

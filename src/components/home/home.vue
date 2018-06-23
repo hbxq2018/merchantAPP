@@ -35,7 +35,7 @@ export default {
   },
   store,
   computed: {
-    ...mapState(["userInfo", "shopId"])
+    ...mapState(["userInfo", "shopId","ismine"])
   },
   watch:{
     ispush:function(){
@@ -45,17 +45,19 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setuserInfo"]),
+    ...mapMutations(["setuserInfo","setismine"]),
     gomenu: function() {
+      this.setismine(1);
       this.ismenu = true;
     },
     gomine: function() {
+      this.setismine(2);
       this.ismenu = false;
     },
     getshopinfo: function() {
       //获取商家信息
       this.$axios
-        .get("api/shop/get/" + this.shopId)
+        .get("/api/shop/get/" + this.shopId)
         .then(res => {
           if (res.data.code == "0") {
             let data = res.data.data;
@@ -67,7 +69,11 @@ export default {
   created: function() {
     // this.getshopinfo();
     // console.log("userInfo:",this.userInfo)
+    quit = true;
     if (this.$route.query.ind == "2") {
+      this.ismenu = false;
+    }
+    if(this.ismine == 2){
       this.ismenu = false;
     }
     

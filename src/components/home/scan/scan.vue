@@ -58,7 +58,7 @@ export default {
         console.log('result:',result)
         console.log('file:',file)
         if (type == 0) {
-          if(result.indexOf("www.hbxq001.cn") > 0 ){
+          if(result.indexOf("www.hbxq001.cn") > 0 || result.indexOf("www.xq0036.top") > 0){
             let arr = result.split("/");
             if (typeof (arr[arr.length - 1] * 1) == "number") {
               that.codenum = arr[arr.length - 1]; //获取券码
@@ -83,7 +83,7 @@ export default {
     getbycode: function(val) { //获取票券信息
     console.log('getbycode:')
       this.$axios
-        .get("api/app/cp/getByCode/" + val)
+        .get("/api/app/cp/getByCode/" + val)
         .then(res => {
           let data = res.data;
           console.log("getbycode_res:",res)

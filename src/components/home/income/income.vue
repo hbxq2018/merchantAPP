@@ -162,7 +162,12 @@ export default {
     _start = _this.$UTILS.dateConv(new Date(_start));
     let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
     _end = _this.$UTILS.dateConv(new Date(_end));
-
+    if(this.$route.query.start){
+      _start=this.$route.query.start
+    }
+    if(this.$route.query.end){
+      _end=this.$route.query.end
+    }
     this.start = _start;
     this.end = _end;
     this.temstart = _start; 
@@ -306,7 +311,7 @@ export default {
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
-      this.$axios.get("api/app/so/totalAmount?" + _value).then(res => {
+      this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
         if (res.data.code == 0 && res.data.data) {
           this.totalPrice = res.data.data;
         } else {
@@ -324,7 +329,7 @@ export default {
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
-      this.$axios.get("api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         this.total = res.data.data.total;
       });
     },
@@ -346,7 +351,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("api/app/so/myorderForShop?" + _value).then(res => {
+      this.$axios.get("/api/app/so/myorderForShop?" + _value).then(res => {
         Indicator.close();
         if (res.data.code == 0) {
           this.loadFlag = false;
@@ -493,7 +498,11 @@ export default {
     },
     //跳转至核销列表页面
     bill() {
-      this.$router.push({name: 'Bill', params: {}});
+      let obj = {
+        start: this.start,
+        end: this.end,
+      }
+      this.$router.push({name: 'Bill', params: obj});
     }
   }
 };

@@ -27,7 +27,7 @@ export default {
             //   src: "../../../../static/images/xiang7Logo.png",
               src: require("../../../../static/images/xiang7Logo.png"),
               name:'版本号:',
-              versionNumber:'1.1.3',
+              versionNumber:'V1.0',
           },
           data1:[
             {

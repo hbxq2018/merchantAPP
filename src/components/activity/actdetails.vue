@@ -5,7 +5,9 @@
                 <mt-button icon="back"></mt-button>
             </router-link>
         </mt-header>
-        <img class="actimg" :src="actdata.mainPic" alt="活动图片">
+        <div class="actimg">
+          <img :src="actdata.mainPic" alt="活动图片">
+        </div>
         <div class="actname">
             <p>{{actdata.actName}}</p>
             <p>人气：{{actdata.viewNum}}</p>
@@ -72,7 +74,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("api/app/act/detail?" + _value).then(res => {
+      this.$axios.get("/api/app/act/detail?" + _value).then(res => {
         if (res.data.code == 0) {
           Indicator.close();
           this.actdata = res.data.data;
@@ -102,7 +104,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("api/app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
           this.dishdata = res.data.data.list;
         }
@@ -157,6 +159,11 @@ export default {
     margin-top: 80px;
     width: 100%;
     height: 420px;
+    overflow: hidden;
+    &>img{
+      max-width: 750px;
+      height: 100%;
+    }
   }
   .actname {
     width: 694px;
@@ -195,7 +202,8 @@ export default {
       color: #fc5e2d;
       padding: 10px 20px;
       display: inline-block;
-      border: 1px solid #fc5e2d;
+      border: 2px solid #fc5e2d;
+      z-index: 2;
     }
     & > span:nth-child(1) {
       margin-right: 150px;

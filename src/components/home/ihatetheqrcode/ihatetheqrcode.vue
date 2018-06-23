@@ -52,7 +52,7 @@ export default {
   text: '图片加载中...',
   spinnerType: 'fading-circle'
 })
-      this.$axios.get("api/app/shop/CreateCode?id=" + this.userInfo.id+'&shopCode='+this.userInfo.shopCode).then(res => {
+      this.$axios.get("/api/app/shop/CreateCode?id=" + this.userInfo.id+'&shopCode='+this.userInfo.shopCode).then(res => {
         if(res.data.code == 0){
             Indicator.close();
             this.imgs = res.data.data;

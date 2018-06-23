@@ -94,6 +94,7 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo"]),
     clickli: function(e) {
+      quit = false;
       const ind = e.currentTarget.id;
       if (ind == 1) {
         this.$router.push({ path: "/scan" });
@@ -112,6 +113,7 @@ export default {
       }
     },
     clickact: function() {
+      quit = false;
       this.$router.push({ path: "/Actdetails" });
     }
   },
@@ -182,9 +184,10 @@ export default {
       }
     }
   }
+
   .menu_content {
     overflow: hidden;
-    margin-top: 310px;
+    padding: 300px 0 230px 0;
     & > .conul {
       padding: 0;
       margin: 0;

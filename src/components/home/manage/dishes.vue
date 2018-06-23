@@ -67,7 +67,7 @@ export default {
         }else{
           _param = "shopId=" + this.userInfo.id + "&page=" + this.page + "&rows=8";
         }
-      this.$axios.get("api/app/sku/tsc?" + _param).then(res => {
+      this.$axios.get("/api/app/sku/tsc?" + _param).then(res => {
         if (res.data.code == 0) {
           let lists = res.data.data.list;
           if (lists && lists.length > 0) {

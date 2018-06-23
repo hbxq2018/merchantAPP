@@ -1,7 +1,7 @@
-// const BASEURL = "https://www.hbxq001.cn/";
-const BASEURL = "https://www.xq0036.top/";
+const BASEURL = "https://www.hbxq001.cn/";  //正式服务器
+// const BASEURL = "https://www.xq0036.top/";  //测试服务器
 const config = {
-  API: BASEURL,  //服务器域名
+  API: BASEURL,  
 };
 // export default config;
 module.exports = config;

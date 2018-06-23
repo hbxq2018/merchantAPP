@@ -2,7 +2,7 @@
     <div class="bill">
 		<div class="bill_top">
             <mt-header fixed title="营业数据" class="bill_header">
-                <router-link to="/income" slot="left">
+                <router-link :to="{path:'/income',query:{start:start,end:end,}}" slot="left">
                     <mt-button icon="back"></mt-button>
                 </router-link>
                 <mt-button @click="turnmore(1)" slot="right" class="bill_header_date">{{actday}}</mt-button>
@@ -146,11 +146,17 @@ export default {
     _start = _this.$UTILS.dateConv(new Date(_start));
     let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
     _end = _this.$UTILS.dateConv(new Date(_end));
-
+    if(this.$route.params.start){
+       _start=this.$route.params.start;
+    }
+    if(this.$route.params.end){
+       _end=this.$route.params.end;
+    }
     this.start = _start;
     this.end = _end;
     this.temstart = _start; 
     this.temend = _end;
+
     this.getdata();
     this.actday = this.days[0].title;
   },
@@ -275,7 +281,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         if (res.data.code == "0") {
           this.loadFlag = false;
           let _data = res.data.data;

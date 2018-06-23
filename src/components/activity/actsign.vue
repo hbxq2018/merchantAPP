@@ -99,7 +99,16 @@ export default {
       this.isfirst= false;
       let obj = {},
         _value = "";
-      if (this.checkdata()) {
+      if (this.fascia == "选择招牌菜" || !this.fascia) {
+        Toast("请选择要报名的菜品");
+        this.fascia == "选择招牌菜";
+      }else if (this.Original == "请输入原价(元)" || !this.Original) {
+        Toast("请输入菜品原价(元)");
+        this.fascia == "请输入原价(元)";
+      }else if (this.Activity == "请输入活动价(元)" || !this.Activity) {
+        Toast("请输入活动价(元)");
+        this.Activity == "请输入活动价(元)";
+      } else {
         obj = {
           skuName: this.platform + "元食典券",
           skuType: 3,
@@ -114,9 +123,10 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("api/app/sku/addSku?" + _value).then(res => {
+        this.$axios.post("/api/app/sku/addSku?" + _value).then(res => {
           if (res.data.code == 0) {
             this.skuupdata();
+            this.getdishdata();
             this.skugId = res.data.data;
           }
         });
@@ -126,7 +136,16 @@ export default {
     skuupdata: function() {
       let obj = {},
         _value = "";
-      if (this.checkdata()) {
+      if (this.fascia == "选择招牌菜" || !this.fascia) {
+        Toast("请选择要报名的菜品");
+        this.fascia == "选择招牌菜";
+      }else if (this.Original == "请输入原价(元)" || !this.Original) {
+        Toast("请输入菜品原价(元)");
+        this.fascia == "请输入原价(元)";
+      }else if (this.Activity == "请输入活动价(元)" || !this.Activity) {
+        Toast("请输入活动价(元)");
+        this.Activity == "请输入活动价(元)";
+      } else {
         obj = {
           skuName: this.fascia,
           skuType: 2,
@@ -143,12 +162,48 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("api/app/sku/update?" + _value).then(res => {
+        this.$axios.post("/api/app/sku/update?" + _value).then(res => {
           if (res.data.code == 0) {
             this.insertByRules();
           }
         });
       }
+    },
+    //查询已报名菜品数量
+    getdishdata: function() {
+      // console.log("API:", this.API.API);
+      let date = new Date(),
+        begain = "",
+        _end = "",
+        _value = "",
+        _parms = {};
+      begain = formatDate(date, "yyyy/MM/dd");
+      _end = new Date(this.$UTILS.dateConv(date)).getTime() + 86400000;
+      _end = this.$UTILS.dateConv(new Date(_end));
+      _parms = {
+        actId: 37,
+        beginTime: begain,
+        endTime: _end,
+        shopId:this.userInfo.id,
+        voteUserId: this.shopInfo.id,
+        isLuoxuan: 0,
+        flag: "1"
+      };
+      for (var key in _parms) {
+        _value += key + "=" + _parms[key] + "&";
+      }
+      _value = _value.substring(0, _value.length - 1);
+      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
+        if (res.data.code == 0) {
+          // this.dishdata = res.data.data.list;
+           let len = res.data.data.list.length;
+            if (len > 4) {
+              console.log('2222')
+              Toast("每家商家最多只能报名五道菜参赛，您已报名有五道菜了");
+              this.$router.push({ name: "Actdetails", params: {} });
+            } 
+        }
+      });
     },
     //新增活动推荐菜信息
     insertByRules: function() {
@@ -168,7 +223,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post("api/app/actSku/insertByRules?" + _value).then(res => {
+      this.$axios.post("/api/app/actSku/insertByRules?" + _value).then(res => {
         if (res.data.code == 0) {
           Toast("报名成功！");
           this.resetdata();
@@ -218,6 +273,7 @@ export default {
         actId: 37,
         beginTime: begain,
         endTime: _end,
+        shopId:this.userInfo.id,
         voteUserId: this.shopInfo.id,
         isLuoxuan: 0,
         flag: "1"
@@ -226,9 +282,12 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("api/app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
-          if(res.data.data.list.length>5){
+          let _list = res.data.data.list;
+          console.log('list:',_list)
+          if( _list && _list.length>4){
+            console.log('111111111')
               this.$router.push({ name: "Actdetails", params: {} });
           }
         }

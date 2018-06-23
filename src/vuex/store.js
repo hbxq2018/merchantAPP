@@ -7,7 +7,8 @@ const state={
     shopId: '',
     userInfo: {},  //此为商户信息
     shopInfo:{},       //此为用户信息
-    newUserInfo: {}
+    newUserInfo: {},
+    ismine:1
 }
 
 const mutations={
@@ -48,6 +49,9 @@ const mutations={
     },
     setshopInfo(state,data){
         state.shopInfo = data
+    },
+    setismine(state,data){
+        state.ismine = data
     }
 }
 

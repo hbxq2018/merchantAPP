@@ -115,7 +115,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("api/app/hx/list?" + _value).then(res => {
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let _data = res.data.data;
         let lists = [];
         if (_data.list) {

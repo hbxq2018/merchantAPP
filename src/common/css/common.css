@@ -146,6 +146,7 @@ ol {
 /* 以下是对Mint UI的样式进行修改 */
 .mint-header{
     background-color: #fc5e2d;
+    z-index: 999;
     /* position: fixed;
     top: 0;
     left: 0;

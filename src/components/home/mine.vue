@@ -69,6 +69,7 @@ export default {
       close:function(){
         MessageBox.confirm('确定要退出登录吗?').then(action => {
         if(action == 'confirm'){
+            quit = false;
             let obj={},id='';
             localStorage.setItem("userId",'');
             this.setuserInfo(obj)
@@ -80,7 +81,8 @@ export default {
       },()=>{});
       },
       WeIntroduce:function(e){
-          const listBoxID = e.currentTarget.id
+          const listBoxID = e.currentTarget.id;
+           quit = false;
           if(listBoxID ==3 ){
               this.$router.push('/aboutUs')
           }else if(listBoxID ==0){

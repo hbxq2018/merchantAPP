@@ -1,6 +1,6 @@
 <template>
   <div class="addDishes">
-    <mt-header :title="name">
+    <mt-header fixed :title="name">
         <router-link to="/dishes" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -8,11 +8,11 @@
     </mt-header>
     <div class="form addDishesBox">
         <div class="addPicBox">
-            <div class="placeHolder">
+            <div class="placeHolder" v-if="!picUrl">
                 <img src="../../../../static/images/camera.png" alt="">
                 <p>添加菜品图片</p>
             </div>
-            <img class="uploadPic" :src="picUrl" alt="" v-if="picUrl">
+            <img v-if="picUrl"  class="uploadPic" :src="picUrl" alt="" >
             <input type="file" ref="foodsPic" @change="getFile">
         </div>
 
@@ -21,7 +21,7 @@
             <input class="fr" type="text" placeholder="例:红烧肉" v-model="skuName" maxlength="13">
         </div>
         <div class="form_area">
-            <textarea name="" id="" cols="30" rows="10" placeholder="推荐菜简介..." v-model="skuInfo" maxlength="300"></textarea>
+            <textarea name="" id="" cols="30" rows="6" placeholder="推荐菜简介..." v-model="skuInfo" maxlength="300"></textarea>
         </div>
     </div>
     <div class="addDish_bot" v-if="id">
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { MessageBox, Toast } from "mint-ui";
+import { MessageBox, Toast,Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -61,7 +61,7 @@ export default {
         this.userInfo.id +
         "&zanUserId=" +
         this.shopInfo.id;
-      this.$axios.get("api/app/sku/getTscForZan?" + _param).then(res => {
+      this.$axios.get("/api/app/sku/getTscForZan?" + _param).then(res => {
         if (res.data.code != 0) {
           Toast("系统繁忙请稍后再试");
           _this.id = "";
@@ -74,6 +74,10 @@ export default {
       });
     },
     getFile: function(e) {
+      Indicator.open({
+        text: '图片上传中...',
+        spinnerType: 'triple-bounce'
+      });
       //上传图片
       let _this = this,
         inputDOM = {};
@@ -94,8 +98,9 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
       this.$axios
-        .post("api/app/img/upload", form)
+        .post("/api/app/img/upload", form)
         .then(res => {
+          Indicator.close();
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
             return false;
@@ -103,6 +108,7 @@ export default {
           _this.picUrl = res.data.data.picUrl;
         })
         .catch(err => {
+          Indicator.close();
           Toast("系统繁忙请稍后再试");
         });
     },
@@ -111,7 +117,7 @@ export default {
       MessageBox.confirm("确定删除?").then(
         action => {
           this.$axios
-          .post("api/app/sku/delete?id=" + this.id)
+          .post("/api/app/sku/delete?id=" + this.id)
           .then(res => {
             if (res.data.code != 0) {
               Toast("系统繁忙请稍后再试");
@@ -165,7 +171,7 @@ export default {
       }
       _param = _param.substring(0, _param.length - 1);
       this.$axios
-        .post("api/app/sku/" + saveUrl + _param)
+        .post("/api/app/sku/" + saveUrl + _param)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
@@ -193,17 +199,21 @@ export default {
   background-color: #ebebeb;
   height: 100%;
   .addDishesBox {
+     padding-top: 90px;
     .addPicBox {
       padding-top: 60px;
-      height: 312px;
+      // min-height: 300px;
+      height: 420px;
       box-sizing: border-box;
       background-color: #fff;
       margin-bottom: 20px;
       position: relative;
+      overflow:hidden;
       .placeHolder {
         img {
           height: 135px;
           width: 135px;
+          margin-top: 50px;
         }
         p {
           margin-top: 5px;
@@ -219,16 +229,17 @@ export default {
         position: absolute;
         left: 0;
         top: 0;
-        z-index: 100;
+        z-index: 1;
       }
       .uploadPic {
-        width: 100%;
-        height: 100%;
+        max-width: 750px;
         background-color: #fff;
-        position: absolute;
+        background-repeat: no-repeat;  
+        background-size: 100% 100%; 
+        position: relative;
         left: 0;
-        top: 0;
-        z-index: 50;
+        top: -60px;
+        // z-index: 50;
       }
     }
     .form_item {
@@ -256,7 +267,7 @@ export default {
       textarea {
         font-size: 28px;
         width: 100%;
-        height: 500px;
+        min-height: 200px;
         padding: 38px 30px;
         box-sizing: border-box;
         border: 0;

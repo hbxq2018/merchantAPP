@@ -1,6 +1,6 @@
 <template>
   <div class="toSetMeal">
-    <mt-header :title="name">
+    <mt-header fixed :title="name">
         <router-link to="/setMeal" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -8,7 +8,7 @@
     </mt-header>
     <div class="form toSetMealBox">
         <div class="addPicBox">
-            <div class="placeHolder">
+            <div class="placeHolder" v-if="!picUrl">
                 <img src="../../../../static/images/camera.png" alt="">
                 <p>添加商品图片</p>
             </div>
@@ -145,7 +145,7 @@ export default {
         this.userInfo.id +
         "&zanUserId=" +
         this.shopInfo.id;
-      this.$axios.get("api/app/sku/getAgio?" + _param).then(res => {
+      this.$axios.get("/api/app/sku/getAgio?" + _param).then(res => {
         if (res.data.code != 0) {
           Toast("系统繁忙请稍后再试");
           _this.id = "";
@@ -185,7 +185,7 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
       this.$axios
-        .post("api/app/img/upload", form)
+        .post("/api/app/img/upload", form)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
@@ -246,7 +246,7 @@ export default {
       MessageBox.confirm("确定删除?").then(
         action => {
           this.$axios
-          .post("api/app/sku/delete?id=" + this.id)
+          .post("/api/app/sku/delete?id=" + this.id)
           .then(res => {
             if (res.data.code != 0) {
               Toast("系统繁忙请稍后再试");
@@ -312,7 +312,7 @@ export default {
       }
       _param = _param.substring(0, _param.length - 1);
       this.$axios
-        .post("api/app/sku/" + saveUrl + _param)
+        .post("/api/app/sku/" + saveUrl + _param)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
@@ -340,13 +340,15 @@ export default {
   background-color: #ebebeb;
   height: 100%;
   .toSetMealBox {
+    padding-top: 80px;
     .addPicBox {
-      height: 312px;
+      height: 420px;
       box-sizing: border-box;
       background-color: #fff;
       margin-bottom: 20px;
       padding-top: 60px;
       position: relative;
+      overflow: hidden;
       .placeHolder {
         img {
           height: 135px;
@@ -369,13 +371,13 @@ export default {
         z-index: 100;
       }
       .uploadPic {
-        width: 100%;
-        height: 100%;
+        max-width: 750px;
         background-color: #fff;
-        position: absolute;
+        background-repeat: no-repeat;  
+        background-size: 100% 100%; 
+        position: relative;
         left: 0;
-        top: 0;
-        z-index: 50;
+        top: -60px;
       }
     }
     .form_name {
