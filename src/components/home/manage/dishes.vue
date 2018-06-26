@@ -257,6 +257,7 @@ export default {
     .dishesUl {
       width: 100%;
       position: relative;
+      background-color: #ebebeb;
       &:before {
         content: "加载中..";
         position: absolute;
