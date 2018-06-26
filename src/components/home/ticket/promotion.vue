@@ -6,16 +6,16 @@
         </router-link>
     </mt-header>
     <div class="promotionBox">
-        <div class="promotion_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id">
-            <router-link :to="item.href">
+        <router-link v-for="(item,index) in list" :key="index" :id="item.id" :to="item.href">
+            <div class="promotion_list clearfix">
                 <img class="icon fl" :src="item.url" alt="">
                 <div class="text fl">
                     <p>{{item.name}}</p>
                     <p>{{item.info}}</p>
                 </div>
                 <div class="arrow fr"></div>
-            </router-link>
-        </div>
+            </div>
+        </router-link>
     </div>
   </div>
 </template>
