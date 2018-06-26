@@ -1,6 +1,6 @@
 <template>
   <div class="settle">
-    <mt-header title="商家入驻">
+    <mt-header fixed title="商家入驻">
         <router-link to="/process" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -12,12 +12,12 @@
     <p class="form_title">商户信息</p>
     <div class="form">
         <mt-field label="申请人" placeholder="输入申请人姓名" type="text" v-model="userName"></mt-field>
-        <mt-field label="联系方式"  :attr="{ maxlength: 11 }" placeholder="输入手机或电话号码" type="number" v-model="phone"></mt-field>
+        <mt-field label="联系方式"  placeholder="输入手机或电话号码" type="number" v-model="phone"></mt-field>
         <mt-field label="店铺名称" placeholder="输入店铺的全称" type="text" v-model="shopName"></mt-field>
         <div class="category clearfix" @click="addrSlide">
           <div class="category_l">详细地址</div>
           <div class="category_r">
-            <span class="category_text fl">{{address}}</span>
+            <span class="category_text fl">{{address | capitalize}}</span>
             <span class="category_arrow fr"></span>
           </div>
         </div>
@@ -43,7 +43,8 @@
         <div class="q_item_r fl">
           <p>上传营业执照</p>
           <div class="files">
-            <img :src="licenseUrl" alt="">
+            <img :src="licenseUrl" alt="营业执照">
+            <span class="loadin" v-if="img1"><span class="line"></span><span class="inloadin"></span></span>
             <input type="file" @change="getFile(1)" ref="license">
           </div>
         </div>
@@ -53,7 +54,8 @@
         <div class="q_item_r fl">
           <p>上传卫生许可证</p>
           <div class="files">
-            <img :src="healthUrl" alt="">
+            <img :src="healthUrl" alt="卫生许可证">
+            <span class="loadin" v-if="img2"><span class="line"></span><span class="inloadin"></span></span>
             <input type="file" @change="getFile(2)" ref="health">
           </div>
         </div>
@@ -63,7 +65,8 @@
         <div class="q_item_r fl">
           <p>上传门头照(限1张)</p>
           <div class="files">
-            <img :src="ShopPhotoUrl" alt="">
+            <img :src="ShopPhotoUrl" alt="门头照">
+            <span class="loadin" v-if="img3"><span class="line"></span><span class="inloadin"></span></span>
             <input type="file" @change="getFile(3)" ref="ShopPhoto">
           </div>
         </div>
@@ -87,7 +90,7 @@
 import Vue from "vue";
 import axios from "axios";
 import qs from "qs";
-import { Field, Toast } from "mint-ui";
+import { Field, Toast, Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Field.name, Field);
@@ -98,7 +101,7 @@ export default {
       id: "",
       userName: "",
       phone: "",
-      ismobile:true, //联系方式是否是手机号 
+      ismobile: true, //联系方式是否是手机号
       shopName: "",
       address: "定位选择详细地址",
       isSeleAdd: false, //是否选择地址
@@ -108,20 +111,34 @@ export default {
       categoryTxt: "选择经营品类",
       milieuTxt: "选择环境分类",
       isSelected: false, //是否选择经营品类
-      defaultPic: require('../../../static/images/add.png'),   //默认图片
+      defaultPic: require("../../../static/images/add.png"), //默认图片
       licenseUrl: "",
       healthUrl: "",
-      ShopPhotoUrl: ""
+      ShopPhotoUrl: "",
+      img1: false,
+      img2: false,
+      img3: false
     };
   },
   store,
   computed: {
-    ...mapState(["newUserInfo",'shopInfo'])
+    ...mapState(["newUserInfo", "shopInfo", "userInfo"])
+  },
+  filters: { 
+    capitalize: function (value) { 
+      if (value.indexOf('-') > 0) {
+          let _value = value.replace(/-/g, "");
+          return _value;
+      }else{
+        return value;
+      }
+        
+    } 
   },
   methods: {
-    ...mapMutations(["setNewUserInfo"]),
+    ...mapMutations(["setNewUserInfo", "setuserInfo"]),
+    //跳转选择经营品类
     cateSlide() {
-      //跳转选择经营品类
       this.setdata();
       if (this.isSelected) {
         this.$router.push({
@@ -138,7 +155,7 @@ export default {
         params: { id: "2", txt: this.milieuTxt }
       });
     },
-    setdata(){
+    setdata() {
       this.setNewUserInfo({
         userName: this.userName,
         phone: this.phone,
@@ -152,11 +169,11 @@ export default {
         licenseUrl: this.licenseUrl,
         healthUrl: this.healthUrl,
         ShopPhotoUrl: this.ShopPhotoUrl,
-        id:this.id
+        id: this.id
       });
     },
+    //跳转选择位置
     addrSlide() {
-      //跳转选择位置
       this.setdata();
       this.$router.push({ path: "shopMap", query: { ind: "1" } });
     },
@@ -164,12 +181,14 @@ export default {
       //上传图片
       let _this = this,
         inputDOM = {};
-      // console.log(e);
       if (e == 1) {
+        _this.img1 = true;
         inputDOM = this.$refs.license;
       } else if (e == 2) {
+        _this.img2 = true;
         inputDOM = this.$refs.health;
       } else if (e == 3) {
+        _this.img3 = true;
         inputDOM = this.$refs.ShopPhoto;
       }
       // console.log(inputDOM);
@@ -199,10 +218,13 @@ export default {
             return false;
           }
           if (e == 1) {
+            this.img1 = false;
             _this.licenseUrl = res.data.data.smallPicUrl;
           } else if (e == 2) {
+            _this.img2 = false;
             _this.healthUrl = res.data.data.smallPicUrl;
           } else if (e == 3) {
+            _this.img3 = false;
             _this.ShopPhotoUrl = res.data.data.smallPicUrl;
           }
         })
@@ -227,12 +249,13 @@ export default {
         };
       }
     },
+    //跳转至地图定位页面
     addMap() {
-       this.setdata();
-      //跳转至地图定位页面
+      this.setdata();
       this.$router.push({ name: "ShopMap" });
     },
-    submitForm() {//提交表单
+    //提交表单
+    submitForm() {
       let _this = this;
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");
@@ -243,26 +266,26 @@ export default {
       let Reg2 = /^(1[3584]\d{9})$/;
       if (Reg1.test(this.phone)) {
         this.ismobile = false;
-      }else if(Reg2.test(this.phone)){
+      } else if (Reg2.test(this.phone)) {
         this.ismobile = true;
-      }else{
-         Toast("请输入联系方式");
-         return false
+      } else {
+        Toast("请输入联系方式");
+        return false;
       }
       if (this.isNull(this.shopName)) {
         Toast("请输入店铺名称");
         return false;
       }
-      if (this.isNull(this.address) || this.address == '"定位选择详细地址"') {
+      if (this.isNull(this.address) || this.address == "定位选择详细地址") {
         Toast("请输入详细地址");
         return false;
       }
-      if(this.isNull(this.categoryTxt) || this.categoryTxt =='选择经营品类') {
-        Toast('请输入经营品类');
+      if (this.isNull(this.categoryTxt) || this.categoryTxt == "选择经营品类") {
+        Toast("请输入经营品类");
         return false;
-      } 
-      if(this.isNull(this.milieuTxt) || this.milieuTxt =='选择环境分类') {
-        Toast('请输入环境分类');
+      }
+      if (this.isNull(this.milieuTxt) || this.milieuTxt == "选择环境分类") {
+        Toast("请输入环境分类");
         return false;
       }
       if (this.isNull(this.licenseUrl) || this.licenseUrl == this.defaultPic) {
@@ -273,7 +296,10 @@ export default {
         Toast("请上传卫生许可证");
         return false;
       }
-      if (this.isNull(this.ShopPhotoUrl) || this.ShopPhotoUrl == this.defaultPic) {
+      if (
+        this.isNull(this.ShopPhotoUrl) ||
+        this.ShopPhotoUrl == this.defaultPic
+      ) {
         Toast("请上传门头照");
         return false;
       }
@@ -288,14 +314,13 @@ export default {
         locationX: this.locationX,
         locationY: this.locationY,
         city: this.city,
-        userId: this.id?this.id:this.shopInfo.id
+        userId: this.id ? this.id : this.shopInfo.id
       };
-      if(this.ismobile){
+      if (this.ismobile) {
         _parms.mobile = this.phone;
-      }else{
+      } else {
         _parms.phone = this.phone;
       }
-    
       this.$axios
         .post("/api/app/shopEnter/add", qs.stringify(_parms))
         .then(res => {
@@ -305,9 +330,9 @@ export default {
           }
           if (res.data.code == 0) {
             Toast("提交成功，请等待审核");
-            setTimeout(function(){
-              _this.$router.push({name: "Examine",params:{status:0}})
-            },1500)
+            setTimeout(function() {
+              _this.$router.push({ name: "Examine", params: { status: 0 } });
+            }, 1500);
           }
         })
         .catch(err => {
@@ -335,20 +360,23 @@ export default {
     }
     if (this.$route.query.address) {
       let adr = this.$route.query;
-      this.address = adr.Province + adr.City + adr.county + adr.address;
-      (this.locationX = adr.lng),
-        (this.locationY = adr.lat),
-        (this.city = adr.City);
+      this.address =
+        adr.Province + "-" + adr.City + "-" + adr.county + "-" + adr.address;
+      this.locationX = adr.lng;
+      this.locationY = adr.lat;
+      this.city = adr.City;
       this.isSeleAdd = true;
+      this.setdata();
     }
     //获取到category的参数值
-
     if (this.$route.params.category) {
       if (this.$route.params.ismin) {
         this.milieuTxt = this.$route.params.category;
+        this.setdata();
       } else {
         this.categoryTxt = this.$route.params.category;
         this.isSelected = true;
+        this.setdata();
       }
     }
     if (this.$route.params.id) {
@@ -364,7 +392,7 @@ export default {
   background-color: #ebebeb;
   color: #b1b1b1;
   .settle_head {
-    margin-top: -1px;
+    padding-top: 78px;
     img {
       width: 100%;
     }
@@ -502,6 +530,38 @@ export default {
             opacity: 0;
             z-index: 100;
           }
+          .loadin {
+            margin-left: 35%;
+            margin-top: 35%;
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            position: relative;
+            background: rgb(136, 124, 124);
+            border-radius: 50%;
+            animation:mymove 1.5s linear infinite;
+            -webkit-animation:mymove 1.5s linear infinite; /*Safari and Chrome*/
+            .line{
+              position: relative;
+              left: 25px;
+
+              display: inline-block;
+              width: 20px;
+              height: 40px;
+              background: #fff;
+              z-index: 1;
+            }
+            .inloadin {
+              display: inline-block;
+              width: 40px;
+              height: 40px;
+              position: relative;
+              top: 10px;
+              left: -10px;
+              background: #fff;
+              border-radius: 50%;
+            }
+          }
         }
       }
     }
@@ -535,6 +595,23 @@ export default {
         margin: 19px 0;
       }
     }
+  }
+}
+@keyframes mymove {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}
+
+@-webkit-keyframes mymove /*Safari and Chrome*/ {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
   }
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="edit">
       <mt-header :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
-        <mt-button slot="right"  @click="save">保存</mt-button>
+        <!-- <mt-button slot="right"  @click="save">保存</mt-button> -->
       </mt-header> 
       <div class="edit_content">
         <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="联系电话" placeholder="请输入新联系电话" ref="phone" type="tel" ></mt-field>

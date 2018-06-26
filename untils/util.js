@@ -123,12 +123,6 @@ function dateConv(dateStr) {
 
 
 
-
-
-
-
-
-
 const methods = {
   calcDistance: calcDistance,
   transformLength: transformLength,

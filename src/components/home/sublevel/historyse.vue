@@ -16,7 +16,7 @@
         <p><span>{{time}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
     </div>
     <div id="hisbeijin" class="hisbeijin"></div>
-    <div class="hisbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+    <div class="hisbox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
         <ul id="history" class="history" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
           <li id="order_history" class="order_history" v-for="(item,index) in totalQuantity" :key="index">
               <div class="order_h_sublevel">
@@ -55,6 +55,7 @@ export default {
       totalQuantity: [],
       time: "",
       allLoaded: true,
+      oDvheight:'0px',
       scrollMode: "auto",
       touchStartY: 0,
       distance: 0,
@@ -79,7 +80,7 @@ export default {
     },
     //獲取核銷數據
     getdata: function(val, type) {
-      Indicator.open('数据加载中...');
+      // Indicator.open('数据加载中...');
       if (val == 1 || this.page ==1) {
         this.totalQuantity = [];
       }
@@ -123,13 +124,13 @@ export default {
           for (let i = 0; i < lists.length; i++) {
             this.totalQuantity.push(lists[i]);
           }
-          Indicator.close();
+          // Indicator.close();
           if (lists.length < 9) {
             this.allLoaded = false;
           }
         } else {
           Toast("没有更多数据了");
-          Indicator.close();
+          // Indicator.close();
           this.allLoaded = false;
         }
       });
@@ -169,14 +170,18 @@ export default {
       return scrollHeight;
     },
     //屏幕可视高度
-    getWindowHeight() {
+    getWindowHeight(val) {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      return windowHeight;
+      if(val == 1){
+         this.oDvheight=windowHeight*1-300+'px';
+      }else{
+         return windowHeight;
+      }
     },
     touchStart(e) {
       let dishesUl = document.getElementById("history");
@@ -255,11 +260,13 @@ export default {
     }
   },
   created: function() {
+    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
     }
     this.$axios.get("/api/app/act/getDate").then(res => {
+     res.data.data =res.data.data.replace(/(-)/g, '/');
       this.today = res.data.data;
       this.getdata();
     })
@@ -287,14 +294,13 @@ export default {
     padding-right: 28px;
   }
   .history_money {
+    padding-top: 80px;
     width: 100%;
     height: 224px;
     z-index: 1;
     background: #fff;
     background-color: #fc5e2d;
     position: fixed;
-    left: 0;
-    top: 80px;
     b:nth-child(1) {
       font-size: 30px;
       padding: 39px 0px 14px 0px;

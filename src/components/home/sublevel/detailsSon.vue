@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+    <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
       <ul id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
         <li class="order_history" v-for="(item,index) in writedata" :key="index">
             <div class="order_h_sublevel">
@@ -58,6 +58,7 @@ export default {
       totalNoService:0,
       isbill:0,
       allLoaded: true,
+      oDvheight:'0px',
       scrollMode: "auto",
       touchStartY: 0,
       distance: 0,
@@ -76,7 +77,7 @@ export default {
   methods: {
     //獲取核銷數據
     getdata: function( type) {
-      Indicator.open('数据加载中...');
+      // Indicator.open('数据加载中...');
       if (this.page == 1) {
         this.writedata = [];
       }
@@ -115,21 +116,21 @@ export default {
               for (let i = 0; i < _data.length; i++) {
                 this.writedata.push(_data[i]);
               }
-              Indicator.close();
+              // Indicator.close();
               if (_data.length < 9) {
                 this.allLoaded = false;
               }
             } else {
               Toast("没有更多数据了");
-              Indicator.close();
+              // Indicator.close();
               this.allLoaded = false;
             }
           } else {
-            Indicator.close();
+            // Indicator.close();
             this.allLoaded = false;
           }
         }else{
-          Indicator.close();
+          // Indicator.close();
         }
       });
     },
@@ -168,14 +169,18 @@ export default {
       return scrollHeight;
     },
     //屏幕可视高度
-    getWindowHeight() {
+    getWindowHeight(val) {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      return windowHeight;
+      if(val == 1){
+         this.oDvheight=windowHeight*1-300+'px';
+      }else{
+         return windowHeight;
+      }
     },
     touchStart(e) {
       let dishesUl = document.getElementById("detasonul");
@@ -253,6 +258,7 @@ export default {
     }
   },
   created: function() {
+    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -262,7 +268,7 @@ export default {
     this.money = this.$route.params.money;
     this.totalNoService = this.$route.params.totalNoService;
     this.service=(this.money*1-this.totalNoService*1).toFixed(2);
-     this.diff = (this.money*1-this.service*1).toFixed(2);
+    this.diff = (this.money*1-this.service*1).toFixed(2);
     this.getdata(this.pag);
   }
 };

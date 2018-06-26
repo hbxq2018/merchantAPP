@@ -221,14 +221,12 @@ export default {
   background-color: #ebebeb;
   height: 100%;
   .addDishesBox {
-    padding-top: 90px;
+    padding-top: 80px;
     .addPicBox {
-      padding-top: 60px;
-      // min-height: 300px;
       height: 420px;
       box-sizing: border-box;
-      background-color: #fff;
-      margin-bottom: 20px;
+      background: #fff;
+      padding-bottom: 20px;
       position: relative;
       overflow: hidden;
       .placeHolder {
@@ -254,13 +252,15 @@ export default {
         z-index: 1;
       }
       .uploadPic {
-        max-width: 750px;
-        background-color: #fff;
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-        position: relative;
-        left: 0;
-        top: -60px;
+        width: 100%;
+        height: 100%;
+        // max-width: 750px;
+        // background-color: #fff;
+        // background-repeat: no-repeat;
+        // background-size: 100% 100%;
+        // position: relative;
+        // left: 0;
+        // top: -60px;
         // z-index: 50;
       }
     }

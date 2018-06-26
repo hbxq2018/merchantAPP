@@ -1,16 +1,16 @@
 <template>
-    <div class="actdetails">
+    <div class="actdetails" @touchend="touchEnd">
         <mt-header fixed title="活动详情">
             <router-link to="/home" slot="left">
                 <mt-button icon="back"></mt-button>
             </router-link>
         </mt-header>
         <div class="actimg">
-          <img :src="actdata.mainPic" alt="活动图片">
+          <img v-if="actdata.mainPic" :src="actdata.mainPic" alt="活动图片">
         </div>
         <div class="actname">
             <p>{{actdata.actName}}</p>
-            <p>人气：{{actdata.viewNum}}</p>
+            <p v-if="actdata.viewNum">人气：{{actdata.viewNum}}</p>
         </div>
         <div class="introduction">{{actdata.actDesc}}</div>
         <div class="buttons">
@@ -80,6 +80,9 @@ export default {
           this.actdata = res.data.data;
         }
       });
+    },
+    touchEnd:function(){
+      this.getdishdata();
     },
     getdishdata: function() {
       // console.log("API:", this.API.API);
@@ -202,7 +205,8 @@ export default {
   }
   .buttons {
     width: 100%;
-    margin: 25px 0;
+    padding: 25px 0;
+    background: #fff;
     & > span {
       border-radius: 24px;
       color: #fc5e2d;
@@ -221,6 +225,7 @@ export default {
     height: 200px;
   }
   .actmore {
+    margin-top: 20px;
     width: 750px;
     background: #ebebeb;
     .moreul {

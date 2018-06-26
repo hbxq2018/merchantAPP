@@ -1,6 +1,6 @@
 <template>
     <div class="income">
-		<div class="income_top">
+    <div class="income_top">
         <mt-header fixed title="营业数据" class="income_header">
             <router-link to="/home" slot="left">
                 <mt-button icon="back"></mt-button>
@@ -50,8 +50,8 @@
         </div>
     </div>
     <div class="filling" id="filling"></div>
-    <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-        <div class="income_list">
+    <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
+        <div class="income_list" :style="styleObject">
           <ul id="income" class="income" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
               <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
                   <div class="income_li_l">
@@ -119,6 +119,9 @@ export default {
       isselecttime: false,
       maxdata: "",
       mindata: "",
+      styleObject: {
+          height:'0px'
+      },
       days: [
         {
           title: "今日"
@@ -135,6 +138,7 @@ export default {
       page: 1,
       allLoaded: true,
       scrollMode: "auto",
+      oDvheight:'0px',
       touchStartY: 0,
       distance: 0,
       topFlag: false, //是否到顶部
@@ -147,6 +151,7 @@ export default {
   created: function() {
     ispush = false;
     let _this = this;
+    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -157,14 +162,12 @@ export default {
       this.today =res.data.data;
       let _date =this.today;
       let _mindata =
-        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
+      new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
       this.mindata = new Date(_mindata);
       let _maxdata =
-        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
+      new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
       this.maxdata = new Date(_maxdata);
 
-
-   
       let _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime();
       _start = _this.$UTILS.dateConv(new Date(_start));
       let _end = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000;
@@ -356,7 +359,7 @@ export default {
     },
     //获取列表数据
     getdata: function(start, end, val, type) {
-      Indicator.open("数据加载中...");
+      // Indicator.open("数据加载中...");
       let obj = {
         shopId: this.shopId,
         soStatus: 2,
@@ -373,7 +376,7 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       this.$axios.get("/api/app/so/myorderForShop?" + _value).then(res => {
-        Indicator.close();
+        // Indicator.close();
         if (res.data.code == 0) {
           this.loadFlag = false;
           let _data = res.data.data;
@@ -438,15 +441,19 @@ export default {
           : documentScrollHeight;
       return scrollHeight;
     },
-    getWindowHeight() {
-      //屏幕可视高度
+    //屏幕可视高度
+    getWindowHeight(val) {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      return windowHeight;
+      if(val == 1){
+         this.oDvheight=windowHeight*1-231+'px';
+      }else{
+         return windowHeight;
+      } 
     },
     touchStart(e) {
       let dishesUl = document.getElementById("income");
@@ -457,10 +464,12 @@ export default {
       } else {
         this.topFlag = false;
       }
-      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
-        this.allLoaded = false;
-        this.bottomFlag = false;
-      }
+  
+      // if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+      //   this.allLoaded = false;
+      //   this.bottomFlag = false;
+      // }
+
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
@@ -538,6 +547,7 @@ export default {
 
 <style lang="less">
 .income {
+  background-color: #ebebeb;
   .income_top {
     position: fixed;
     top: 0;
@@ -736,7 +746,6 @@ export default {
     position: absolute;
     top: 460px;
     width: 100%;
-    height: 870px;
     background-color: #ebebeb;
   }
   .select {

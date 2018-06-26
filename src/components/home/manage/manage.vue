@@ -121,7 +121,8 @@ export default {
     },
     //保存修改信息
     save: function() {
-      let userdata = this.userInfo;
+      let userdata = this.userInfo,_address='';
+      // _address = userdata.address.replace(/\^/g, "%5e");
       MessageBox.confirm("确定进行保存?").then(
         action => {
           let obj = {
@@ -328,7 +329,11 @@ export default {
     },
     setformdata: function() {
       if (this.userInfo) {
-        let shopdata = this.userInfo;
+        let shopdata = this.userInfo,_arr=[];
+        let _address = this.userInfo.address;
+        if (_address.indexOf('-') > 0) {
+          _arr = _address.split('-');
+        }
         let ind = shopdata.businessCate.indexOf("/");
         let val1 = shopdata.businessCate.slice(0, ind);
         let val2 = shopdata.businessCate.slice(
@@ -341,7 +346,7 @@ export default {
           : shopdata.mobile;
         this.formdata[1].value = val1;
         this.formdata[2].value = val2;
-        this.formdata[3].value = shopdata.address;
+        this.formdata[3].value = _arr[3]?_arr[3]:shopdata.address;
         this.formdata[4].value = shopdata.shopInfo;
       }
     }

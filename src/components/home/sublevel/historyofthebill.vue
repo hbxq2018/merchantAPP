@@ -74,7 +74,7 @@ export default {
     }
   },
   created: function() {
-    Indicator.open("数据加载中...");
+    // Indicator.open("数据加载中...");
     let _this = this;
     this.$axios.get("/api/app/act/getDate").then(res => {
       res.data.data =res.data.data.replace(/(-)/g, '/');
@@ -106,7 +106,7 @@ export default {
             _data.push(res.data.data[key]);
           }
           _data.reverse();
-          Indicator.close();
+          // Indicator.close();
           _this.data = _data;
         }
       });

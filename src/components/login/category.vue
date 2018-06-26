@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mt-header :title="title">
+    <mt-header fixed :title="title">
         <div slot="left" @click="categoryTxt">
             <mt-button icon="back"></mt-button>
         </div>
@@ -120,6 +120,7 @@ export default {
 
 <style lang="less">
 .category {
+  padding-top: 80px;
   ul {
     .category_item {
       height: 100px;

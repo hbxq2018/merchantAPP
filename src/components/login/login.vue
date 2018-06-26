@@ -14,11 +14,11 @@
 					<input type="number" class="login_form_inp" max="4" placeholder="请输入验证码" v-model="password" @keyup.enter="verification">
 				</div>
 				<div class="login_form_btn">
-					<button type="button" @click="verification"></button>
+          <img src="../../../static/images/enter.png" alt="登录" @click="verification">
 				</div>
 			</form>
 			<div class="othor_login" v-if="!isSignWX">
-				<p class="othor_login_text">————<span>其他登陆方式</span>————</p>
+				<p class="othor_login_text">————<span>其他登录方式</span>————</p>
 				<div id="returnIcon" class="othor_login_type">
 					<img class="login_weixin" src="../../../static/images/wx-icon.png" alt="" @click="weixinLogin"/>
 				</div>
@@ -27,8 +27,10 @@
     </div>
 </template>
 <script>
+import Vue from "vue";
 import GLOBAL from "../../../untils/config/config";
-import { Toast } from "mint-ui";
+import { Toast,Button  } from "mint-ui";
+Vue.component(Button.name, Button);
 import qs from "qs";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
@@ -599,13 +601,12 @@ export default {
         }
       }
       .login_form_btn {
-        button {
-          width: 80px;
-          height: 80px;
-          border: 0;
-          background: #fc5e2d url(../../../static/images/enter.png) no-repeat
-            center center;
-          background-size: 80px 80px;
+        width: 168px;
+        height: 124px;
+        margin-left: 280px;
+        img {
+          width: 100%;
+          height: 100%;
         }
       }
     }

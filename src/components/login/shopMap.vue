@@ -9,7 +9,8 @@
       </span>
       <mt-cell title="详细地址"><input v-model="obj.address" class="address" type="text"></mt-cell>
       <div class="tishi">提示：为了方便顾客准确导航，请在地图标出店铺位置</div>
-      <div class="map" id="container" style="width:100%; height:600px">
+  
+      <div class="map" id="container" :style="styleObject">
       </div>
       <div v-show="ispro" class="molde" @click="shutprovince">
         <mt-picker :slots="myAddressSlots" @change="onMyAddressChange"></mt-picker>
@@ -35,6 +36,12 @@
           lng:'',//经度
           lat:''  //纬度
         },
+        styleObject: {
+          width:'100%',
+          height:'400px'
+        },
+        oDivWidth:'100%',
+        oDivHeight:'400',
         goback:'settlein',
         ispro:false,
         myAddressSlots: [
@@ -79,19 +86,40 @@
       ...mapMutations(['setuserInfo']),
       init: function () {
         let _this = this;
+
+        // 数据初始化
+        this.obj.lng = this.userInfo.locationX;
+        this.obj.lat = this.userInfo.locationY;
+        let _address = this.userInfo.address;
+        if(_address){
+          if (_address.indexOf('-') > 0) {
+            let _arr = _address.split('-');
+            this.obj.Province=_arr[0];
+            this.obj.City=_arr[1];
+            this.obj.county=_arr[2];
+            this.obj.address=_arr[3];
+          }
+        }
+        
+        
+        // 地图初始化
+        let maparr =[],_maplng='',_maplat='';
+        _maplng = _this.obj.lng?_this.obj.lng:'114.367237';
+        _maplat = _this.obj.lat?_this.obj.lat:'30.571349';
+        maparr.push(_maplng);
+        maparr.push(_maplat);
         map = new AMap.Map('container', {
-          center: [114.367237,30.571349],
+          center: maparr,
           resizeEnable: true,
           zoom: 10
         })
-         var marker = new AMap.Marker({
+        var marker = new AMap.Marker({
             position: map.getCenter(),
             draggable: true,
             cursor: 'move',
             raiseOnDrag: true
         });
         marker.setMap(map);
-
         map.plugin(['AMap.ToolBar', 'AMap.Scale','AMap.Marker'], function () {
           map.addControl(new AMap.ToolBar())
           map.addControl(new AMap.Scale())
@@ -106,22 +134,25 @@
           map.addControl(geolocation)
           geolocation.getCurrentPosition()
           AMap.event.addListener(geolocation, 'complete', (result) => {
-            _this.obj.lng = result.position.getLng();//定位成功返回的经度
-            _this.obj.lat = result.position.getLat();//定位成功返回的纬度
-            let arr =[];
-            arr.push(result.position.getLng())
-            arr.push( result.position.getLat())
+            // result.position.getLng();//定位成功返回的经度
+            // result.position.getLat();//定位成功返回的纬度
+            let arr =[],_lng='',_lat='';
+            _lng = _this.obj.lng?_this.obj.lng:result.position.getLng();
+            _lat = _this.obj.lat?_this.obj.lat:result.position.getLat();
+            arr.push(_lng);
+            arr.push(_lat);
              if (marker) {
                 marker.setMap(null);
                 marker = null;
             }
+            map.setZoomAndCenter(14, arr);
             marker = new AMap.Marker({
               position:arr,
               draggable: true,
               cursor: 'move',
               raiseOnDrag: true
-          });
-          marker.setMap(map);
+            });
+            marker.setMap(map);
           })  //  返回定位信息
           AMap.event.addListener(geolocation, 'error', (result) => {
             console.log(result)
@@ -130,6 +161,7 @@
         AMap.event.addListener(map, 'click', (result) => {
             _this.obj.lng = result.lnglat.lng;
             _this.obj.lat = result.lnglat.lat;
+
             let arr =[];
             arr.push(_this.obj.lng )
             arr.push(_this.obj.lat)
@@ -146,6 +178,16 @@
           marker.setMap(map);
         });
       },
+       //屏幕可视高度
+      getWindowHeight() {
+        var windowHeight = 0;
+        if (document.compatMode == "CSS1Compat") {
+          windowHeight = document.documentElement.clientHeight;
+        } else {
+          windowHeight = document.body.clientHeight;
+        }
+        this.styleObject.height=windowHeight*1-171+'px';
+      },  
       onMyAddressChange(picker, values) {
        if(myaddress[values[0]]){  
           picker.setSlotValues(1,Object.keys(myaddress[values[0]])); // Object.keys()会返回一个数组，当前省的数组
@@ -171,7 +213,7 @@
           Toast('请选择所在省县市');
         }else{
           if(_obj.address){
-            let _address = _obj.Province+_obj.City+_obj.county+_obj.address;
+            let _address = _obj.Province+'-'+_obj.City+'-'+_obj.county+'-'+_obj.address;
             let address = _address +'/'+'address';
             this.setuserInfo(address);
           }
@@ -184,21 +226,16 @@
               this.setuserInfo(locationX);
           }
           if(this.$route.query.ind == 2){
-            Toast({
-              message: '返回后请在右上角点击保存',
-              duration: 2000
-            });
-            setTimeout(() => {
-              this.$router.push({path: this.goback,query:_obj})
-            }, 2000);
+            this.$router.push({path: this.goback,query:_obj});
           }else{
-            this.$router.push({path: this.goback,query:_obj})
+            this.$router.push({path: this.goback,query:_obj});
           }
           
         }
       }
     },
     created:function(){
+      this.getWindowHeight();
       if(this.$route.query.ind == 1){
         this.goback = 'settlein'
       }else if(this.$route.query.ind == 2){
@@ -222,7 +259,6 @@
       padding-top: 80px;
       .map{
         width: 100%;
-        height: 80%;
       }
       .mint-cell-value{
         color: #808080;

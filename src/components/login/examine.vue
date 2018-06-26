@@ -17,7 +17,7 @@ export default {
       return {
         status: 0,
         msg: "入驻审核中",
-        examineImg: "../../../static/images/wait.png",
+        examineImg:require("../../../static/images/wait.png"),
         colorSit: "",
         colorBtn: "",
         toHref: "home",

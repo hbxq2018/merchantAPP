@@ -5,11 +5,11 @@ import App from './App'
 import router from './router'
 import MintUI from 'mint-ui'
 import './assets/css/my-mint.css'; //全局修改mint-UI样式  
-import 'lib-flexible'
-import 'babel-polyfill'  
+import 'lib-flexible';
+import 'babel-polyfill';
 import axios from 'axios';
-import GLOBAL from '../untils/config/config'
-import UTILS from '../untils/util'
+import GLOBAL from '../untils/config/config';
+import UTILS from '../untils/util';
 // require('./assets/util/vconsole.js');
 Vue.prototype.$axios = axios;
 Vue.prototype.$GLOBAL = GLOBAL;

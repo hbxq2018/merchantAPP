@@ -1,6 +1,6 @@
 <template>
     <div class="bill">
-		<div class="bill_top">
+    <div class="bill_top">
             <mt-header fixed title="营业数据" class="bill_header">
                 <router-link :to="{path:'/income',query:{start:start,end:end,actday:actday}}" slot="left">
                     <mt-button icon="back"></mt-button>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="filling" id="filling"></div>
-        <div class="loadBottom billbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+        <div class="loadBottom billbox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
             <div class="bill_list">
                 <ul id="bill" class="bill" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
                     <li class="bill_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
@@ -98,6 +98,7 @@ export default {
       actval: "",
       orderNum: "0",
       totalCost: 0,
+      oDvheight:'0px',
       pickerValue: "",
       Visible: true,
       ismore: false,
@@ -132,6 +133,7 @@ export default {
   },
   created: function() {
     let _this = this;
+    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -143,7 +145,7 @@ export default {
       let _date = new Date(this.today);
       // this.today =_date;
       let _mindata =
-        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
+      new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
       this.mindata = new Date(_mindata);
       let _maxdata =
         new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
@@ -298,7 +300,7 @@ export default {
     },
     //获取列表数据
     getdata: function(start, end, val) {
-      Indicator.open("数据加载中...");
+      // Indicator.open("数据加载中...");
       let obj = {
           shopId: this.shopId,
           begainTime: start ? start : this.start,
@@ -330,20 +332,22 @@ export default {
                     "******" +
                     _data.list[j].userName.substring(9, 11);
                 }
-                Indicator.close();
+                // Indicator.close();
                 this.votes.push(_data.list[j]);
               }
               if (_data.list.length < 10) {
                 this.allLoaded = false;
               }
             } else {
-              Indicator.close();
+              // Indicator.close();
               this.allLoaded = false;
             }
           } else {
-            Indicator.close();
+            // Indicator.close();
             this.allLoaded = false;
           }
+        }else{
+          // Indicator.close();
         }
       });
     },
@@ -381,7 +385,7 @@ export default {
           : documentScrollHeight;
       return scrollHeight;
     },
-    getWindowHeight() {
+    getWindowHeight(val) {
       //屏幕可视高度
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
@@ -389,7 +393,11 @@ export default {
       } else {
         windowHeight = document.body.clientHeight;
       }
-      return windowHeight;
+      if(val == 1){
+         this.oDvheight=windowHeight*1-110+'px';
+      }else{
+         return windowHeight;
+      }
     },
     touchStart(e) {
       let dishesUl = document.getElementById("bill");
@@ -647,7 +655,6 @@ export default {
   }
   .billbox {
     background-color: #ebebeb;
-    min-height: 1130px;
   }
   .select {
     width: 672px;

@@ -4,7 +4,7 @@
             <router-link :to="{path:'/bill',query:{start:start,end:end,actday:actday}}" slot="left">
                 <mt-button icon="back"></mt-button>
             </router-link>
-		</mt-header>
+    </mt-header>
         <ul class="writ">
             <li class="off" v-for="(item,index) in data" :key="index">
                 <span class="wtitle">{{item.title}}</span>

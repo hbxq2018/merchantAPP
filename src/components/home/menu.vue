@@ -25,8 +25,8 @@
                 </router-link>
               </li>
           </ul>
-        <div class="activity">
-          <div class="actleft" @click="clickact">
+        <div class="activity" @click="clickact">
+          <div class="actleft" >
             <p>享7活动</p>
             <p>活动新玩法、提高客流量</p>
           </div>
