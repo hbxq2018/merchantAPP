@@ -6,7 +6,7 @@
       </mt-header> 
       <div class="manage_cont">
         <div class="man_info">商户信息</div>
-        <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:'edit',query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
+        <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:item.to,query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
         <div class="man_info">推荐菜管理</div>
         <mt-cell title="推荐菜" is-link :to="{path:'/dishes',query:{type:1}}"></mt-cell>
         <div class="man_info">员工管理</div>
@@ -58,6 +58,11 @@ export default {
         {
           name: "店铺简介",
           to: "/edit",
+          value: ""
+        },
+        {
+          name: "其他信息",
+          to: "/other",
           value: ""
         }
       ],
@@ -174,7 +179,7 @@ export default {
             name: "/edit",
             params: { id: obj.id, name: obj.name }
           });
-        }
+        } 
       }
     },
     clickadd: function() {
@@ -305,7 +310,7 @@ export default {
       });
     },
     setvalue: function(val) {
-      if (val.length > 13) {
+      if (val && val.length > 13) {
         let str = val.substring(0, 13) + "...";
         return str;
       } else {
@@ -341,13 +346,19 @@ export default {
           shopdata.businessCate.length
         );
         this.name = shopdata.shopName;
-        this.formdata[0].value = shopdata.phone
-          ? shopdata.phone
-          : shopdata.mobile;
+        if(shopdata.phone && shopdata.phone != 'null') {
+          this.formdata[0].value = shopdata.phone;
+        } else {
+          this.formdata[0].value = shopdata.mobile;
+        }
+        if(shopdata.shopInfo && shopdata.shopInfo != 'null') {
+          this.formdata[4].value = shopdata.shopInfo;
+        } else {
+          this.formdata[4].value = '';
+        }
         this.formdata[1].value = val1;
         this.formdata[2].value = val2;
         this.formdata[3].value = _arr[3]?_arr[3]:shopdata.address;
-        this.formdata[4].value = shopdata.shopInfo;
       }
     }
   },

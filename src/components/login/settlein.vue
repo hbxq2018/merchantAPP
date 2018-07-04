@@ -1,5 +1,5 @@
 <template>
-  <div class="settle">
+  <div class="settle" @click="allFlag">
     <mt-header fixed title="商家入驻">
         <router-link to="/process" slot="left">
             <mt-button icon="back"></mt-button>
@@ -71,6 +71,41 @@
           </div>
         </div>
       </div>
+      <div class="q_item clearfix">
+        <p class="q_item_l fl">Logo</p>
+        <div class="q_item_r fl">
+          <p>门店Logo(1张、选填)</p>
+          <div class="files">
+            <img :src="LogoUrl" alt="门头照">
+            <span class="loadin" v-if="img4"><span class="line"></span><span class="inloadin"></span></span>
+            <input type="file" @change="getFile(4)" ref="Logo">
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="form_title">其他信息</p>
+    <div class="otherBox">
+      <div class="otherInfo clearfix" @click="isWeek">
+        <div class="otherInfo_l">营业日</div>
+        <div class="otherInfo_r">
+          <span class="otherInfo_text fl">{{weekTxt}}</span>
+          <span class="otherInfo_arrow fr"></span>
+        </div>
+      </div>
+      <div class="otherInfo clearfix">
+        <div class="otherInfo_l">营业时段</div>
+        <div class="otherInfo_r">
+          <span class="timeTxt" @click="isTime(1)">{{startTime}}</span>
+          <span class="timeLine">~</span>
+          <span class="timeTxt" @click="isTime(2)">{{endTime}}</span>
+        </div>
+      </div>
+      <div class="otherInfo clearfix">
+        <div class="otherInfo_l">其他服务</div>
+        <div class="otherInfo_r">
+          <div v-for="(item,index) in otherArr" :key='index' class="other_item" :class="item.flag?'active':''" @click="setting(index)">{{item.name}}</div>
+        </div>
+      </div>
     </div>
     <div class="submitBox">
       <div class="agreement">
@@ -84,20 +119,61 @@
       </div>
       <p>入驻过程如有问题可拨打400-100-111</p>
     </div>
+    <div class="weekBox" v-if="weekFlag">
+      <mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
+    </div>
+    <mt-datetime-picker
+      ref="picker"
+      type="time"
+      @confirm="handleConfirm">
+    </mt-datetime-picker>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import axios from "axios";
 import qs from "qs";
-import { Field, Toast, Indicator } from "mint-ui";
+import { Field, Toast, Indicator, Picker, DatetimePicker } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
-Vue.component(Field.name, Field);
+Vue.component(Field.name, Field, Picker.name, Picker, DatetimePicker.name, DatetimePicker);
 export default {
   name: "Settle",
   data() {
     return {
+      slots: [
+        {
+          flex: 1,
+          values: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
+          className: 'slot1',
+          textAlign: 'right'
+        }, 
+        {
+          divider: true,
+          content: '~',
+          className: 'slot2'
+        }, 
+        {
+          flex: 1,
+          values: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
+          className: 'slot3',
+          textAlign: 'left'
+        }
+      ],
+      otherArr: [
+        {
+          name: 'Wifi',
+          flag: false
+        },
+        {
+          name: '停车位',
+          flag: false
+        },
+        {
+          name: '包间',
+          flag: false
+        }
+      ],
       id: "",
       userName: "",
       phone: "",
@@ -115,9 +191,16 @@ export default {
       licenseUrl: "",
       healthUrl: "",
       ShopPhotoUrl: "",
+      LogoUrl: "",
       img1: false,
       img2: false,
-      img3: false
+      img3: false,
+      img4: false,
+      weekFlag: false,
+      weekTxt: '请设置营业日',
+      selectTime: 1,
+      startTime: '开始时间',
+      endTime: '结束时间'
     };
   },
   store,
@@ -132,7 +215,6 @@ export default {
       }else{
         return value;
       }
-        
     } 
   },
   methods: {
@@ -169,6 +251,7 @@ export default {
         licenseUrl: this.licenseUrl,
         healthUrl: this.healthUrl,
         ShopPhotoUrl: this.ShopPhotoUrl,
+        LogoUrl: this.LogoUrl,
         id: this.id
       });
     },
@@ -190,6 +273,9 @@ export default {
       } else if (e == 3) {
         _this.img3 = true;
         inputDOM = this.$refs.ShopPhoto;
+      } else if (e == 4) {
+        _this.img4 = true;
+        inputDOM = this.$refs.Logo;
       }
       // console.log(inputDOM);
       // 通过DOM取文件数据
@@ -226,6 +312,9 @@ export default {
           } else if (e == 3) {
             _this.img3 = false;
             _this.ShopPhotoUrl = res.data.data.smallPicUrl;
+          } else if (e == 4) {
+            _this.img4 = false;
+            _this.LogoUrl = res.data.data.smallPicUrl;
           }
         })
         .catch(err => {
@@ -253,6 +342,33 @@ export default {
     addMap() {
       this.setdata();
       this.$router.push({ name: "ShopMap" });
+    },
+    allFlag() {
+      this.weekFlag = false;
+    },
+    onValuesChange(picker, values) {   //获取营业日的值
+      if (values[0] > values[1]) {
+        picker.setSlotValue(1, values[0]);
+      }
+      this.weekTxt = values[0] + '至' + values[1]
+    },
+    isWeek(e) {     //营业日的弹窗是否显示
+      e.stopPropagation();
+      this.weekFlag = !this.weekFlag;
+    },
+    handleConfirm (time) {    //获取营业时段的值
+      if(this.selectTime == 1) {
+        this.startTime = time;
+      } else if(this.selectTime == 2) {
+        this.endTime = time;
+      }
+    },
+    isTime(id) {     //营业时段的弹窗是否显示
+      this.selectTime = id;
+      this.$refs.picker.open();
+    },
+    setting(idx) {    //设置其他服务
+      this.otherArr[idx].flag = !this.otherArr[idx].flag;
     },
     //提交表单
     submitForm() {
@@ -296,13 +412,33 @@ export default {
         Toast("请上传卫生许可证");
         return false;
       }
-      if (
-        this.isNull(this.ShopPhotoUrl) ||
-        this.ShopPhotoUrl == this.defaultPic
-      ) {
+      if (this.isNull(this.ShopPhotoUrl) || this.ShopPhotoUrl == this.defaultPic) {
         Toast("请上传门头照");
         return false;
       }
+      if(this.weekTxt == '请设置营业日') {
+        Toast("请设置营业日");
+        return false;
+      }
+      if(this.startTime == '开始时间' || this.endTime == '结束时间') {
+        Toast("请设置营业时间");
+        return false;
+      }
+      let startArr = [], endArr = [];
+      startArr = this.startTime.split(':');
+      endArr = this.endTime.split(':');
+      if(parseInt(startArr[0]) * 60 + parseInt(startArr[1]) >= parseInt(endArr[0]) * 60 + parseInt(endArr[1])){
+        Toast('开始时间不得大于结束时间');
+        return false;
+      }
+      let otherService = '', shopHours = '';
+      shopHours = this.weekTxt + ',' + this.startTime + '至' + this.endTime
+      for(let i = 0; i < this.otherArr.length; i++) {
+        if(this.otherArr[i].flag) {
+          otherService += this.otherArr[i].name + ','
+        }
+      }
+      otherService = otherService.substring(0, otherService.length-1);
       let _parms = {
         userName: this.userName,
         shopName: this.shopName,
@@ -314,12 +450,17 @@ export default {
         locationX: this.locationX,
         locationY: this.locationY,
         city: this.city,
-        userId: this.id ? this.id : this.shopInfo.id
+        userId: this.id ? this.id : this.shopInfo.id,
+        shopHours: shopHours,
+        otherService: otherService
       };
       if (this.ismobile) {
         _parms.mobile = this.phone;
       } else {
         _parms.phone = this.phone;
+      }
+      if(!this.isNull(this.LogoUrl) && this.LogoUrl != this.defaultPic) {
+        _parms.logoPic = this.LogoUrl;
       }
       this.$axios
         .post("/api/app/shopEnter/add", qs.stringify(_parms))
@@ -354,7 +495,7 @@ export default {
     }
   },
   created() {
-    this.licenseUrl = this.healthUrl = this.ShopPhotoUrl = this.defaultPic;
+    this.licenseUrl = this.healthUrl = this.ShopPhotoUrl = this.LogoUrl = this.defaultPic;
     for (var key in this.newUserInfo) {
       this[key] = this.newUserInfo[key];
     }
@@ -391,6 +532,7 @@ export default {
   width: 100%;
   background-color: #ebebeb;
   color: #b1b1b1;
+  position: relative;
   .settle_head {
     padding-top: 78px;
     img {
@@ -452,7 +594,7 @@ export default {
         width: 77%;
         .category_text {
           height: 100%;
-          width: 100%;
+          // width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -565,6 +707,97 @@ export default {
         }
       }
     }
+  }
+  .otherBox {
+    background-color: #fff;
+    .otherInfo {
+      width: 100%;
+      height: 100px;
+      line-height: 100px;
+      font-size: 30px;
+      color: #000;
+      padding: 0 15px 0 28px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #e0e0e0;
+      .otherInfo_l {
+        float: left;
+        height: 100%;
+        width: 23%;
+        text-align: left;
+      }
+      .otherInfo_r {
+        float: right;
+        height: 100%;
+        width: 77%;
+        color: #B1B1B1;
+        text-align: center;
+        .otherInfo_text {
+          height: 100%;
+          // width: 100%;
+          padding-left: 90px;
+          box-sizing: border-box;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 30px;
+          color: #b1b1b1;
+        }
+        .timeTxt {
+          display: inline-block;
+          width: 45%;
+          height: 100%;
+          font-size: 30px;
+          color: #b1b1b1;
+        }
+        .otherInfo_arrow {
+          width: 40px;
+          height: 40px;
+          position: relative;
+          margin-top: 35px;
+          &:after,
+          &:before {
+            content: "";
+            position: absolute;
+            top: 0;
+          }
+          &:after {
+            left: 0px;
+            border-left: 15px solid #fff;
+            border-right: 15px solid transparent;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+          }
+          &:before {
+            left: 2px;
+            border-left: 15px solid #b1b1b1;
+            border-right: 15px solid transparent;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+          }
+        }
+        .other_item {
+          display: inline-block;
+          height: 50px!important;
+          line-height: 50px;
+          color: #B1B1B1;
+          padding: 0 15px;
+          margin-right: 16px;
+          border-radius: 6px;
+          border: 1px solid #B1B1B1;
+          &.active {
+            border: 1px solid #FC5E2D;
+            color: #FC5E2D;
+          }
+        }
+      }
+    }
+  }
+  .weekBox {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
   }
   .submitBox {
     margin-top: 20px;

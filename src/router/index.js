@@ -24,6 +24,7 @@ import Historyse from '@/components/home/sublevel/historyse'
 import Historyofthebill from '@/components/home/sublevel/historyofthebill'
 import DetailsSon from '@/components/home/sublevel/detailsSon'
 import Edit from '@/components/home/manage/edit'
+import Other from '@/components/home/manage/other'
 import Ticket from '@/components/home/ticket/ticket'
 import Promotion from '@/components/home/ticket/promotion'
 import SetMeal from '@/components/home/ticket/setMeal'
@@ -75,6 +76,11 @@ export default new Router({
       path: '/edit',
       name: 'Edit',
       component: Edit
+    },
+    {
+      path: '/other',
+      name: 'Other',
+      component: Other
     },
     {
       path: '/process',
