@@ -14,10 +14,18 @@ const state={
 const mutations={
     setuserInfo(state,data){
         if(typeof data == "string" ){
-            let arr = data.split('/')
+            let reg = /7loog/,arr=[];
+            if(reg.test(data)){
+                arr = data.split('7loog');
+            }else{
+                arr = data.split('/');
+            }
+            
             for(let key in state.userInfo){
                 if(arr[1] == key){
-                    if((state.userInfo[key]+'').indexOf('/') != -1){
+                    if(reg.test(data)){
+                        state.userInfo[key] = arr[0];
+                    }else if((state.userInfo[key]+'').indexOf('/') != -1){
                         let ind = state.userInfo[key].indexOf("/");
                         let val1 = state.userInfo[key].slice(0,ind);
                         let val2 = state.userInfo[key].slice(ind+1,state.userInfo[key].length);
@@ -39,7 +47,6 @@ const mutations={
         }else if(typeof data == "object"){
             state.userInfo = data;
         }
-        // console.log('state:',state)
     },
     setshopId(state,id){
         state.shopId = id;

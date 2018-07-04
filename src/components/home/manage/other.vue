@@ -1,13 +1,14 @@
 <template>
   <div class="other" @click="allFlag">
-      <mt-header title="其他信息">
+      <mt-header :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
+        <!-- <mt-button slot="right"  @click="save">保存</mt-button> -->
       </mt-header>
       <div>
           <div class="otherInfo clearfix" @click="isWeek">
               <div class="otherInfo_l">营业日</div>
               <div class="otherInfo_r">
-              <span class="otherInfo_text fl">{{weekTxt}}</span>
+              <span class="otherInfo_text fl">{{startWeek}}至{{endWeek}}</span>
               <span class="otherInfo_arrow fr"></span>
               </div>
           </div>
@@ -44,6 +45,7 @@ export default {
   name: "Other",
   data() {
     return {
+      name: '其他信息',
       slots: [
         {
           flex: 1,
@@ -95,7 +97,8 @@ export default {
       ],
       selectTime: 1,
       weekFlag: false,
-      weekTxt: "",
+      startWeek: "",
+      endWeek: "",
       startTime: "",
       endTime: ""
     };
@@ -107,6 +110,16 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo"]),
     clickback() {
+      let otherService = '', shopHours = '';
+      for(let i = 0; i < this.otherArr.length; i++) {
+        if(this.otherArr[i].flag) {
+          otherService += this.otherArr[i].name + ',';
+        }
+      }
+      otherService = otherService + "/otherService";
+      shopHours = this.startWeek + '至' + this.endWeek + ',' + this.startTime + '至' + this.endTime + "/shopHours";
+      this.setuserInfo(otherService);
+      this.setuserInfo(shopHours);
       this.$router.push({ name: "Manage", params: {} });
     },
     allFlag() {
@@ -131,7 +144,8 @@ export default {
       if (values[0] > values[1]) {
         picker.setSlotValue(1, values[0]);
       }
-      this.weekTxt = values[0] + "至" + values[1];
+      this.startWeek = values[0];
+      this.endWeek = values[1];
     },
     //获取营业时段的值
     handleConfirm(time) {
@@ -153,7 +167,10 @@ export default {
             }
           }
       }
-      console.log(shopHours);
+      this.startWeek = shopHours[0].substring(0, shopHours[0].indexOf('至'));
+      this.endWeek = shopHours[0].substring(shopHours[0].indexOf('至')+1, shopHours[0].length);
+      this.startTime = shopHours[1].substring(0, shopHours[1].indexOf('至'));
+      this.endTime = shopHours[1].substring(shopHours[1].indexOf('至')+1, shopHours[1].length);
   },
   created: function() {
       

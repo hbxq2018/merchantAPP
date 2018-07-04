@@ -438,7 +438,6 @@ export default {
           otherService += this.otherArr[i].name + ','
         }
       }
-      otherService = otherService.substring(0, otherService.length-1);
       let _parms = {
         userName: this.userName,
         shopName: this.shopName,

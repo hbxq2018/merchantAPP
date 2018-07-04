@@ -7,6 +7,32 @@
       <div class="manage_cont">
         <div class="man_info">商户信息</div>
         <mt-cell v-for="(item,index) in formdata" :key="index" :id='index' :title="item.name" :to="{path:item.to,query:{'ind':index,'name':item.name,'value':item.value}}" is-link :value="setvalue(item.value)" @click="clickformli"></mt-cell>
+        <div class="man_info">商家照片</div>
+        <div class="manage_photo">
+          <div class="photo_item">
+            <div class="photo_item_l fl">门头照<span class="photo_tips">(点击图片更换)</span></div>
+            <div class="photo_item_r fr">
+              <img class="photo_url" :src="indexUrl" alt="">
+              <!-- <span class="loadin"><span class="line"></span><span class="inloadin"></span></span> -->
+              <input type="file" @change="getFile(1)" ref="door">
+            </div>
+          </div>
+          <div class="photo_item">
+            <div class="photo_item_l fl">Logo<span class="photo_tips">(点击图片更换)</span></div>
+            <div class="photo_item_r fr">
+              <img class="photo_url" :src="logoUrl" alt="">
+              <!-- <span class="loadin" v-if="img2"><span class="line"></span><span class="inloadin"></span></span> -->
+              <input type="file" @change="getFile(2)" ref="Logo">
+            </div>
+          </div>
+          <div class="photo_item photo_list" @click="shopImgList">
+            <div class="photo_item_l fl">店铺图片</div>
+            <div class="photo_item_r fr">
+              <span>{{photoNum}}张</span>
+              <img class="photo_arrow" src="../../../../static/images/home_arrow.png" alt="">
+            </div>
+          </div>
+        </div>
         <div class="man_info">推荐菜管理</div>
         <mt-cell title="推荐菜" is-link :to="{path:'/dishes',query:{type:1}}"></mt-cell>
         <div class="man_info">员工管理</div>
@@ -68,7 +94,12 @@ export default {
       ],
       issave: true,
       writedata: [],
-      ismain: false
+      ismain: false,
+      indexUrl: require("../../../../static/images/home_arrow.png"),
+      logoUrl: require("../../../../static/images/home_arrow.png"),
+      img1: false,
+      img2: false,
+      photoNum: 0
     };
   },
   store,
@@ -77,7 +108,7 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
-     //查询当前用户是否是当前商家的主账号
+    //查询当前用户是否是当前商家的主账号
     account: function() {
       let obj = { shopId: this.userInfo.id },
         _value = "",
@@ -126,7 +157,8 @@ export default {
     },
     //保存修改信息
     save: function() {
-      let userdata = this.userInfo,_address='';
+      let userdata = this.userInfo,
+        _address = "";
       // _address = userdata.address.replace(/\^/g, "%5e");
       MessageBox.confirm("确定进行保存?").then(
         action => {
@@ -138,7 +170,11 @@ export default {
             shopInfo: userdata.shopInfo,
             locationX: userdata.locationX,
             locationY: userdata.locationY,
-            businessCate: userdata.businessCate
+            businessCate: userdata.businessCate,
+            shopHours: userdata.shopHours,
+            otherService: userdata.otherService,
+            indexUrl: userdata.indexUrl,
+            logoUrl: userdata.logoUrl
           };
           let _value = "";
           for (var key in obj) {
@@ -179,7 +215,7 @@ export default {
             name: "/edit",
             params: { id: obj.id, name: obj.name }
           });
-        } 
+        }
       }
     },
     clickadd: function() {
@@ -231,6 +267,10 @@ export default {
         }
       });
     },
+    //跳转至店铺照片
+    shopImgList() {
+      this.$router.push({ name: "PhotoList", params: {} });
+    },
     addHxUser: function(value) {
       let obj = {
         shopId: this.shopId,
@@ -269,7 +309,7 @@ export default {
       }
       this.$axios.post("/api/" + url + _value).then(res => {
         if (res.data.code == "0") {
-          console.log("操作成功");
+
         } else {
           // MessageBox("提示", res.data.message);
         }
@@ -334,10 +374,11 @@ export default {
     },
     setformdata: function() {
       if (this.userInfo) {
-        let shopdata = this.userInfo,_arr=[];
+        let shopdata = this.userInfo,
+          _arr = [];
         let _address = this.userInfo.address;
-        if (_address.indexOf('-') > 0) {
-          _arr = _address.split('-');
+        if (_address.indexOf("-") > 0) {
+          _arr = _address.split("-");
         }
         let ind = shopdata.businessCate.indexOf("/");
         let val1 = shopdata.businessCate.slice(0, ind);
@@ -346,28 +387,82 @@ export default {
           shopdata.businessCate.length
         );
         this.name = shopdata.shopName;
-        if(shopdata.phone && shopdata.phone != 'null') {
+        if (shopdata.phone && shopdata.phone != "null") {
           this.formdata[0].value = shopdata.phone;
         } else {
           this.formdata[0].value = shopdata.mobile;
         }
-        if(shopdata.shopInfo && shopdata.shopInfo != 'null') {
+        if (shopdata.shopInfo && shopdata.shopInfo != "null") {
           this.formdata[4].value = shopdata.shopInfo;
         } else {
-          this.formdata[4].value = '';
+          this.formdata[4].value = "";
         }
         this.formdata[1].value = val1;
         this.formdata[2].value = val2;
-        this.formdata[3].value = _arr[3]?_arr[3]:shopdata.address;
+        this.formdata[3].value = _arr[3] ? _arr[3] : shopdata.address;
+        this.indexUrl = shopdata.indexUrl;
+        this.logoUrl = shopdata.logoUrl;
       }
+    },
+    getFile: function(e) {
+      let _this = this,
+        inputDOM = {};
+      if (e == 1) {
+        _this.img1 = true;
+        inputDOM = this.$refs.door;
+      } else if (e == 2) {
+        _this.img2 = true;
+        inputDOM = this.$refs.Logo;
+      }
+      this.file = inputDOM.files[0];
+      this.errText = "";
+      this.$emit("input", this.file);
+      this.fileName = this.file.name;
+      this.onChange && this.onChange(this.file, inputDOM.value);
+      let form = new FormData();
+      form.append("file", this.file, this.file.name);
+      form.append("userName", "test");
+      this.$axios
+        .post("/api/app/img/upload", form)
+        .then(res => {
+          if (res.data.code != 0) {
+            Toast("系统繁忙请稍后再试");
+            return false;
+          }
+          if (e == 1) {
+            let indexUrl = '';
+            _this.img1 = false;
+            _this.indexUrl = res.data.data.smallPicUrl;
+            indexUrl = _this.indexUrl + "7loogindexUrl";
+            _this.setuserInfo(indexUrl);
+          } else if (e == 2) {
+            let logoUrl = '';
+            _this.img2 = false;
+            _this.logoUrl = res.data.data.smallPicUrl;
+            logoUrl = _this.logoUrl + "7looglogoUrl";
+            _this.setuserInfo(logoUrl);
+          }
+        })
+        .catch(err => {
+          Toast("系统繁忙请稍后再试");
+        });
+    },
+    getPhoto() {
+      this.$axios
+        .get("/api/app/shopTopPic/selectPic?shopId=" + this.shopId)
+        .then(res => {
+          if (res.data.code == 0) {
+            this.photoNum = res.data.data.length;
+          }
+        });
     }
   },
   created: function() {
     this.account();
+    this.getPhoto();
     if (this.writedata.length < 1) {
       this.getWritelist();
     }
-
     if (!this.formdata[0].value) {
       this.setformdata();
     }
@@ -407,7 +502,92 @@ export default {
     font-size: 28px;
     color: #b1b1b1;
   }
+  .manage_photo {
+    background-color: #fff;
+    padding: 0 26px;
+    .photo_item {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 26px 0;
+      overflow: hidden;
+      .photo_item_l {
+        line-height: 120px;
+        color: #191919;
+        font-size: 30px;
+        .photo_tips {
+          color: #B1B1B1;
+          font-size: 24px;
+          margin-left: 12px;
+        }
+      }
+      .photo_item_r {
+        position: relative;
+        .photo_url {
+          width: 120px;
+          height: 120px;
+        }
+        // .loadin {
+        //   display: inline-block;
+        //   width: 60px;
+        //   height: 60px;
+        //   position: relative;
+        //   // left: 32px;
+        //   // top: 32px;
+        //   background: rgb(136, 124, 124);
+        //   border-radius: 50%;
+        //   animation: mymove 1.5s linear infinite;
+        //   -webkit-animation: mymove 1.5s linear infinite; /*Safari and Chrome*/
+        //   .line {
+        //     position: relative;
+        //     left: 25px;
 
+        //     display: inline-block;
+        //     width: 20px;
+        //     height: 40px;
+        //     background: #fff;
+        //     z-index: 1;
+        //   }
+        //   .inloadin {
+        //     display: inline-block;
+        //     width: 40px;
+        //     height: 40px;
+        //     position: relative;
+        //     top: 10px;
+        //     left: -10px;
+        //     background: #fff;
+        //     border-radius: 50%;
+        //   }
+        // }
+        input {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: 0;
+          z-index: 100;
+        }
+      }
+    }
+    .photo_list {
+      height: 100px;
+      line-height: 100px;
+      padding: 0;
+      .photo_item_l {
+        line-height: 100px;
+      }
+      .photo_item_r {
+        color: #808080;
+        font-size: 30px;
+        span {
+          padding-right: 12px;
+        }
+      }
+      .photo_arrow {
+        width: 12px;
+        height: 22px;
+      }
+    }
+  }
   .hexiaoyuan {
     padding: 29px 20px;
     border-bottom: 1px solid #e0e0e0;
