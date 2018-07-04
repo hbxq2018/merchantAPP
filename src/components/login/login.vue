@@ -282,7 +282,8 @@ export default {
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
-            if (res.data.data && res.data.data.status) {
+            console.log(res.data.data)
+            if (res.data.data && _this.isNull(res.data.data.status)) {
               let status = res.data.data.status;
               if (status == 0) {
                 _this.$router.push({
