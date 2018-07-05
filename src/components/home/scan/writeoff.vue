@@ -77,7 +77,7 @@ export default {
          console.log('shopInfo:',this.userInfo)
         let obj = {
           soId: _ticket.soId, //订单id	Long
-          shopId: _ticket.id, //商家id	Long
+          shopId: this.userInfo.id, //商家id	Long
           shopName: this.userInfo.shopName, //店铺名称	Date  
           shopAmount: _ticket.couponAmount, //消费总额	BigDecimal
           couponId: _ticket.id, //电子券id	Long

@@ -12,11 +12,13 @@
         <span>&yen;{{dataarr.totalService}}</span>
         <!-- <P>打款日:次月5号</P> -->
     </div>
+
     <div class="data_statistics">
         <p><span>{{time}}</span><span>月已核销</span><span>{{total}}</span>张代金券，总额度<span>{{dataarr.totalPrice}}</span>元</p>
     </div>
+
     <div id="hisbeijin" class="hisbeijin"></div>
-    <div class="hisbox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
+    <div class="hisbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
         <ul id="history" class="history" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
           <li id="order_history" class="order_history" v-for="(item,index) in totalQuantity" :key="index">
               <div class="order_h_sublevel">
@@ -135,7 +137,9 @@ export default {
         }
       });
     },
-    //获取顶部卷去高度
+
+
+      //获取顶部卷去高度
     getScrollTop() {
       var scrollTop = 0,
         bodyScrollTop = 0,
@@ -170,18 +174,14 @@ export default {
       return scrollHeight;
     },
     //屏幕可视高度
-    getWindowHeight(val) {
+    getWindowHeight() {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      if(val == 1){
-         this.oDvheight=windowHeight*1-300+'px';
-      }else{
-         return windowHeight;
-      }
+      return windowHeight;
     },
     touchStart(e) {
       let dishesUl = document.getElementById("history");
@@ -197,6 +197,7 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
+      
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
@@ -258,6 +259,8 @@ export default {
         this.getdata();
       }
     }
+
+   
   },
   created: function() {
     this.getWindowHeight(1);
@@ -332,7 +335,8 @@ export default {
     top: 300px;
   }
   .hisbeijin{
-     height:317px;
+    width: 100%;
+    height: 312px;
   }
   .hisbox {
     margin-top:90px;

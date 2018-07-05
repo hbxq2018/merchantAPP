@@ -50,9 +50,9 @@
         </div>
     </div>
     <div class="filling" id="filling"></div>
-    <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
-        <div class="income_list" :style="styleObject">
-          <ul id="income" class="income" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+    <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+
+          <ul id="income" class="incomeul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
               <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
                   <div class="income_li_l">
                       <div class="income_li_l_date">{{item.createTime}}</div>
@@ -60,8 +60,8 @@
                   </div>
                   <div class="income_li_r">
                       <div class="left">
-                          <p>付款单号</p>
-                          <p>付款人</p>
+                          <p>付款单号:</p>
+                          <p>付款人:</p>
                           <p v-if="item.skuName">代金券</p>
                       </div>
                       <div class="right">
@@ -73,7 +73,7 @@
               </li>
               <li class="loadingBox" v-if="loadFlag">加载中..</li>
           </ul>
-        </div>
+     
   
     </div>
 
@@ -109,7 +109,7 @@ export default {
       temstart: "",
       temend: "",
       actval: "",
-      total: "",
+      total: "0",
       orderNum: "0",
       pickerValue: "",
       Visible: true,
@@ -151,7 +151,6 @@ export default {
   created: function() {
     ispush = false;
     let _this = this;
-    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -211,9 +210,6 @@ export default {
     ...mapState(["shopId"])
   },
   methods: {
-    init: function(val) {
-      
-    },
     openPicker(val) {
       this.actval = val;
       this.$refs.picker.open();
@@ -354,7 +350,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
-        this.total = res.data.data.total;
+        this.total = res.data.data.total?res.data.data.total:0;
       });
     },
     //获取列表数据
@@ -375,6 +371,14 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
+      if (this.page == 1) {
+        this.votes = [];
+      }
+      this.myorderforshop(_value);
+     
+      
+    },
+    myorderforshop:function(_value){
       this.$axios.get("/api/app/so/myorderForShop?" + _value).then(res => {
         // Indicator.close();
         if (res.data.code == 0) {
@@ -382,9 +386,7 @@ export default {
           let _data = res.data.data;
           this.orderNum = _data.total ? _data.total : 0;
           if (_data.list) {
-            if (this.page == 1) {
-              this.votes = [];
-            }
+            
             if (_data.list.length > 0) {
               for (let j = 0; j < _data.list.length; j++) {
                 if (/^1[34578]\d{9}$/.test(_data.list[j].userName)) {
@@ -393,8 +395,13 @@ export default {
                     "******" +
                     _data.list[j].userName.substring(9, 11);
                 }
+                if(_data.list[j].userName.length>11){
+                  _data.list[j].userName=_data.list[j].userName.slice(0,12);
+                }
                 this.votes.push(_data.list[j]);
+                
               }
+               this.myorder(_value);
               if (_data.list.length < 10) {
                 this.allLoaded = false;
               }
@@ -407,8 +414,55 @@ export default {
         }
       });
     },
+    myorder:function(_value){
+this.$axios.get("/api/app/so/myorder?" + _value).then(res => {
+        // Indicator.close();
+        console.log('res:',res)
+        if (res.data.code == 0) {
+          this.loadFlag = false;
+          let _data = res.data.data;
+          this.orderNum = _data.total ? _data.total : 0;
+          if (_data) {
+            console.log("_data:",_data)
+            if (_data.length > 0) {
+              for (let j = 0; j < _data.length; j++) {
+                if (/^1[34578]\d{9}$/.test(_data[j].userName)) {
+                  _data[j].userName =
+                    _data[j].userName.substring(0, 3) +
+                    "******" +
+                    _data[j].userName.substring(9, 11);
+                }
+                if(_data[j].userName.length>11){
+                  _data[j].userName=_data[j].userName.slice(0,12);
+                }
+                this.votes.push(_data[j]);
+
+              }
+              if (_data.length < 10) {
+                this.allLoaded = false;
+              }
+            } else {
+              this.allLoaded = false;
+            }
+          } else {
+            this.allLoaded = false;
+          }
+        }
+      });
+    },
+    //跳转至核销列表页面
+    bill() {
+      let obj = {
+        start: this.start,
+        end: this.end,
+        actday:this.actday
+      };
+      this.$router.push({ name: "Bill", params: obj });
+    },
+
+
+    //获取顶部卷去高度
     getScrollTop() {
-      //获取顶部卷去高度
       var scrollTop = 0,
         bodyScrollTop = 0,
         documentScrollTop = 0;
@@ -424,8 +478,8 @@ export default {
           : documentScrollTop;
       return scrollTop;
     },
+    //盒子总高度
     getScrollHeight() {
-      //盒子总高度
       var scrollHeight = 0,
         bodyScrollHeight = 0,
         documentScrollHeight = 0;
@@ -442,34 +496,30 @@ export default {
       return scrollHeight;
     },
     //屏幕可视高度
-    getWindowHeight(val) {
+    getWindowHeight() {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      if(val == 1){
-         this.oDvheight=windowHeight*1-231+'px';
-      }else{
-         return windowHeight;
-      } 
+      return windowHeight;
     },
     touchStart(e) {
       let dishesUl = document.getElementById("income");
-      let bottomH = document.getElementById("filling").clientHeight;
+      let bottomH =
+        document.getElementById("filling").clientHeight;
       this.touchStartY = e.targetTouches[0].pageY;
       if (this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
       } else {
         this.topFlag = false;
       }
-  
-      // if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
-      //   this.allLoaded = false;
-      //   this.bottomFlag = false;
-      // }
-
+      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
+        this.allLoaded = false;
+        this.bottomFlag = false;
+      }
+      
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
@@ -519,7 +569,6 @@ export default {
         this.getdata();
       }
       if (this.distance < 0 && this.bottomFlag == true) {
-        this.loadFlag = true;
         let index = -100;
         let timer = setInterval(function() {
           if (index == 0) {
@@ -531,15 +580,6 @@ export default {
         ++this.page;
         this.getdata();
       }
-    },
-    //跳转至核销列表页面
-    bill() {
-      let obj = {
-        start: this.start,
-        end: this.end,
-        actday:this.actday
-      };
-      this.$router.push({ name: "Bill", params: obj });
     }
   }
 };
@@ -625,78 +665,79 @@ export default {
       }
     }
   }
-  .income_list {
-    ul {
-      padding: 0;
-      padding-top: 30px;
-      margin: 0;
-      position: relative;
-      &:before {
-        content: "加载中..";
-        position: absolute;
-        left: 0;
-        top: -50px;
-        height: 20px;
-        width: 100%;
+
+  .incomeul {
+    padding: 0;
+    padding-top: 30px;
+    margin: 0;
+    position: relative;
+    &:before {
+      content: "加载中..";
+      position: absolute;
+      left: 0;
+      top: -50px;
+      height: 20px;
+      width: 100%;
+    }
+    li {
+      display: flex;
+      margin: 0 30px 20px 30px;
+      padding: 30px;
+      box-sizing: border-box;
+      text-align: left;
+      background-color: #fff;
+      color: #b1b1b1;
+      font-size: 22px;
+      & > div {
+        flex: direction-flex;
+        justify-content: space-between;
       }
-      li {
-        display: flex;
-        margin: 0 30px 20px 30px;
-        padding: 30px;
-        box-sizing: border-box;
-        text-align: left;
-        background-color: #fff;
-        color: #b1b1b1;
-        font-size: 22px;
-        & > div {
-          flex: direction-flex;
-          justify-content: space-between;
-        }
-        .income_li_l {
-          width: 50%;
-          .income_li_l_money {
-            font-size: 50px;
-            color: #191919;
-          }
-        }
-        .income_li_r {
-          width: 50%;
-          .left {
-            float: left;
-            p:nth-child(1) {
-              margin-bottom: 5px;
-            }
-            p:nth-child(2) {
-              margin-bottom: 5px;
-            }
-          }
-          .right {
-            float: left;
-            margin-left: 20px;
-            p:nth-child(1) {
-              margin-bottom: 5px;
-            }
-            p:nth-child(2) {
-              margin-bottom: 5px;
-            }
-          }
+      .income_li_l {
+        width: 50%;
+        .income_li_l_money {
+          font-size: 50px;
+          color: #191919;
         }
       }
-      .loadingBox {
-        background-color: #ebebeb;
-        text-align: center;
-        height: 30px;
-        line-height: 30px;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        display: block;
-        position: absolute;
-        bottom: -30px;
-        left: 0;
+      .income_li_r {
+        width: 50%;
+        padding-top: 10px;
+        .left {
+          float: left;
+          p:nth-child(1) {
+            margin-bottom: 5px;
+          }
+          p:nth-child(2) {
+            margin-bottom: 5px;
+          }
+        }
+        .right {
+          float: left;
+          margin-left: 20px;
+          p:nth-child(1) {
+            margin-bottom: 5px;
+          }
+          p:nth-child(2) {
+            margin-bottom: 5px;
+          }
+        }
       }
     }
+    .loadingBox {
+      background-color: #ebebeb;
+      text-align: center;
+      height: 30px;
+      line-height: 30px;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      display: block;
+      position: absolute;
+      bottom: -30px;
+      left: 0;
+    }
   }
+
   .mobox {
     width: 100%;
     position: fixed;

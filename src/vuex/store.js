@@ -20,29 +20,32 @@ const mutations={
             }else{
                 arr = data.split('/');
             }
-            
-            for(let key in state.userInfo){
-                if(arr[1] == key){
-                    if(reg.test(data)){
-                        state.userInfo[key] = arr[0];
-                    }else if((state.userInfo[key]+'').indexOf('/') != -1){
-                        let ind = state.userInfo[key].indexOf("/");
-                        let val1 = state.userInfo[key].slice(0,ind);
-                        let val2 = state.userInfo[key].slice(ind+1,state.userInfo[key].length);
-                        let last = arr[0].substr(arr[0].length-1,1);
-                        if(last == 1){
-                            val1 = '';
-                            val1 = arr[0].slice(0,arr[0].length-1);
-                        }else if(last ==2){
-                            val2 = '';
-                            val2 = arr[0].slice(0,arr[0].length-1);
-                        }
-                        let val = val1+'/'+val2;
-                        state.userInfo[key]=val;
-                    }else{
-                        state.userInfo[key] = arr[0];
-                    } 
+            if(state.userInfo.id){
+                for(let key in state.userInfo){
+                    if(arr[1] == key){
+                        if(reg.test(data)){
+                            state.userInfo[key] = arr[0];
+                        }else if((state.userInfo[key]+'').indexOf('/') != -1){
+                            let ind = state.userInfo[key].indexOf("/");
+                            let val1 = state.userInfo[key].slice(0,ind);
+                            let val2 = state.userInfo[key].slice(ind+1,state.userInfo[key].length);
+                            let last = arr[0].substr(arr[0].length-1,1);
+                            if(last == 1){
+                                val1 = '';
+                                val1 = arr[0].slice(0,arr[0].length-1);
+                            }else if(last ==2){
+                                val2 = '';
+                                val2 = arr[0].slice(0,arr[0].length-1);
+                            }
+                            let val = val1+'/'+val2;
+                            state.userInfo[key]=val;
+                        }else{
+                            state.userInfo[key] = arr[0];
+                        } 
+                    }
                 }
+            }else{
+                state.userInfo[arr[1]]=arr[0];
             }
         }else if(typeof data == "object"){
             state.userInfo = data;

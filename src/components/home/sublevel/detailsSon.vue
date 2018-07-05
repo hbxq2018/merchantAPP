@@ -11,7 +11,7 @@
         <p>本月服务费：¥{{money}}</p>
       </div>
       <div class="detailsSon_top"  v-if="isbill != 1">
-        <p>4月剩余应缴服务费</p>
+        <p>{{this.$route.params.ind}}月剩余应缴服务费</p>
         <p>¥{{diff}}</p>
         <p>本月总服务费¥{{money}}，已缴¥{{service}}</p>
       </div>
@@ -19,7 +19,7 @@
           <p>本月已核销<span>{{total}}</span>张代金券</p>
       </div>
     </div>
-
+    <div class="detasbj" id="detasbj"></div>
     <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
       <ul id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
         <li class="order_history" v-for="(item,index) in writedata" :key="index">
@@ -134,7 +134,9 @@ export default {
         }
       });
     },
-    //获取顶部卷去高度
+
+
+     //获取顶部卷去高度
     getScrollTop() {
       var scrollTop = 0,
         bodyScrollTop = 0,
@@ -169,22 +171,19 @@ export default {
       return scrollHeight;
     },
     //屏幕可视高度
-    getWindowHeight(val) {
+    getWindowHeight() {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      if(val == 1){
-         this.oDvheight=windowHeight*1-300+'px';
-      }else{
-         return windowHeight;
-      }
+      return windowHeight;
     },
     touchStart(e) {
       let dishesUl = document.getElementById("detasonul");
-      let bottomH = document.getElementById("sonbeijin").clientHeight;
+      let bottomH =
+        document.getElementById("detasbj").clientHeight;
       this.touchStartY = e.targetTouches[0].pageY;
       if (this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
@@ -195,6 +194,7 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
+      
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
@@ -256,9 +256,10 @@ export default {
         this.getdata();
       }
     }
+
+
   },
   created: function() {
-    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -322,6 +323,10 @@ export default {
     z-index: 99999;
     position: fixed;
   }
+  .detasbj{
+    width: 100%;
+    height: 412px;
+  }
   .songe{
     width: 100%;
     height: 420px;
@@ -339,7 +344,6 @@ export default {
   }
   .detabox {
     width: 100%;
-    padding-top:400px; 
     .detasonul:before {
         content: "加载中..";
         position: absolute;

@@ -40,29 +40,29 @@
             </div>
         </div>
         <div class="filling" id="filling"></div>
-        <div class="loadBottom billbox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
-            <div class="bill_list">
-                <ul id="bill" class="bill" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-                    <li class="bill_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
-                        <div class="bill_li_name">{{item.couponAmount}}元代金券</div>
-                        <div class="bill_li_info">
-                            <div class="left">
-                                <p>券码</p>
-                                <p>券状态</p>
-                                <p>服务费</p>
-                                <p>核销时间</p>
-                            </div>
-                            <div class="right">
-                                <p>{{item.couponCode}}</p>
-                                <p>{{item.userName}}</p>
-                                <p>{{item.couponAmount/10}}</p>
-                                <p>{{item.updateTime}}</p>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="loadingBox" v-if="loadFlag">加载中..</li>
-                </ul>
-            </div>
+        <div class="loadBottom billbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
+  
+          <ul id="bill" class="billul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+              <li class="bill_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
+                  <div class="bill_li_name">{{item.couponAmount}}元代金券</div>
+                  <div class="bill_li_info">
+                      <div class="left">
+                          <p>券码</p>
+                          <p>券状态</p>
+                          <p>服务费</p>
+                          <p>核销时间</p>
+                      </div>
+                      <div class="right">
+                          <p>{{item.couponCode}}</p>
+                          <p>{{item.userName}}</p>
+                          <p>{{item.couponAmount/10}}</p>
+                          <p>{{item.updateTime}}</p>
+                      </div>
+                  </div>
+              </li>
+              <li class="loadingBox" v-if="loadFlag">加载中..</li>
+          </ul>
+  
         </div>
         <mt-datetime-picker
                 ref="picker"
@@ -98,7 +98,6 @@ export default {
       actval: "",
       orderNum: "0",
       totalCost: 0,
-      oDvheight:'0px',
       pickerValue: "",
       Visible: true,
       ismore: false,
@@ -133,7 +132,6 @@ export default {
   },
   created: function() {
     let _this = this;
-    this.getWindowHeight(1);
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
@@ -351,8 +349,11 @@ export default {
         }
       });
     },
+
+
+
+    //获取顶部卷去高度
     getScrollTop() {
-      //获取顶部卷去高度
       var scrollTop = 0,
         bodyScrollTop = 0,
         documentScrollTop = 0;
@@ -368,8 +369,8 @@ export default {
           : documentScrollTop;
       return scrollTop;
     },
+    //盒子总高度
     getScrollHeight() {
-      //盒子总高度
       var scrollHeight = 0,
         bodyScrollHeight = 0,
         documentScrollHeight = 0;
@@ -385,23 +386,20 @@ export default {
           : documentScrollHeight;
       return scrollHeight;
     },
-    getWindowHeight(val) {
-      //屏幕可视高度
+    //屏幕可视高度
+    getWindowHeight() {
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
       } else {
         windowHeight = document.body.clientHeight;
       }
-      if(val == 1){
-         this.oDvheight=windowHeight*1-110+'px';
-      }else{
-         return windowHeight;
-      }
+      return windowHeight;
     },
     touchStart(e) {
       let dishesUl = document.getElementById("bill");
-      let bottomH = document.getElementById("filling").clientHeight;
+      let bottomH =
+        document.getElementById("filling").clientHeight;
       this.touchStartY = e.targetTouches[0].pageY;
       if (this.getScrollTop() == 0 && this.flag) {
         this.topFlag = true;
@@ -412,6 +410,7 @@ export default {
         this.allLoaded = false;
         this.bottomFlag = false;
       }
+      
       if (
         Math.abs(
           this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
@@ -461,7 +460,6 @@ export default {
         this.getdata();
       }
       if (this.distance < 0 && this.bottomFlag == true) {
-        this.loadFlag = true;
         let index = -100;
         let timer = setInterval(function() {
           if (index == 0) {
@@ -537,77 +535,77 @@ export default {
       }
     }
   }
-  .bill_list {
-    ul {
-      padding: 0;
-      padding-top: 30px;
-      margin: 0;
-      position: relative;
-      &:before {
-        content: "加载中..";
-        position: absolute;
-        left: 0;
-        top: -50px;
-        height: 20px;
+
+  .billul{
+    padding: 0;
+    padding-top: 30px;
+    margin: 0;
+    position: relative;
+    &:before {
+      content: "加载中..";
+      position: absolute;
+      left: 0;
+      top: -50px;
+      height: 20px;
+      width: 100%;
+    }
+    li {
+      margin: 0 30px 20px 30px;
+      padding: 30px;
+      box-sizing: border-box;
+      text-align: left;
+      background-color: #fff;
+      color: #555555;
+      font-size: 22px;
+      .bill_li_name {
+        font-size: 30px;
+        color: #191919;
+        font-weight: 600;
         width: 100%;
+        margin-bottom: 20px;
       }
-      li {
-        margin: 0 30px 20px 30px;
-        padding: 30px;
-        box-sizing: border-box;
-        text-align: left;
-        background-color: #fff;
-        color: #555555;
-        font-size: 22px;
-        .bill_li_name {
-          font-size: 30px;
-          color: #191919;
-          font-weight: 600;
-          width: 100%;
-          margin-bottom: 20px;
-        }
-        .bill_li_info {
-          width: 100%;
-          clear: both;
-          content: "";
-          display: block;
-          overflow: hidden;
-          .left {
-            float: left;
-            p {
-              margin-bottom: 10px;
-            }
-            p:last-child {
-              margin-bottom: 0;
-            }
-          }
-          .right {
-            float: left;
-            margin-left: 20px;
-            p {
-              margin-bottom: 10px;
-            }
-            p:last-child {
-              margin-bottom: 0;
-            }
-          }
-        }
-      }
-      .loadingBox {
-        background-color: #ebebeb;
-        text-align: center;
-        height: 30px;
-        line-height: 30px;
+      .bill_li_info {
         width: 100%;
-        padding: 0;
-        margin: 0;
+        clear: both;
+        content: "";
         display: block;
-        position: absolute;
-        bottom: -30px;
-        left: 0;
+        overflow: hidden;
+        .left {
+          float: left;
+          p {
+            margin-bottom: 10px;
+          }
+          p:last-child {
+            margin-bottom: 0;
+          }
+        }
+        .right {
+          float: left;
+          margin-left: 20px;
+          p {
+            margin-bottom: 10px;
+          }
+          p:last-child {
+            margin-bottom: 0;
+          }
+        }
       }
     }
+    .loadingBox {
+      background-color: #ebebeb;
+      text-align: center;
+      height: 30px;
+      line-height: 30px;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      display: block;
+      position: absolute;
+      bottom: -30px;
+      left: 0;
+    }
   }
+ 
   .mobox {
     width: 100%;
     position: fixed;

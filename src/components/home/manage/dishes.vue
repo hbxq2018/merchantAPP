@@ -101,8 +101,10 @@ export default {
         this.$router.push({ name: "AddDishes", params: { id: id ,isSign:isSign} });
       }
     },
+
+
+    //获取顶部卷去高度
     getScrollTop() {
-      //获取顶部卷去高度
       var scrollTop = 0,
         bodyScrollTop = 0,
         documentScrollTop = 0;
@@ -118,8 +120,8 @@ export default {
           : documentScrollTop;
       return scrollTop;
     },
+    //盒子总高度
     getScrollHeight() {
-      //盒子总高度
       var scrollHeight = 0,
         bodyScrollHeight = 0,
         documentScrollHeight = 0;
@@ -135,8 +137,8 @@ export default {
           : documentScrollHeight;
       return scrollHeight;
     },
+    //屏幕可视高度
     getWindowHeight() {
-      //屏幕可视高度
       var windowHeight = 0;
       if (document.compatMode == "CSS1Compat") {
         windowHeight = document.documentElement.clientHeight;
