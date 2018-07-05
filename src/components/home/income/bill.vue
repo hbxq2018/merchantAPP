@@ -44,7 +44,7 @@
   
           <ul id="bill" class="billul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
               <li class="bill_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
-                  <div class="bill_li_name">{{item.couponAmount}}元代金券</div>
+                  <div class="bill_li_name">{{item.skuName}}</div>
                   <div class="bill_li_info">
                       <div class="left">
                           <p>券码</p>
@@ -55,7 +55,7 @@
                       <div class="right">
                           <p>{{item.couponCode}}</p>
                           <p>{{item.userName}}</p>
-                          <p>{{item.couponAmount/10}}</p>
+                          <p>{{item.servicePrice}}</p>
                           <p>{{item.updateTime}}</p>
                       </div>
                   </div>
@@ -264,6 +264,12 @@ export default {
         end: this.end,
         actday: this.actday
       };
+      for(let i = 0; i < this.votes.length; i++) {
+        if(this.votes[i].id == id) {
+          obj.skuName = this.votes[i].skuName;
+          obj.servicePrice = this.votes[i].servicePrice;
+        }
+      }
       this.$router.push({ name: "Writeoff", params: obj });
     },
     // 选择日期

@@ -51,7 +51,9 @@ export default {
                   title:'核销员',
                   value:''
               }
-          ]
+          ],
+          skuName: '',
+          servicePrice: 0
       }
   },
   methods:{
@@ -68,7 +70,7 @@ export default {
         .then((res) => {
             if(res.data.code ==  '0'){
                let _data = res.data.data;
-               this.data[0].title = _data.couponAmount+'元代金券';
+               this.data[0].title = this.skuName;
                this.data[1].value = '¥ '+_data.shopAmount;
                this.data[2].value = _data.userName;
                this.data[3].value = _data.couponCode;
@@ -81,7 +83,7 @@ export default {
                let _s = _date.getSeconds();
                let newdate =_y+'-'+_m+'-'+_d+'  '+_h+':'+_mm+':'+_s;
                this.data[4].value = newdate;
-               this.data[5].value = '¥ '+_data.couponAmount/10;
+               this.data[5].value = '¥ '+this.servicePrice;
                this.data[6].value = _data.cashierName;
             }
         })
@@ -90,11 +92,14 @@ export default {
   },
   created:function(){
     //   app/so/getForOrder/
+    console.log(this.$route.params);
     if(this.$route.params.id){
       let id = this.$route.params.id,type= this.$route.params.type;
       this.start= this.$route.params.start;
       this.end= this.$route.params.end;
       this.actday= this.$route.params.actday;
+      this.skuName = this.$route.params.skuName;
+      this.servicePrice = this.$route.params.servicePrice;
       this.getdata(id,type);
     }
   }
