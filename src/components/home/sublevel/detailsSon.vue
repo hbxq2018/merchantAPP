@@ -25,7 +25,8 @@
         <li class="order_history" v-for="(item,index) in writedata" :key="index">
             <div class="order_h_sublevel">
                 <div class="roder_left">
-                    <b>{{item.couponAmount}}<span>元代金券</span></b>
+                    <!-- <b>{{item.couponAmount}}<span>元代金券</span></b> -->
+                    <b>{{item.skuName}}</b>
                     <p>{{item.updateTime}}</p>
                 </div>
                 <div class="roder-right">

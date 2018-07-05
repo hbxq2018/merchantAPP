@@ -1,7 +1,7 @@
 <template>
   <div class="billCheck">
         <mt-header fixed title="历史账单">
-          <router-link to="/historyse" slot="left">
+          <router-link slot="left" :to="{path:'home',query:{'ind':index}}">
             <mt-button icon="back"></mt-button>
           </router-link>
         </mt-header>
@@ -16,7 +16,7 @@
             <div class="checkCtSublevel">
               <div class="roder_left">
                   <b>{{data.length-index}}<span>月账单</span></b>
-                  <p>&yen;{{item?item.totalPrice:'0'}}</p>
+                  <p>&yen;{{item?item.totalService:'0'}}</p>
               </div>
               <div class="roder-right">
                   <span :class="!item.isBill?'actspan':''">{{item.isBill?'已缴清':'待打款'}}</span>
@@ -40,7 +40,8 @@ export default {
     return {
       time: "",
       data: [],
-      today:''
+      today:'',
+      index: 2
     };
   },
   filters: {

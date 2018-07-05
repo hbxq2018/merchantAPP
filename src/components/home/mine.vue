@@ -88,7 +88,8 @@ export default {
           if(listBoxID ==3 ){
               this.$router.push('/aboutUs')
           }else if(listBoxID ==0){
-              this.$router.push('/historyse')
+            //   this.$router.push('/historyse')
+              this.$router.push('/historyofthebill')
           }else if(listBoxID ==2){
               window.location.href="tel:027-59728176"
           }else if(listBoxID ==1){
