@@ -63,6 +63,12 @@ export default {
       this.file = inputDOM.files[0];
       this.errText = "";
       this.$emit("input", this.file);
+      if(!this.file) {
+        setTimeout(function(){
+          Indicator.close();
+        }, 500);
+        return false;
+      }
       this.fileName = this.file.name;
       this.onChange && this.onChange(this.file, inputDOM.value);
       let form = new FormData();

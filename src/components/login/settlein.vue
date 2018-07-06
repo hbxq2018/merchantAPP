@@ -288,6 +288,9 @@ export default {
       // }
       // 触发这个组件对象的input事件
       this.$emit("input", this.file);
+      if(!this.file) {
+        return false;
+      }
       // 这里就可以获取到文件的名字了
       this.fileName = this.file.name;
       // 这里加个回调也是可以的
