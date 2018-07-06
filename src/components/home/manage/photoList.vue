@@ -77,6 +77,7 @@ export default {
       this.$axios
         .post("/api/app/img/upload", form)
         .then(res => {
+          Indicator.close();
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
             return false;
