@@ -164,10 +164,10 @@ export default {
         action => {
           let obj = {
             id: userdata.id,
-            phone: userdata.phone,
+            // phone: userdata.phone,
             mobile: userdata.mobile,
             address: userdata.address,
-            shopInfo: userdata.shopInfo,
+            // shopInfo: userdata.shopInfo,
             locationX: userdata.locationX,
             locationY: userdata.locationY,
             businessCate: userdata.businessCate,
@@ -176,6 +176,12 @@ export default {
             indexUrl: userdata.indexUrl,
             logoUrl: userdata.logoUrl
           };
+          if(userdata.phone) {
+            obj.phone = userdata.phone;
+          }
+          if(userdata.shopInfo) {
+            obj.shopInfo = userdata.shopInfo;
+          }
           let _value = "";
           for (var key in obj) {
             _value += key + "=" + obj[key] + "&";
