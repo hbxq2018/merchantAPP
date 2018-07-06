@@ -27,9 +27,9 @@
               </div>
           </div>
       </div>
-      <div class="weekBox" v-if="weekFlag">
+      <!-- <div class="weekBox" v-if="weekFlag">
           <mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
-      </div>
+      </div> -->
       <mt-datetime-picker
           ref="picker"
           type="time"

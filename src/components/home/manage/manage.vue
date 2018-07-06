@@ -442,6 +442,7 @@ export default {
             logoUrl = _this.logoUrl + "7looglogoUrl";
             _this.setuserInfo(logoUrl);
           }
+          Toast("上传成功");
         })
         .catch(err => {
           Toast("系统繁忙请稍后再试");

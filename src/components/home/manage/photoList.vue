@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import { Field, Toast } from "mint-ui";
+import { Field, Toast, Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import qs from "qs";
 import { mapState, mapMutations } from "vuex";
@@ -52,6 +52,10 @@ export default {
         });
     },
     getFile: function() {
+      Indicator.open({
+        text: '上传中...',
+        spinnerType: 'fading-circle'
+      });
       this.isEdit = false;
       let _this = this,
         inputDOM = {};
@@ -90,6 +94,7 @@ export default {
         .then(res => {
           if(res.data.code == 0) {
               this.getPhoto();
+              Indicator.close();
           }
         });
     },
@@ -99,6 +104,7 @@ export default {
         .then(res => {
           if(res.data.code == 0) {
               this.getPhoto();
+              Toast('删除成功');
           }
         });
     }
