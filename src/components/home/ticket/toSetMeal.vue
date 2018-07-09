@@ -110,7 +110,7 @@
 </template>
 
 <script>
-import { MessageBox, Toast } from "mint-ui";
+import { MessageBox, Toast, Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import qs from "qs";
 import { mapState, mapMutations, mapGetters } from "vuex";
@@ -163,6 +163,10 @@ export default {
       });
     },
     getFile: function(e) {
+      Indicator.open({
+        text: "图片上传中...",
+        spinnerType: "triple-bounce"
+      });
       //上传图片
       //上传图片
       let _this = this,
@@ -187,6 +191,7 @@ export default {
       this.$axios
         .post("/api/app/img/upload", form)
         .then(res => {
+          Indicator.close();
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
             return false;
@@ -194,6 +199,7 @@ export default {
           _this.picUrl = res.data.data.picUrl;
         })
         .catch(err => {
+          Indicator.close();
           Toast("系统繁忙请稍后再试");
         });
     },

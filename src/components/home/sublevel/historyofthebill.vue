@@ -19,7 +19,7 @@
                   <p>&yen;{{item?item.totalService:'0'}}</p>
               </div>
               <div class="roder-right">
-                  <span :class="!item.isBill?'actspan':''">{{item.isBill?'已缴清':'待打款'}}</span>
+                  <span :class="!item.isBill?'actspan':''">{{item.isBill?'已缴清':item.totalService?'待打款':''}}</span>
                   <img src="../../../../static/images/home_arrow.png" alt="账单详情图标">
               </div>
             </div>
