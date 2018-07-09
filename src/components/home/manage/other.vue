@@ -38,9 +38,11 @@
   </div>
 </template>
 <script>
-import { Toast } from "mint-ui";
+import Vue from "vue";
+import { Toast, Picker, DatetimePicker } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
+Vue.component(Picker.name, Picker, DatetimePicker.name, DatetimePicker);
 export default {
   name: "Other",
   data() {
@@ -110,6 +112,13 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo"]),
     clickback() {
+      let startArr = [], endArr = [];
+      startArr = this.startTime.split(':');
+      endArr = this.endTime.split(':');
+      if(parseInt(startArr[0]) * 60 + parseInt(startArr[1]) >= parseInt(endArr[0]) * 60 + parseInt(endArr[1])){
+        Toast('开始时间不得大于结束时间');
+        return false;
+      }
       let otherService = '', shopHours = '';
       for(let i = 0; i < this.otherArr.length; i++) {
         if(this.otherArr[i].flag) {

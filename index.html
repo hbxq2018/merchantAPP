@@ -18,6 +18,7 @@
   <script>
     var quit = false;
     var ispush = false,pushinfo={},pushmsg={};
+    var isBack = false;
     document.addEventListener("plusready", function () {
       message = document.getElementById("message");
       console.log('index_message:')
@@ -89,7 +90,9 @@
           first = null;
         }, 1000);
       } else {
-        if (new Date().getTime() - first < 1000) {//如果两次按下的时间小于1s，
+        if(isBack) {
+          plus.runtime.quit();//那么就退出app
+        } else if (new Date().getTime() - first < 1000) {//如果两次按下的时间小于1s，
           if(quit){
             plus.runtime.quit();//那么就退出app
           }

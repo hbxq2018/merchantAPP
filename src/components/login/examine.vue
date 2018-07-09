@@ -26,23 +26,23 @@ export default {
   },
   created() {
       this.status = this.$route.params.status;
-      console.log(this.status)
+      isBack = true;
       if(this.status == 0) {
           this.msg = "入驻审核中";
-          this.examineImg = "../../../static/images/wait.png";
+          this.examineImg = require("../../../static/images/wait.png");
           this.colorSit = "";
           this.toHref = "";
           this.colorBtn = "";
       } else if(this.status == 1) {
           this.msg = "恭喜你，审核通过";
-          this.examineImg = "../../../static/images/pass.png";
+          this.examineImg = require("../../../static/images/pass.png");
           this.colorSit = "pass";
           this.colorBtn = "pass";
           this.toHref = "home";
           this.btnTxt = "进入店铺";
       } else if(this.status == 2) {
           this.msg = "审核没有通过";
-          this.examineImg = "../../../static/images/noPass.png";
+          this.examineImg = require("../../../static/images/noPass.png");
           this.colorSit = "nopass";
           this.colorBtn = "nopass";
           this.toHref = "settlein";
