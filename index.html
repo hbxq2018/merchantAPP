@@ -2,104 +2,106 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>享7科技商家APP</title>
-  <link rel="stylesheet" href="http://at.alicdn.com/t/font_653216_hfrzfk2f2do0f6r.css">
-  <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.0&key=572119ddd1f359d7caab5c67ff94e12c"></script>
-  <script src="//webapi.amap.com/ui/1.0/main.js"></script>
-  <script type='text/javascript' src='./static/mui.min.js'></script>
-  <script type="text/javascript" src="./static/igexinTool.js"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>享7科技商家APP</title>
+	<link rel="stylesheet" href="http://at.alicdn.com/t/font_653216_hfrzfk2f2do0f6r.css">
+	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.0&key=572119ddd1f359d7caab5c67ff94e12c"></script>
+	<script src="//webapi.amap.com/ui/1.0/main.js"></script>
+	<script type='text/javascript' src='./static/mui.min.js'></script>
+	<script type="text/javascript" src="./static/igexinTool.js"></script>
 </head>
 
 <body>
-  <div id="app"></div>
-  <!-- built files will be auto injected -->
-  <script>
-    var quit = false;
-    var ispush = false,pushinfo={},pushmsg={};
-    var isBack = false;
-    document.addEventListener("plusready", function () {
-      message = document.getElementById("message");
-      console.log('index_message:')
-      // 监听点击消息事件
-      plus.push.addEventListener("click", function (msg) {
-        console.log('index_click_msg')
-        // 判断是从本地创建还是离线推送的消息
-        switch (msg.payload) {
-          case "LocalMSG":
-            console.log("点击本地创建消息启动：");
-            break;
-          default:
-            console.log("点击离线推送消息启动：");
-            break;
-        }
-        // 提示点击的内容
-        plus.ui.alert(msg.content);
-        // 处理其它数据
-        logoutPushMsg(msg);
-      }, false);
-      // 监听在线消息事件
-      plus.push.addEventListener("receive", function (msg) {
-        console.log('index_receive_msg')
-        console.log('msg:',msg)
-        if (msg.aps) {  // Apple APNS message
-          console.log("接收到在线APNS消息：");
-        } else {
-          console.log("接收到在线透传消息index：");
-        }
-        
-        // window.open(window.location.origin + '/income')
-        getPushInfo(msg);
-        // opepage();
-        
-      }, false);
-    }, false);
-    function getPushInfo(msg) {
-      pushmsg = msg;
-      pushinfo = plus.push.getClientInfo();
-      ispush = true;
-      console.log('pushmsg:', pushmsg)
-      console.log('pushinfo:', pushinfo)
-      console.log('ispush:', ispush)
-      //  window.location.reload();
-      // logoutPushMsg(msg);
-      // outSet( "获取客户端推送标识信息：" );
-      // outLine( "token: "+info.token );
-      // outLine( "clientid: "+info.clientid );
-      // outLine( "appid: "+info.appid );
-      // outLine( "appkey: "+info.appkey );
-    }
+	<div id="app"></div>
+	<!-- built files will be auto injected -->
+	<script>
+		var quit = false;
+		var ispush = false, pushinfo = {}, pushmsg = {};
+		var isBack = false;
+		document.addEventListener("plusready", function () {
+			message = document.getElementById("message");
+			console.log('index_message:')
+			// 监听点击消息事件
+			plus.push.addEventListener("click", function (msg) {
+				console.log('index_click_msg')
+				// 判断是从本地创建还是离线推送的消息
+				switch (msg.payload) {
+					case "LocalMSG":
+						console.log("点击本地创建消息启动：");
+						break;
+					default:
+						console.log("点击离线推送消息启动：");
+						break;
+				}
+				// 提示点击的内容
+				plus.ui.alert(msg.content);
+				// 处理其它数据
+				logoutPushMsg(msg);
+			}, false);
+			// 监听在线消息事件
+			plus.push.addEventListener("receive", function (msg) {
+				console.log('index_receive_msg')
+				console.log('msg:', msg)
+				if (msg.aps) {  // Apple APNS message
+					console.log("接收到在线APNS消息：");
+				} else {
+					console.log("接收到在线透传消息index：");
+				}
+
+				// window.open(window.location.origin + '/income')
+				getPushInfo(msg);
+				// opepage();
+
+			}, false);
+		}, false);
+		function getPushInfo(msg) {
+			pushmsg = msg;
+			pushinfo = plus.push.getClientInfo();
+			ispush = true;
+			console.log('pushmsg:', pushmsg)
+			console.log('pushinfo:', pushinfo)
+			console.log('ispush:', ispush)
+			//  window.location.reload();
+			// logoutPushMsg(msg);
+			// outSet( "获取客户端推送标识信息：" );
+			// outLine( "token: "+info.token );
+			// outLine( "clientid: "+info.clientid );
+			// outLine( "appid: "+info.appid );
+			// outLine( "appkey: "+info.appkey );
+		}
 
 
-    mui.init({
-      keyEventBind: {
-        backbutton: true  //关闭back按键监听
-      }
-    });
-    // //首页返回键处理
-    // //处理逻辑：1秒内，连续两次按返回键，则退出应用；
-    var first = null;
-    mui.back = function () {
-      //首次按键，提示‘再按一次退出应用’
-      if (!first) {
-        first = new Date().getTime();//记录第一次按下回退键的时间
-        // mui.toast('再按一次退出应用');//给出提示
-        history.go(-1)//回退到上一页面
-        setTimeout(function () {//1s中后清除
-          first = null;
-        }, 1000);
-      } else {
-        if(isBack) {
-          plus.runtime.quit();//那么就退出app
-        } else if (new Date().getTime() - first < 1000) {//如果两次按下的时间小于1s，
-          if(quit){
-            plus.runtime.quit();//那么就退出app
-          }
-        }
-      }
-    };
-  </script>
+		mui.init({
+			keyEventBind: {
+				backbutton: true  //关闭back按键监听
+			}
+		});
+		// //首页返回键处理
+		// //处理逻辑：1秒内，连续两次按返回键，则退出应用；
+		var first = null;
+		mui.back = function () {
+			if (isBack) {    //如果在审核页面点击物理返回键就退出程序
+				plus.runtime.quit();//那么就退出app
+			} else {
+				//首次按键，提示‘再按一次退出应用’
+				if (!first) {
+					first = new Date().getTime();//记录第一次按下回退键的时间
+					// mui.toast('再按一次退出应用');//给出提示
+					history.go(-1)//回退到上一页面
+					setTimeout(function () {//1s中后清除
+						first = null;
+					}, 1000);
+				} else {
+					if (new Date().getTime() - first < 1000) {//如果两次按下的时间小于1s，
+						if (quit) {
+							plus.runtime.quit();//那么就退出app
+						}
+					}
+				}
+			}
+		};
+	</script>
 </body>
 
 </html>
