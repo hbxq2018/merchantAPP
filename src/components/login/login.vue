@@ -29,7 +29,7 @@
 <script>
 import Vue from "vue";
 import GLOBAL from "../../../untils/config/config";
-import { Toast,Button  } from "mint-ui";
+import { Toast, Button } from "mint-ui";
 Vue.component(Button.name, Button);
 import qs from "qs";
 import store from "@/vuex/store";
@@ -87,8 +87,7 @@ export default {
       _this.timeFlag = false;
       let RegExp = /^(1[3584]\d{9})$/;
       if (RegExp.test(this.telephone)) {
-        // "/api/  <==> /api/    上线时所有替换
-        console.log("this.telephone:", this.telephone);
+        // this.$GLOBAL.API  <==> /api/    上线时所有替换
         this.$axios
           .post(
             "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
@@ -139,10 +138,12 @@ export default {
       } else if (!this.password) {
         Toast("请输入短信验证码");
       } else {
-        _parms = {
+        (_parms = {
           shopMobile: this.telephone,
           smsContent: this.password
-        };
+        }),
+          (value = ""),
+          (_this = this);
         for (var key in _parms) {
           value += key + "=" + _parms[key] + "&";
         }
@@ -282,7 +283,7 @@ export default {
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
-            console.log(res.data.data)
+            console.log(res.data.data);
             if (res.data.data && _this.isNull(res.data.data.status)) {
               let status = res.data.data.status;
               if (status == 0) {
@@ -328,7 +329,7 @@ export default {
               break;
             }
           }
-          console.log("ssss:",s)
+          console.log("ssss:", s);
           if (!s.authResult) {
             s.login(
               function(e) {
@@ -347,7 +348,7 @@ export default {
                       ? s.userInfo.unionid
                       : "";
                     _this.isSignWX = true;
-                    // _this.$axios.get("/api/"app/user/findByOpenId/" + _this.openId, {})
+                    // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
                         "/api/app/user/findByOpIdAndUnId/?openId=" +
@@ -393,7 +394,7 @@ export default {
             );
           } else {
             console.log("已经登陆认证！");
-             s.login(
+            s.login(
               function(e) {
                 console.log("登陆认证成功！");
                 s.getUserInfo(
@@ -481,40 +482,7 @@ export default {
     this.setScroll();
     let userId = localStorage.getItem("userId");
     if (userId) {
-      mui.plusReady(function() {
-        var tool = new igexinTool();
-        tool.bindAlias(userId);
-        plus.push.addEventListener(
-          "receive",
-          function(msg) {
-            console.log("login_receive_msg:", msg);
-            if (msg.aps) {
-              // Apple APNS message
-              console.log("接收到在线APNS消息：");
-              _arr = msg.payload.split(",");
-              if (_arr[0] == 1) {
-                _this.$router.push({ path: "/income" });
-              } else if (_arr[0] == 2) {
-                _this.$router.push({ path: "/historyse" });
-              } else {
-                _this.$router.push({ path: "/income" });
-              }
-            } else {
-              console.log("接收到在线透传消息login：");
-              _arr = msg.payload.split(",");
-              if (_arr[0] == 1) {
-                _this.$router.push({ path: "/income" });
-              } else if (_arr[0] == 2) {
-                _this.$router.push({ path: "/historyse" });
-              } else {
-                _this.$router.push({ path: "/income" });
-              }
-            }
-          },
-          false
-        );
-      });
-
+      console.log(userId)
       this.$axios.get("/api/app/user/get/" + userId).then(res => {
         if (
           res.data.code == "0" &&

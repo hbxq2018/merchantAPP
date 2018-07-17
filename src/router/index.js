@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/login/login'
 import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
@@ -13,6 +12,7 @@ import Category from '@/components/login/category'
 import Agreement from '@/components/login/agreement'
 import Examine from '@/components/login/examine'
 import Menu from '@/components/home/menu'
+import Moving from '@/components/home/moving'
 import Actlist from '@/components/activity/actlist'
 import Actsign from '@/components/activity/actsign'
 import Actdetails from '@/components/activity/actdetails'
@@ -39,6 +39,9 @@ import Howtouse from '@/components/home/sublevel/synopsisManual/howtouse'
 import ImproveService from '@/components/home/sublevel/synopsisManual/improveService'
 import Questions from '@/components/home/sublevel/synopsisManual/questions'
 import Ihatetheqrcode from '@/components/home/ihatetheqrcode/ihatetheqrcode'
+import AddVideo from '@/components/home/addDynamic/addVideo'
+import Article from '@/components/home/addDynamic/article'
+import VideoDateil from '@/components/home/addDynamic/videoDateil'
 Vue.use(Router)
 
 export default new Router({
@@ -237,6 +240,26 @@ export default new Router({
       path:'/actsign',
       name:'Actsign',
       component:Actsign
+    },
+    {
+      path:'/addVideo',
+      name:'AddVideo',
+      component:AddVideo
+    },
+    {
+      path:'/moving',
+      name:'Moving',
+      component:Moving
+    },
+    {
+      path:'/article',
+      name:'Article',
+      component:Article
+    },
+    {
+      path:'/videoDateil',
+      name:'VideoDateil',
+      component:VideoDateil
     }
   ]
 })

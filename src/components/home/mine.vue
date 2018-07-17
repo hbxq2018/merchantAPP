@@ -69,18 +69,18 @@ export default {
       close:function(){
         let _this = this;
         MessageBox.confirm('确定要退出登录吗?').then(action => {
-        if(action == 'confirm'){
-            _this.setismine(1);
-            quit = false;
-            let obj={},id='';
-            localStorage.setItem("userId",'');
-            this.setuserInfo(obj)
-            this.setshopId(id)
-            this.setNewUserInfo(obj)
-            this.setshopInfo(obj)
-            this.$router.push('/')
-        }
-      },()=>{});
+            if(action == 'confirm'){
+                _this.setismine(1);
+                quit = false;
+                let obj={},id='';
+                localStorage.setItem("userId",'');
+                this.setuserInfo(obj)
+                this.setshopId(id)
+                this.setNewUserInfo(obj)
+                this.setshopInfo(obj)
+                this.$router.push('/')
+            }
+        },()=>{});
       },
       WeIntroduce:function(e){
           const listBoxID = e.currentTarget.id;

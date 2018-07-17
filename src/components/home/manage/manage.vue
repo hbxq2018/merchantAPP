@@ -642,6 +642,13 @@ export default {
       }
     }
   }
+  .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button{
+    width: 20px;
+    height: 20px;
+  }
+  .ql-toolbar.ql-snow + .ql-container.ql-snow{
+    font-size: 20px;
+  }
 }
 </style>
 

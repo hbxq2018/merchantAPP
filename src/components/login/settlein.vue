@@ -375,6 +375,7 @@ export default {
     },
     //提交表单
     submitForm() {
+      console.log('shopInfo:',this.shopInfo)
       let _this = this;
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");

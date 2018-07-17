@@ -77,40 +77,34 @@ export default {
   created: function() {
     // Indicator.open("数据加载中...");
     let _this = this;
-    this.$axios.get("/api/app/act/getDate").then(res => {
-      res.data.data =res.data.data.replace(/(-)/g, '/');
-      this.today = res.data.data;
-      let _date = new Date(res.data.data);
-      
-      let _start = _this.$UTILS.dateConv(_date);
-      let arr = _start.split("/");
-      arr[1] = "01";
-      arr[2] = "01";
-      _start = arr.join("/");
-      let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
-      _end = _this.$UTILS.dateConv(new Date(_end));
-      let obj = {
-        shopId: this.shopId,
-        begainTime: _start,
-        endTime: _end
-      };
-      let parms = "",
-        value = "";
-      for (var key in obj) {
-        value += key + "=" + obj[key] + "&";
+    let _date = new Date();
+    let _start =_this.$UTILS.dateConv(_date);
+    let arr = _start.split("/");
+    arr[1]= '01';
+    arr[2] = "01";
+    _start = arr.join("/");
+    //  let _end = new Date(_this.$UTILS.dateConv(_date)).getTime() + 86400000;
+    let _end = new Date(_this.$UTILS.dateConv(_date)).getTime();
+    _end = _this.$UTILS.dateConv(new Date(_end));
+    let obj = {
+      shopId: this.shopId,
+      begainTime: _start,
+      endTime: _end
+    };
+    let parms = "",value = "";
+    for (var key in obj) {
+      value += key + '=' + obj[key] + '&';
+    }
+    value = value.substring(0, value.length-1);
+    this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
+      if (res.data.code == 0) {
+        let _data =[];
+         for(key in res.data.data){
+           _data.push(res.data.data[key])
+         }
+        _data.reverse();
+        _this.data = _data;
       }
-      value = value.substring(0, value.length - 1);
-      this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
-        if (res.data.code == 0) {
-          let _data = [];
-          for (key in res.data.data) {
-            _data.push(res.data.data[key]);
-          }
-          _data.reverse();
-          // Indicator.close();
-          _this.data = _data;
-        }
-      });
     });
   }
 };

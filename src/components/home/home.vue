@@ -1,16 +1,21 @@
 <template>
   <div class="home">
       
-      <Menu v-if="ismenu"></Menu>
-      <Mine v-if="!ismenu"></Mine>
+      <Menu v-if="ismenu==1"></Menu>
+      <Moving v-if="ismenu==2"></Moving>
+      <Mine v-if="ismenu==3"></Mine>
      
       <div class="h_but">
-          <div :class="ismenu?'h_bar h_bar_active':'h_bar'" @click="gomenu">
-            <div class="icon iconfont iconfont-sye">&#xe663;</div>
+          <div :class="ismenu==1?'h_bar h_bar_active':'h_bar'" @click="gomenu">
+            <div class="icon iconfont iconfont-sye">&#xe629;</div>
             <div>首页</div>
           </div>
-          <div :class="ismenu?'h_bar':'h_bar  h_bar_active'" @click="gomine">
-            <div class="icon iconfont iconfont-sye">&#xe646;</div>
+          <div :class="ismenu==2?'h_bar h_bar_active':'h_bar'" @click="gomoving">
+            <div class="icon iconfont iconfont-sye">&#xe684;</div>
+            <div>动态</div>
+          </div>
+          <div :class="ismenu==3?'h_bar  h_bar_active':'h_bar'" @click="gomine">
+            <div class="icon iconfont iconfont-sye">&#xe8a1;</div>
             <div>我的</div>
           </div>
       </div>
@@ -20,18 +25,20 @@
 <script>
 import Menu from "./menu";
 import Mine from "./mine";
+import Moving from "./moving";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "Home",
   data() {
     return {
-      ismenu: true
+      ismenu: 1
     };
   },
   components: {
     Menu,
-    Mine
+    Mine,
+    Moving
   },
   store,
   computed: {
@@ -48,11 +55,14 @@ export default {
     ...mapMutations(["setuserInfo","setismine"]),
     gomenu: function() {
       this.setismine(1);
-      this.ismenu = true;
+      this.ismenu = 1;
+    },
+    gomoving:function(){
+      this.ismenu =2
     },
     gomine: function() {
       this.setismine(2);
-      this.ismenu = false;
+      this.ismenu = 3;
     },
     getshopinfo: function() {
       //获取商家信息
@@ -68,14 +78,16 @@ export default {
   },
   created: function() {
     // this.getshopinfo();
-    // console.log("userInfo:",this.userInfo)
+    console.log(this.$route.query.ind)
     quit = true;
-    if (this.$route.query.ind == "2") {
-      this.ismenu = false;
+    if (this.$route.query.ind == 2) {
+      this.ismenu = 3;
+    }else if(this.$route.query.ind == 3){
+      this.ismenu = 2;
     }
-    if(this.ismine == 2){
-      this.ismenu = false;
-    }
+    // if(this.ismine == 2){
+    //   this.ismenu = 3;
+    // }
     
     // if (ispush) {
     //   console.log("ispush:", ispush);
@@ -101,7 +113,7 @@ export default {
     background: #fff;
     .h_bar {
       display: block;
-      width: 50%;
+      width: 33.33%;
       height: 100%;
       text-decoration: none;
       float: left;
@@ -114,6 +126,7 @@ export default {
       color: #fc5e2d;
     }
   }
+  
 }
 </style>
 

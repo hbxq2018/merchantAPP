@@ -2,9 +2,9 @@ var config = require('./config/config.js');
 import { myStore } from './tools/store';
 import { tools } from './tools/tools';
 
-function getNowFormatDate(){  //yyyy-MM-dd HH:MM:SS”
+function getNowFormatDate() {  //yyyy-MM-dd HH:MM:SS”
   var date = new Date();
-  var seperator1 = "/"; 
+  var seperator1 = "/";
   var seperator2 = ":";
   var month = date.getMonth() + 1;
   var strDate = date.getDate();
@@ -44,6 +44,28 @@ function transformLength(len) {
   }
 }
 
+
+//获取本地视频地址及播放时长
+function getFileURL(file) {
+  //获取视频本地地址
+  var getUrl = null,duration='';
+  if (window.createObjectURL != undefined) { // basic
+    getUrl = window.createObjectURL(file);
+  } else if (window.URL != undefined) { // mozilla(firefox)
+    getUrl = window.URL.createObjectURL(file);
+  } else if (window.webkitURL != undefined) { // webkit or chrome
+    getUrl = window.webkitURL.createObjectURL(file);
+  }
+
+  if (getUrl) {
+    videoId.src = getUrl;
+    setTimeout(function () {
+      //获取视频时长
+      duration = videoId.duration;
+    }, 1000)
+  }
+}
+
 function utf16toEntities(str) {  //将emoji表情转为字符进行存储 
   var patt = /[\ud800-\udbff][\udc00-\udfff]/g; // 检测utf16字符正则 
   str = str.replace(patt, function (char) {
@@ -78,7 +100,7 @@ function uncodeUtf16(str) {  //反解开EMOJI编码后的字符串   与上对�
 
 function timeDiffrence(current, updateTime, createTime) {      //文章发布时间  updateTime
   let createT = '', timestamp = 0, str = '暂无';
-  updateTime = updateTime?updateTime.replace(/-/g, "/"):''; 
+  updateTime = updateTime ? updateTime.replace(/-/g, "/") : '';
   updateTime = updateTime ? updateTime : createTime;
   if (updateTime != null && updateTime != '') {
     createT = new Date(updateTime).getTime();
@@ -99,13 +121,13 @@ function timeDiffrence(current, updateTime, createTime) {      //文章发布时
   }
   return str;
 }
-function million(num){    //数字过万处理
+function million(num) {    //数字过万处理
   return num > 9999 ? (Math.floor(num / 1000) / 10) + '万+' : num
 }
 
 //判断值是否为空
 function isNull(value) {
-  if(value == 'null' || value == null || value == '' || value == undefined) {
+  if (value == 'null' || value == null || value == '' || value == undefined) {
     return false;
   }
   return true;
@@ -134,29 +156,29 @@ const methods = {
   million: million,
   getNowFormatDate: getNowFormatDate,
   isNull: isNull,
-  dateConv:dateConv
+  dateConv: dateConv
 }
 
-export function formatDate (date, fmt) {
+export function formatDate(date, fmt) {
   if (/(y+)/.test(fmt)) {
-      fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
   let o = {
-      'M+': date.getMonth() + 1,
-      'd+': date.getDate(),
-      'h+': date.getHours(),
-      'm+': date.getMinutes(),
-      's+': date.getSeconds()
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds()
   };
   for (let k in o) {
-      if (new RegExp(`(${k})`).test(fmt)) {
-          let str = o[k] + '';
-          fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str));
-      }
+    if (new RegExp(`(${k})`).test(fmt)) {
+      let str = o[k] + '';
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str));
+    }
   }
   return fmt;
 };
-function padLeftZero (str) {
+function padLeftZero(str) {
   return ('00' + str).substr(str.length);
 };
 

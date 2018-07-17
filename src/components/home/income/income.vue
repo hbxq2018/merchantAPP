@@ -149,7 +149,6 @@ export default {
     };
   },
   created: function() {
-    ispush = false;
     let _this = this;
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
@@ -158,19 +157,21 @@ export default {
 
     this.$axios.get("/api/app/act/getDate").then(res => {
       res.data.data =res.data.data.replace(/(-)/g, '/');
-      this.today =res.data.data;
-      let _date =this.today;
+       this.today =res.data.data;
+      let _date = new Date(this.today);
+      // this.today =_date;
       let _mindata =
       new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() - 86400000 * 365;
       this.mindata = new Date(_mindata);
       let _maxdata =
-      new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
+        new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000 * 365 * 3;
       this.maxdata = new Date(_maxdata);
 
       let _start = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime();
       _start = _this.$UTILS.dateConv(new Date(_start));
       let _end = new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() + 86400000;
       _end = _this.$UTILS.dateConv(new Date(_end));
+
 
       if (this.$route.query.start) {
         _start = this.$route.query.start;
@@ -415,174 +416,174 @@ export default {
       });
     },
     myorder:function(_value){
-this.$axios.get("/api/app/so/myorder?" + _value).then(res => {
-        // Indicator.close();
-        console.log('res:',res)
-        if (res.data.code == 0) {
-          this.loadFlag = false;
-          let _data = res.data.data;
-          this.orderNum = _data.total ? _data.total : 0;
-          if (_data) {
-            console.log("_data:",_data)
-            if (_data.length > 0) {
-              for (let j = 0; j < _data.length; j++) {
-                if (/^1[34578]\d{9}$/.test(_data[j].userName)) {
-                  _data[j].userName =
-                    _data[j].userName.substring(0, 3) +
-                    "******" +
-                    _data[j].userName.substring(9, 11);
-                }
-                if(_data[j].userName.length>11){
-                  _data[j].userName=_data[j].userName.slice(0,12);
-                }
-                this.votes.push(_data[j]);
+      this.$axios.get("/api/app/so/myorder?" + _value).then(res => {
+            // Indicator.close();
+            console.log('res:',res)
+            if (res.data.code == 0) {
+              this.loadFlag = false;
+              let _data = res.data.data;
+              this.orderNum = _data.total ? _data.total : 0;
+              if (_data) {
+                console.log("_data:",_data)
+                if (_data.length > 0) {
+                  for (let j = 0; j < _data.length; j++) {
+                    if (/^1[34578]\d{9}$/.test(_data[j].userName)) {
+                      _data[j].userName =
+                        _data[j].userName.substring(0, 3) +
+                        "******" +
+                        _data[j].userName.substring(9, 11);
+                    }
+                    if(_data[j].userName.length>11){
+                      _data[j].userName=_data[j].userName.slice(0,12);
+                    }
+                    this.votes.push(_data[j]);
 
-              }
-              if (_data.length < 10) {
+                  }
+                  if (_data.length < 10) {
+                    this.allLoaded = false;
+                  }
+                } else {
+                  this.allLoaded = false;
+                }
+              } else {
                 this.allLoaded = false;
               }
-            } else {
-              this.allLoaded = false;
             }
+          });
+        },
+        //跳转至核销列表页面
+        bill() {
+          let obj = {
+            start: this.start,
+            end: this.end,
+            actday:this.actday
+          };
+          this.$router.push({ name: "Bill", params: obj });
+        },
+
+
+        //获取顶部卷去高度
+        getScrollTop() {
+          var scrollTop = 0,
+            bodyScrollTop = 0,
+            documentScrollTop = 0;
+          if (document.body) {
+            bodyScrollTop = document.body.scrollTop;
+          }
+          if (document.documentElement) {
+            documentScrollTop = document.documentElement.scrollTop;
+          }
+          scrollTop =
+            bodyScrollTop - documentScrollTop > 0
+              ? bodyScrollTop
+              : documentScrollTop;
+          return scrollTop;
+        },
+        //盒子总高度
+        getScrollHeight() {
+          var scrollHeight = 0,
+            bodyScrollHeight = 0,
+            documentScrollHeight = 0;
+          if (document.body) {
+            bodyScrollHeight = document.body.scrollHeight;
+          }
+          if (document.documentElement) {
+            documentScrollHeight = document.documentElement.scrollHeight;
+          }
+          scrollHeight =
+            bodyScrollHeight - documentScrollHeight > 0
+              ? bodyScrollHeight
+              : documentScrollHeight;
+          return scrollHeight;
+        },
+        //屏幕可视高度
+        getWindowHeight() {
+          var windowHeight = 0;
+          if (document.compatMode == "CSS1Compat") {
+            windowHeight = document.documentElement.clientHeight;
           } else {
+            windowHeight = document.body.clientHeight;
+          }
+          return windowHeight;
+        },
+        touchStart(e) {
+          let dishesUl = document.getElementById("income");
+          let bottomH =
+            document.getElementById("filling").clientHeight;
+          this.touchStartY = e.targetTouches[0].pageY;
+          if (this.getScrollTop() == 0 && this.flag) {
+            this.topFlag = true;
+          } else {
+            this.topFlag = false;
+          }
+          if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
             this.allLoaded = false;
+            this.bottomFlag = false;
+          }
+          
+          if (
+            Math.abs(
+              this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
+            ) < 5 &&
+            this.allLoaded
+          ) {
+            this.bottomFlag = true;
+          } else {
+            this.bottomFlag = false;
+          }
+        },
+        touchMove(e) {
+          let dishesUl = document.getElementById("income");
+          this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
+          if (this.distance > 0 && this.topFlag == true && this.flag) {
+            if (this.distance > 100) {
+              this.distance = 100;
+            }
+            dishesUl.style.transform =
+              "translate3d(0px, " + this.distance + "px, 0px)";
+          }
+          if (this.distance < 0 && this.bottomFlag == true) {
+            if (this.distance < -100) {
+              this.distance = -100;
+            }
+            dishesUl.style.transform =
+              "translate3d(0px, " + this.distance + "px, 0px)";
+          }
+        },
+        touchEnd() {
+          let dishesUl = document.getElementById("income"),
+            _this = this;
+          if (this.distance > 0 && this.topFlag == true && this.flag) {
+            this.flag = false;
+            let index = 100;
+            let timer = setInterval(function() {
+              if (index == 0) {
+                clearInterval(timer);
+                _this.flag = true;
+                _this.distance = 0;
+              }
+              index--;
+              dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
+            }, 5);
+            this.page = 1;
+            this.allLoaded = true;
+            this.getdata();
+          }
+          if (this.distance < 0 && this.bottomFlag == true) {
+            let index = -100;
+            let timer = setInterval(function() {
+              if (index == 0) {
+                clearInterval(timer);
+              }
+              index++;
+              dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
+            }, 5);
+            ++this.page;
+            this.getdata();
           }
         }
-      });
-    },
-    //跳转至核销列表页面
-    bill() {
-      let obj = {
-        start: this.start,
-        end: this.end,
-        actday:this.actday
-      };
-      this.$router.push({ name: "Bill", params: obj });
-    },
-
-
-    //获取顶部卷去高度
-    getScrollTop() {
-      var scrollTop = 0,
-        bodyScrollTop = 0,
-        documentScrollTop = 0;
-      if (document.body) {
-        bodyScrollTop = document.body.scrollTop;
       }
-      if (document.documentElement) {
-        documentScrollTop = document.documentElement.scrollTop;
-      }
-      scrollTop =
-        bodyScrollTop - documentScrollTop > 0
-          ? bodyScrollTop
-          : documentScrollTop;
-      return scrollTop;
-    },
-    //盒子总高度
-    getScrollHeight() {
-      var scrollHeight = 0,
-        bodyScrollHeight = 0,
-        documentScrollHeight = 0;
-      if (document.body) {
-        bodyScrollHeight = document.body.scrollHeight;
-      }
-      if (document.documentElement) {
-        documentScrollHeight = document.documentElement.scrollHeight;
-      }
-      scrollHeight =
-        bodyScrollHeight - documentScrollHeight > 0
-          ? bodyScrollHeight
-          : documentScrollHeight;
-      return scrollHeight;
-    },
-    //屏幕可视高度
-    getWindowHeight() {
-      var windowHeight = 0;
-      if (document.compatMode == "CSS1Compat") {
-        windowHeight = document.documentElement.clientHeight;
-      } else {
-        windowHeight = document.body.clientHeight;
-      }
-      return windowHeight;
-    },
-    touchStart(e) {
-      let dishesUl = document.getElementById("income");
-      let bottomH =
-        document.getElementById("filling").clientHeight;
-      this.touchStartY = e.targetTouches[0].pageY;
-      if (this.getScrollTop() == 0 && this.flag) {
-        this.topFlag = true;
-      } else {
-        this.topFlag = false;
-      }
-      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
-        this.allLoaded = false;
-        this.bottomFlag = false;
-      }
-      
-      if (
-        Math.abs(
-          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
-        ) < 5 &&
-        this.allLoaded
-      ) {
-        this.bottomFlag = true;
-      } else {
-        this.bottomFlag = false;
-      }
-    },
-    touchMove(e) {
-      let dishesUl = document.getElementById("income");
-      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        if (this.distance > 100) {
-          this.distance = 100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        if (this.distance < -100) {
-          this.distance = -100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-    },
-    touchEnd() {
-      let dishesUl = document.getElementById("income"),
-        _this = this;
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        this.flag = false;
-        let index = 100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-            _this.flag = true;
-            _this.distance = 0;
-          }
-          index--;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        this.page = 1;
-        this.allLoaded = true;
-        this.getdata();
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        let index = -100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-          }
-          index++;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        ++this.page;
-        this.getdata();
-      }
-    }
-  }
-};
+    };
 </script>
 
 <style lang="less">
