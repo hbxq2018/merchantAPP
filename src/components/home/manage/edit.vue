@@ -46,7 +46,7 @@ export default {
       options: [],
       option1: [
         {
-          label: "日本菜",
+          label: "料理",
           checked: false
         },
         {

@@ -19,7 +19,7 @@
 
 
         <div class="loadBottom mocontent" :style="{'-webkit-overflow-scrolling': scrollMode}">
-            <div id="moving"  class="movingBox" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+            <div v-if="listData.length>0" id="moving"  class="movingBox" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
                 <div class="contentList" v-for="(item,index) in listData" :key="index">
                     <div class="listTop">
                         <img class="userHead" :src="item.iconUrl" alt="用户头像">
@@ -38,6 +38,7 @@
                     </div>
                 </div>
             </div>
+            <img v-else class="empty" src="../../../static/images/zhanweitu.png" alt="空空如也">
         </div> 
 
 
@@ -394,10 +395,17 @@ export default {
     height: 0px;
   }
   .mocontent {
-    width: 100%;
     padding-top: 80px;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
     background: RGBA(245, 245, 250, 1);
-
+    .empty{
+      width: 50%;
+      margin-top: 40%;
+    }
     .movingBox {
         &:before {
           content: "加载中...";

@@ -141,11 +141,12 @@ export default {
               data[i].full = arr[0];
             }
             this.ticketlist = data;
+            console.log("ticketlist:",this.ticketlist)
           }
         });
     },
     getskulist: function() {
-      this.$axios.get("/api/app/sku/list").then(res => {
+      this.$axios.get("/api/app/sku/list?page=1&rows=30").then(res => {
         if (res.data.code == "0") {
           let data = res.data.data.list.slice(1);
           let _arr = [];

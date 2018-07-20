@@ -31,7 +31,7 @@ export default {
         { name: "约会", checked: false }
       ],
       Category: [
-        { name: "日本菜", checked: false },
+        { name: "料理", checked: false },
         { name: "自助餐", checked: false },
         { name: "湖北菜", checked: false },
         { name: "川菜", checked: false },

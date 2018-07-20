@@ -85,7 +85,7 @@ export default {
         return false;
       }
       _this.timeFlag = false;
-      let RegExp = /^(1[3584]\d{9})$/;
+      let RegExp = /^(1[345789]\d{9})$/;
       if (RegExp.test(this.telephone)) {
         // this.$GLOBAL.API  <==> /api/    上线时所有替换
         this.$axios

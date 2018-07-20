@@ -74,7 +74,7 @@ export default {
         let _ticket = this.ticket;
         console.log('_ticket:',_ticket)
         console.log('shopInfo:',this.shopInfo)
-         console.log('shopInfo:',this.userInfo)
+        console.log('shopInfo:',this.userInfo)
         let obj = {
           soId: _ticket.soId, //订单id	Long
           shopId: this.userInfo.id, //商家id	Long
