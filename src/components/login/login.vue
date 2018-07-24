@@ -482,7 +482,6 @@ export default {
     this.setScroll();
     let userId = localStorage.getItem("userId");
     if (userId) {
-      console.log(userId)
       this.$axios.get("/api/app/user/get/" + userId).then(res => {
         if (
           res.data.code == "0" &&

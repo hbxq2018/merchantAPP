@@ -40,8 +40,6 @@
             </div>
             <img v-else class="empty" src="../../../static/images/zhanweitu.png" alt="空空如也">
         </div> 
-
-
     </div>
 </template>
 
@@ -64,7 +62,6 @@ export default {
       topFlag: false, //是否到顶部
       bottomFlag: false, //是否到底部
       flag: true, //节流阀
-
       topicType: "",
       delImg: require("../../../static/images/more.png"),
       popupVisible: false,
