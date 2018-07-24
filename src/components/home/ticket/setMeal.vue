@@ -6,7 +6,7 @@
         </router-link>
     </mt-header>
     <div id="setMealBox" class="setMealBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-        <ul id="setMealUl" class="setMealUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+        <ul v-if="list.length>0" id="setMealUl" class="setMealUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
             <li class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
                 <img class="icon fl" :src="item.picUrl" alt="">
                 <div class="text fl">
@@ -20,6 +20,7 @@
                 <div class="arrow fr"></div>
             </li>
         </ul>
+        <img v-else class="emtpy" :src="url" alt="什么都没有">
     </div>
     <div id="setMealBottom" class="setMealBottom" @click="toSetMeal()">
         <span>+</span>
@@ -37,6 +38,7 @@ export default {
   data() {
     return {
       name: "套餐",
+      url: require('../../../../static/images/zhanweitu.png'),
       list: [],
       page: 1,
       allLoaded: true,
@@ -214,6 +216,7 @@ export default {
         width: 100%;
         padding: 81px 0 110px 0;
         box-sizing: border-box;
+        
         .setMealUl {
             width: 100%;
             position: relative;

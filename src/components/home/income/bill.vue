@@ -44,7 +44,7 @@
     <div class="filling" id="filling"></div>
 
     <div class="loadBottom billbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-      <ul id="bill" class="billul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+      <ul v-if="votes.length>0" id="bill" class="billul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
           <li class="bill_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
               <div class="bill_li_name">{{item.skuName}}</div>
               <div class="bill_li_info">
@@ -64,6 +64,7 @@
           </li>
           <li class="loadingBox" v-if="loadFlag">加载中..</li>
       </ul>
+      <img v-else class="emtpy" :src="url" alt="什么都没有">
     </div>
 
     <mt-datetime-picker
@@ -109,6 +110,7 @@ export default {
       isselecttime: false,
       maxdata: "",
       mindata: "",
+      url: require('../../../../static/images/zhanweitu.png'),
       days: [
         {
           title: "今日"

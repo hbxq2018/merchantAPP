@@ -215,7 +215,7 @@
           if(_obj.address){
             let _address = _obj.Province+'-'+_obj.City+'-'+_obj.county+'-'+_obj.address;
             let address = _address +'/'+'address';
-           this.setuserInfo(address);
+            this.setuserInfo(address);
           }
           if(_obj.lat){
               let locationY = _obj.lat +'/'+'locationY';

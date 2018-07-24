@@ -6,7 +6,7 @@
         </router-link>
     </mt-header>
     <div class="dishesBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-			<ul id="dishesUl" class="dishesUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+			<ul v-if="list.length>0" id="dishesUl" class="dishesUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
 				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(index,item.skuName,item.id,item.isSign)">
 					<img class="icon fl" :src="item.picUrl" alt="">
 					<div class="text fl">
@@ -20,6 +20,7 @@
 					<div v-if="type == 1" class="arrow fr"></div>
 				</li>
 			</ul>
+      <img v-else class="empty" :src="url" alt="什么都没有">
     </div>
     <div v-show="type == 1 || !type" id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
         <span>+</span>
@@ -39,6 +40,7 @@ export default {
     return {
       title: "推荐菜管理",
       list: [],
+      url: require('../../../../static/images/zhanweitu.png'),
       type: 1, //1 推荐菜管理   2推荐菜列表  2是在活动（37）中使用
       backpath: "/manage",
       page: 1,

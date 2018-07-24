@@ -6,7 +6,7 @@
         </router-link>
         <mt-button slot="right" @click="addticket">+添加</mt-button>
     </mt-header>
-    <ul>
+    <ul v-if="ticketlist.length>0">
         <li class="tic" v-for="(item,index) in ticketlist" :key="index">
             <span class="text">满</span>
             <span class="teval">{{item.full}}</span>
@@ -15,6 +15,7 @@
             <button class="deltic" :id='item.id' @click="delticket">删除</button>
         </li>
     </ul>
+    <img v-else class="emtpy" :src="url" alt="什么都没有">
 
     <div v-show="isadd" class="model_box">
         <div class="settic">
@@ -42,6 +43,7 @@ export default {
       msg: "ticket",
       name: "享7券",
       isadd: false,
+      url: require('../../../../static/images/zhanweitu.png'),
       slots: [
         {
           values: []
@@ -141,7 +143,7 @@ export default {
               data[i].full = arr[0];
             }
             this.ticketlist = data;
-            console.log("ticketlist:",this.ticketlist)
+            // console.log("ticketlist:",this.ticketlist)
           }
         });
     },
@@ -235,7 +237,7 @@ export default {
           border: none;
         }
         .picker {
-          width: 100px;
+          width: 150px;
           position: absolute;
           top: 30px;
           right: 50px;

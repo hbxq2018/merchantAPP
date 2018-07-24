@@ -34,10 +34,14 @@ const webpackConfig = merge(baseWebpackConfig, {
       'process.env': env,
       SERVERDOMAIN:'https://www.hbxq001.cn/'
     }),
+    // 修改下面这段代码是针对解决IOS10白屏的问题，详情请看https://segmentfault.com/a/1190000013075464
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: {
           warnings: false
+        },
+        mangle: {
+          safari10: true
         }
       },
       sourceMap: config.build.productionSourceMap,
@@ -94,6 +98,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         )
       }
     }),
+    
     // extract webpack runtime and module manifest to its own file in order to
     // prevent vendor hash from being updated whenever app bundle is updated
     new webpack.optimize.CommonsChunkPlugin({

@@ -7,7 +7,6 @@ import MintUI from 'mint-ui';
 import './assets/css/my-mint.css'; //全局修改mint-UI样式 
 import './assets/css/iconfont/icon.css'; // 字体图标
 import 'lib-flexible';
-import 'babel-polyfill';
 import axios from 'axios';
 import GLOBAL from '../untils/config/config';
 import UTILS from '../untils/util';

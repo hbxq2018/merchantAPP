@@ -5,7 +5,9 @@
         <!-- <mt-button slot="right"  @click="save">保存</mt-button> -->
       </mt-header> 
       <div class="edit_content">
-        <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="联系电话" placeholder="请输入新联系电话" ref="phone" type="tel" ></mt-field>
+        <mt-field class="indleft" v-show="ind == '0'" v-model="data.mobile" label="手机电话" placeholder="请输入手机号码" ref="phone" type="tel" ></mt-field>
+        <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="座机电话" placeholder="请输入座机号码" ref="phone" type="tel" ></mt-field>
+        <div class="legend">座机号码和手机号码，请正确输入至少一个联系方式</div>
         <!-- <mt-checklist  
             v-if="ind == '1' || ind == '2'" 
             :max="_max"
@@ -39,6 +41,7 @@ export default {
       _max: "",
       data: {
         phone: "",
+        mobile:"",
         Introduction: ""
       },
       value: [],
@@ -124,22 +127,44 @@ export default {
       this.$router.push({ name: "Manage", params: {} });
       const ind = this.ind;
       if (ind == 0) {
-        const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
-        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
-        if (reg.test(this.data.phone)) {
-          let mobile = this.data.phone + "/" + "mobile";
-          this.setuserInfo(mobile);
-          this.$router.push({ name: "Manage", params: {} });
-          //    this.$router.go(-1) //返回上一页面
-        } else if (reg2.test(this.data.phone)) {
-          let phone = this.data.phone + "/" + "phone";
-          this.setuserInfo(phone);
-          this.$router.push({ name: "Manage", params: {} });
-        } else {
-          Toast("联系方式输入有误，请重新输入");
-          this.data.phone = "";
+        if(this.data.mobile || this.data.phone){
+          const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
+          const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
+          
+          if (reg.test(this.data.mobile)) {
+            let mobile = this.data.mobile + "/" + "mobile";
+            this.setuserInfo(mobile);
+            this.$router.push({ name: "Manage", params: {} });
+          } else {
+            this.data.mobile = "";
+            let mobile = this.data.mobile + "/" + "mobile";
+            this.setuserInfo(mobile);
+            this.$router.push({ name: "Manage", params: {} });
+            if(this.data.mobile){
+              Toast("手机号码输入有误，请重新输入");
+            }
+          }
+        
+          if (reg2.test(this.data.phone)) {
+            let phone = this.data.phone + "/" + "phone";
+            this.setuserInfo(phone);
+            this.$router.push({ name: "Manage", params: {} });
+          } else {
+            this.data.phone = "";
+            let phone = this.data.phone + "/" + "phone";
+            this.setuserInfo(phone);
+            this.$router.push({ name: "Manage", params: {} });
+            if(this.data.phone){
+              Toast("座机号码输入有误，请重新输入");
+            }
+          }
+          
+        }else{
+          Toast("请正确输入至少一个联系电话");
+          return false
         }
-      } else if (ind == 1) {
+        
+      }else if (ind == 1) {
         let arr = [];
         for (let i = 0; i < this.checkedArr.length; i++) {
           arr.push(this.checkedArr[i].label);
@@ -194,21 +219,32 @@ export default {
       const ind = this.ind;
       let _this = this;
       if (ind == 0) {
-        const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
-        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
-        if (reg.test(this.data.phone)) {
-          let mobile = this.data.phone + "/" + "mobile";
-          this.setuserInfo(mobile);
-
-          //    this.$router.go(-1) //返回上一页面
-        } else if (reg2.test(this.data.phone)) {
-          let phone = this.data.phone + "/" + "phone";
-          this.setuserInfo(phone);
-
-        } else {
-          Toast("联系方式输入有误，请重新输入");
-          this.data.phone = "";
+        if(this.data.mobile || this.data.phone){
+          const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
+          const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
+          if(this.data.mobile){
+            if (reg.test(this.data.mobile)) {
+              let mobile = this.data.mobile + "/" + "mobile";
+              this.setuserInfo(mobile);
+            } else {
+              Toast("手机号码输入有误，请重新输入");
+              this.data.phone = "";
+            }
+          }
+          if(this.data.phone){
+            if (reg2.test(this.data.phone)) {
+              let phone = this.data.phone + "/" + "phone";
+              this.setuserInfo(phone);
+            } else {
+              Toast("座机号码输入有误，请重新输入");
+              this.data.phone = "";
+            }
+          }
+        }else{
+          Toast("请正确输入至少一个联系电话");
+          return false
         }
+        
       } else if (ind == 1) {
         let arr = [];
         for (let i = 0; i < this.checkedArr.length; i++) {
@@ -276,7 +312,15 @@ export default {
     this.ind = this.$route.query.ind;
     this.content = this.$route.query.value;
     if (this.ind == "0") {
-      this.data.phone = this.content;
+        const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
+        const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
+        if (reg.test(this.content)) {
+          this.data.mobile = this.content;
+        }
+        if (reg2.test(this.content)) {
+          this.data.phone = this.content;
+        }
+      
     }
     if (this.ind == "1") {
       this.options = this.option1;
@@ -319,7 +363,9 @@ export default {
   }
   .edit_content {
     padding-top: 80px;
-
+    .legend{
+      margin-top: 50px;
+    }
     .mint-cell-title,
     .mint-cell-text {
       width: 130px;

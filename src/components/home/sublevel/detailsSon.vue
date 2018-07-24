@@ -20,8 +20,8 @@
       </div>
     </div>
     <div class="detasbj" id="detasbj"></div>
-    <div v-if="first.totalService" class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
-      <ul id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+    <div class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
+      <ul v-if="writedata.length>0" id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
         <li class="order_history" v-for="(item,index) in writedata" :key="index">
             <div class="order_h_sublevel">
                 <div class="roder_left">
@@ -35,6 +35,7 @@
             </div>
         </li>
       </ul>
+      <img v-else class="emtpy" :src="url" alt="什么都没有">
     </div>
   </div>
 </template>
@@ -53,6 +54,7 @@ export default {
       total: "",
       first: {},
       writedata: [],
+      url: require('../../../../static/images/zhanweitu.png'),
       ind: 1,
       page: 1,
       service:0,

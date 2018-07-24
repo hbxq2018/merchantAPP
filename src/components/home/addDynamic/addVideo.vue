@@ -5,7 +5,7 @@
             <mt-button slot="right" @click="handsend">发送</mt-button>
         </mt-header>
         <div class="content">
-            <div class="cover" >
+            <div class="cover">
                 <div class="uploadvideo" v-if="!coverImg">
                     <p v-if="motype==2 && !coverImg" class="p1">上传视频</p>
                     <p v-if="motype==2 && !coverImg" class="p2">（上传抖音、快手、微视等原创视频效果更好）</p>
@@ -120,11 +120,13 @@ export default {
     },
     //点击发送，保存编辑
     handsend: function() {
+      let _this = this;
       if($('#article-body').html()){
-        this.content=encodeURIComponent($('#article-body').html());
+        this.content=$('#article-body').html();
       }
-       console.log('this.content:',this.content)
-      if (!this.moTitle) {
+      if(this.content.length>4800){
+        Toast("文字内容过长，可用图片代替");
+      }else if (!this.moTitle) {
         Toast("请输入标题");
       } else if (!this.coverImg) {
         Toast("请上传封面图片或视频");
@@ -137,30 +139,27 @@ export default {
         this.content='';
       }else{
        this.moTitle=this.utf16toEntities(this.moTitle);
-      //  this.content=this.utf16toEntities(this.content);
+       this.content=this.utf16toEntities(this.content);
+        
         MessageBox.confirm("确定保存?").then(
           action => {
             if (action == "confirm") {
               let _parms = {
-                  title: this.moTitle,
-                  content: this.content,
-                  topicType: this.motype,
-                  userId: this.shopInfo.id,
-                  summary: this.moTitle,
-                  homePic: this.coverImg,
-                  userName: this.shopInfo.userName,
-                  nickName: this.shopInfo.nickName
-                },_value = "";
-              for (var key in _parms) {
-                _value += key + "=" + _parms[key] + "&";
+                title: this.moTitle,
+                content: this.content,
+                topicType: this.motype,
+                userId: this.shopInfo.id,
+                summary: this.moTitle,
+                homePic: this.coverImg,
+                userName: this.shopInfo.userName,
+                nickName: this.shopInfo.nickName
               }
-              _value = _value.substring(0, _value.length - 1);
-              this.$axios.post("/api/app/topic/add?" + _value).then(res => {
-                if (res.data.code == "0") {
-                  this.EmptyData();
+              $.post("/api//app/topic/add",_parms,function(res){
+                if (res.code == 0) {
+                  _this.EmptyData();
                   MessageBox("提示", "保存成功");
                 }
-              });
+              })
             }
           },
           () => {}
@@ -197,10 +196,7 @@ export default {
         _text = "视频上传中...";
         _Url = "/api/app/img/uploadMp4";
       }
-      Indicator.open({
-        text: _text,
-        spinnerType: "triple-bounce"
-      });
+      
       let _this = this,
         inputDOM = {};
       inputDOM = this.$refs.mocover;
@@ -208,11 +204,16 @@ export default {
       console.log("inputDOM:", inputDOM);
       this.file = inputDOM.files[0];
       this.errText = "";
-      // 触发这个组件对象的input事件
-      this.$emit("input", this.file);
+      
       if (!this.file) {
         return false;
       }
+      Indicator.open({
+        text: _text,
+        spinnerType: "triple-bounce"
+      });
+      // 触发这个组件对象的input事件
+      this.$emit("input", this.file);
       // 这里就可以获取到文件的名字了
       this.getFileURL(this.file)
       this.fileName = this.file.name;
@@ -226,6 +227,7 @@ export default {
         .post(_Url, form)
         .then(res => {
           Indicator.close();
+          console.log('res:',res)
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
             return false;

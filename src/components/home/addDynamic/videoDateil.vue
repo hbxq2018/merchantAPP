@@ -290,7 +290,7 @@ export default {
                 span {
                     position: relative;
                     top: -14px;
-                    background: #ebebeb;
+                    background: #fff;
                     padding: 0 20px;
                 }
             }

@@ -6,7 +6,7 @@
             </router-link>
         </mt-header>
         <div class="artcontent">
-            <h3 class="title">{{artData.title}}</h3>
+            <h3 class="title">{{artData.title | uncodeUtf16}}</h3>
             <p>{{artData.nickName?artData.nickName:artData.userName}}</p>
             <div class="artdetail" v-html="artData.content"></div>
 
@@ -52,6 +52,23 @@ export default {
     };
   },
   store,
+  filters: {
+    uncodeUtf16:function(str) {  //反解开EMOJI编码后的字符串   与上对应使用
+      var reg = /\&#.*?;/g;
+      var result = str.replace(reg, function (char) {
+        var H, L, code;
+        if (char.length == 9) {
+          code = parseInt(char.match(/[0-9]+/g));
+          H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+          L = (code - 0x10000) % 0x400 + 0xDC00;
+          return unescape("%u" + H.toString(16) + "%u" + L.toString(16));
+        } else {
+          return char;
+        }
+      });
+      return result;
+    }
+  },
   computed: {
     ...mapState(["shopInfo"])
   },

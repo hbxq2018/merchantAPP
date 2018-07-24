@@ -52,7 +52,7 @@
     <div class="filling" id="filling"></div>
     <div class="loadBottom inbox" :style="{'-webkit-overflow-scrolling': scrollMode}">
 
-          <ul id="income" class="incomeul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+          <ul v-if="votes.length>0" id="income" class="incomeul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
               <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
                   <div class="income_li_l">
                       <div class="income_li_l_date">{{item.createTime}}</div>
@@ -73,7 +73,7 @@
               </li>
               <li class="loadingBox" v-if="loadFlag">加载中..</li>
           </ul>
-     
+     <img v-else class="emtpy" :src="url" alt="什么都没有">
   
     </div>
 
@@ -119,6 +119,7 @@ export default {
       isselecttime: false,
       maxdata: "",
       mindata: "",
+      url: require('../../../../static/images/zhanweitu.png'),
       styleObject: {
           height:'0px'
       },
@@ -418,13 +419,11 @@ export default {
     myorder:function(_value){
       this.$axios.get("/api/app/so/myorder?" + _value).then(res => {
             // Indicator.close();
-            console.log('res:',res)
             if (res.data.code == 0) {
               this.loadFlag = false;
               let _data = res.data.data;
               this.orderNum = _data.total ? _data.total : 0;
               if (_data) {
-                console.log("_data:",_data)
                 if (_data.length > 0) {
                   for (let j = 0; j < _data.length; j++) {
                     if (/^1[34578]\d{9}$/.test(_data[j].userName)) {
