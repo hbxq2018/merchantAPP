@@ -179,7 +179,8 @@ export default {
             if (action == "confirm") {
                 this.$axios.get("/api/app/topic/delete/" + this.artId).then(res => {
                     if (res.data.code == 0) {
-                    Toast("删除成功！");
+                        history.go(-1)//回退到上一页面
+                        Toast("删除成功！");
                     }
                 });
                 }

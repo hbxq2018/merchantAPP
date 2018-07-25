@@ -6,6 +6,10 @@
         </mt-header>
         <div class="content">
             <div class="cover">
+                <mt-progress :value="schedule" v-if="ispro">
+                  <div slot="start">{{schedule}}%</div>
+                  <div slot="end">{{finish}}%</div>
+                </mt-progress>
                 <div class="uploadvideo" v-if="!coverImg">
                     <p v-if="motype==2 && !coverImg" class="p1">上传视频</p>
                     <p v-if="motype==2 && !coverImg" class="p2">（上传抖音、快手、微视等原创视频效果更好）</p>
@@ -26,7 +30,7 @@
             <input class="moTitle" type="text" placeholder="标题" v-model="moTitle">
             <hr>
             
-            <div id="article-body" v-if="motype==1">
+            <div id="article-body">
               
             </div>
 
@@ -48,12 +52,15 @@ export default {
     return {
       motype: 2,
       duration:0,
+      schedule:0,
+      finish:100,
       title: "",
       content: "",
       moTitle: "",
       coverImg: "",
       coverUrl: "",
       isplay: false,
+      ispro:false,
       playIcon: "https://xq-1256079679.file.myqcloud.com/test_play_0.8.jpg"
     };
   },
@@ -89,6 +96,7 @@ export default {
   computed: {
     ...mapState(["shopInfo"])
   },
+
   methods: {
     //返回
     handback:function(){
@@ -123,6 +131,7 @@ export default {
       let _this = this;
       if($('#article-body').html()){
         this.content=$('#article-body').html();
+        this.content=this.utf16toEntities(this.content);
       }
       if(this.content.length>4800){
         Toast("文字内容过长，可用图片代替");
@@ -139,8 +148,7 @@ export default {
         this.content='';
       }else{
        this.moTitle=this.utf16toEntities(this.moTitle);
-       this.content=this.utf16toEntities(this.content);
-        
+       
         MessageBox.confirm("确定保存?").then(
           action => {
             if (action == "confirm") {
@@ -184,10 +192,82 @@ export default {
         this.content = "";
       }
     },
-    //上传图片视频
+    // 获取文件
     getFile: function(e) {
       let _text = "",
-        _Url = "";
+        _Url = "",reg= /\.(jpg|bmp|gif)$/,_this = this,inputDOM = {};
+        // 1-文章  2-视频
+      if (this.motype == 1) {
+        _text = "图片上传中...";
+        _Url = "/api/app/img/upload";
+      } else if (this.motype == 2) {
+        _text = "视频上传中...";
+        _Url = "/api/app/img/uploadMp4";
+      }
+      inputDOM = this.$refs.mocover;
+      // 通过DOM取文件数据
+      console.log("inputDOM:", inputDOM);
+      this.file = inputDOM.files[0];
+      this.errText = "";
+
+      if (!this.file) {
+        return false;
+      }
+      console.log(this.file);
+      console.log(this.file.size);
+      console.log("10485760")
+      if(this.file.size*1>10485760){
+        Toast("视频过大，请重新选择上传");
+        return false;
+      }
+      
+      if (!reg.test(this.file.name) && this.motype == 1) {
+        Indicator.close();
+        Toast("请上传一张图片");
+        return false
+      }
+      if (reg.test(this.file.name) && this.motype == 2) {
+        Indicator.close();
+        Toast("请上传一个视频");
+        return false
+      }
+      Indicator.open({
+        text: _text,
+        spinnerType: "triple-bounce"
+      });
+      // 触发这个组件对象的input事件
+      this.$emit("input", this.file);
+      // 这里就可以获取到文件的名字了
+      
+      if (reg.test(this.file.name)) {
+        console.log("1111")
+        
+       this.getvideo();
+      }else{
+        console.log("222")
+       this.getFileURL(this.file);
+      }
+     
+      
+    },
+    getvideo:function(){ //上传图片视频
+      let _this= this, _text = "",_Url = "",timer=null;
+      this.ispro = true;
+      this.schedule = 0;
+      timer = setInterval(getTotelNumber,200)
+      function getTotelNumber() {
+        _this.schedule+=1; 
+        if(_this.coverImg){
+          _this.schedule=100;
+          clearInterval(timer);
+          _this.ispro = false;
+        }else if(_this.schedule<99){
+          _this.schedule+=1; 
+        } else if(_this.schedule==99){
+         clearInterval(timer);
+        }
+      }
+      getTotelNumber();
         // 1-文章  2-视频
       if (this.motype == 1) {
         _text = "图片上传中...";
@@ -197,25 +277,6 @@ export default {
         _Url = "/api/app/img/uploadMp4";
       }
       
-      let _this = this,
-        inputDOM = {};
-      inputDOM = this.$refs.mocover;
-      // 通过DOM取文件数据
-      console.log("inputDOM:", inputDOM);
-      this.file = inputDOM.files[0];
-      this.errText = "";
-      
-      if (!this.file) {
-        return false;
-      }
-      Indicator.open({
-        text: _text,
-        spinnerType: "triple-bounce"
-      });
-      // 触发这个组件对象的input事件
-      this.$emit("input", this.file);
-      // 这里就可以获取到文件的名字了
-      this.getFileURL(this.file)
       this.fileName = this.file.name;
       // 这里加个回调也是可以的
       this.onChange && this.onChange(this.file, inputDOM.value);
@@ -223,11 +284,10 @@ export default {
       let form = new FormData();
       form.append("file", this.file, this.file.name);
       form.append("userName", this.shopInfo.userName);
-      this.$axios
-        .post(_Url, form)
-        .then(res => {
+      this.$axios.post(_Url, form).then(res => {
           Indicator.close();
           if (res.data.code != 0) {
+            _this.ispro = false;
             Toast("系统繁忙请稍后再试");
             return false;
           }
@@ -244,10 +304,10 @@ export default {
               txt:''
             },arr=[],value='';
             arr.push(_obj);
-            value = encodeURIComponent(JSON.stringify(arr));
+            value = JSON.stringify(arr);
             _this.content = value;
           }
-        })
+      })
     },
     //获取视频时长
     getFileURL(file) {
@@ -260,12 +320,20 @@ export default {
       } else if (window.webkitURL != undefined) { // webkit or chrome
         getUrl = window.webkitURL.createObjectURL(file);
       }
-      
+     
       if (getUrl) {
+        let that = this;
         videoId.src = getUrl;
           setTimeout(function(){
            //获取视频时长
-            this.duration = videoId.duration;
+           if(videoId.duration){
+            that.duration = videoId.duration;
+            that.getvideo();
+           }else{
+             Indicator.close();
+             Toast("请上传一个视频");
+             return 0;
+           }
           },1000)
       }
     },
@@ -288,7 +356,6 @@ export default {
   },
   created() {
     this.EmptyData();
-    
     if (this.$route.params._type == 1) {
       this.motype = 1;
       this.title = "编辑文章";
@@ -296,6 +363,7 @@ export default {
       this.motype = 2;
       this.title = "编辑视频";
     }
+    
   }
 };
 </script>
@@ -308,6 +376,8 @@ export default {
     overflow:scroll;
     border: 1px solid #7e6e6e;
     padding-bottom: 500px;
+    opacity: 0;
+    z-index: -1;
   }
   .content {
     width: 694px;
@@ -321,6 +391,10 @@ export default {
       border-radius: 8px;
       border-style: dotted;
       position: relative;
+      .mt-progress{
+        position: relative;
+        top: 200px;
+      }
       .getfile {
         width: 100%;
         height: 390px;

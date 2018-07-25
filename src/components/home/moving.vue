@@ -157,11 +157,12 @@ export default {
       _value = _value.substring(0, _value.length - 1);
       this.$axios.get("/api/app/topic/myList?" + _value).then(res => {
         if (res.data.code == 0) {
+
           if (this.page == 1) {
             this.listData = [];
           }
           oldData = this.listData;
-          if (res.data.data.list.length > 0) {
+          if (res.data.data.list && res.data.data.list.length > 0) {
             let _listData = res.data.data.list,
               reg = /^1[34578][0-9]{9}$/;
             for (let i in _listData) {
@@ -428,15 +429,6 @@ export default {
           height: 20px;
           width: 100%;
         }
-        &:after{
-            content: "加载中...";
-            position: relative;
-            left: 0;
-            top: 50px;
-            height: 20px;
-            width: 100%;
-        }
-
         .loadingBox {
           background-color: #ebebeb;
           text-align: center;
