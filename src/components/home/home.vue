@@ -90,8 +90,8 @@ export default {
     }
   },
   created: function() {
-    console.log(this.$route.query.ind);
-    // this.getflag();
+    console.log(this.$route.query.ind)
+    this.getflag();
     quit = true;
     if (this.$route.query.ind == 2) {
       this.ismenu = 3;

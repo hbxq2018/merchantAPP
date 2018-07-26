@@ -9,7 +9,7 @@
         </mt-header>
         <div class="income_banner">
             <div class="income_banner_data">
-                <p class="income_data_num">￥{{totalPrice}}</p>
+                <p class="income_data_num">￥{{totalPrice | changemoney}}</p>
                 <p>营业额</p>
             </div>
             <div class="income_banner_data" @click="bill">
@@ -21,8 +21,8 @@
             <div class="income_operate_result">
                 <p>{{start}} -- {{end}}</p>
                 <p>
-                    <span>营业额：￥{{totalPrice}}元</span>
-                    <span>订单数：{{orderNum}}张</span>
+                    <span>营业额：￥{{totalPrice | changemoney}}元</span>
+                    <span>订单数：{{votes.length}}张</span>
                 </p>
             </div>
             <div class="income_operate_time" @click="turnmore(2)">
@@ -56,7 +56,7 @@
               <li class="income_li" v-for="(item,index) in votes" :key='index' :id='item.id' @click="getliid">
                   <div class="income_li_l">
                       <div class="income_li_l_date">{{item.createTime}}</div>
-                      <div class="income_li_l_money">￥{{item.soAmount}}</div>
+                      <div class="income_li_l_money">￥{{item.soAmount | changemoney}}</div>
                   </div>
                   <div class="income_li_r">
                       <div class="left">
@@ -109,8 +109,8 @@ export default {
       temstart: "",
       temend: "",
       actval: "",
-      total: "0",
-      orderNum: "0",
+      total: 0,
+      orderNum: 0,
       pickerValue: "",
       Visible: true,
       ismore: false,
@@ -148,6 +148,26 @@ export default {
       loadFlag: false,
       today:''
     };
+  },
+  filters: {
+    changemoney:function(val){
+      val = val*1;
+      val=val.toFixed(2);
+      let result=addCommas(val),x='', x1=0,x2=0;
+      function addCommas(nStr){
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        } 
+        val = x1 + x2;
+        return val;
+      }
+      return result;
+    }
   },
   created: function() {
     let _this = this;
@@ -236,6 +256,9 @@ export default {
     closemore:function(){
       this.temend = this.end;
       this.temstart = this.start;
+      this.ismore = false;
+      this.isselectday = false;
+      this.isselecttime = false;
     },
     cfrm: function() {
       if (this.temstart && this.temend) {
@@ -270,16 +293,10 @@ export default {
         this.pickerVisible = true;
       }
     },
-    closemore: function() {
-      this.ismore = false;
-      this.isselectday = false;
-      this.isselecttime = false;
-    },
     // 跳转至详情
     getliid: function(e) {
       return false;
       let id = e.currentTarget.id;
-
       this.$router.push({ name: "Writeoff", params: { id: id, type: 1 } });
     },
     // 选择日期
@@ -358,21 +375,27 @@ export default {
     //获取列表数据
     getdata: function(start, end, val, type) {
       // Indicator.open("数据加载中...");
+      this.start= start?start:this.start;
+      this.end= end?end:this.end;
+      this.page=val?val:1;
       let obj = {
         shopId: this.shopId,
         soStatus: 2,
-        beginTime: start ? start : this.start,
-        endTime: end ? end : this.end,
-        page: val ? val : this.page,
+        beginTime:this.start,
+        endTime:this.end,
+        page: this.page,
         rows: 10
       };
+     
       // this.oldstart == start;
       // this.oldend == end;
       let _value = "";
       for (var key in obj) {
         _value += key + "=" + obj[key] + "&";
       }
+      
       _value = _value.substring(0, _value.length - 1);
+      
       if (this.page == 1) {
         this.votes = [];
       }
@@ -403,7 +426,7 @@ export default {
                 this.votes.push(_data.list[j]);
                 
               }
-               this.myorder(_value);
+               
               if (_data.list.length < 10) {
                 this.allLoaded = false;
               }
@@ -412,17 +435,30 @@ export default {
             }
           } else {
             this.allLoaded = false;
+            this.myorder();
           }
         }
       });
     },
-    myorder:function(_value){
-      this.$axios.get("/api/app/so/myorder?" + _value).then(res => {
+    myorder:function(){
+      let obj2 = {
+        shopId: this.shopId,
+        soStatus: 3,
+        beginTime:this.start,
+        endTime:this.end,
+        page: this.page,
+        rows: 10
+      },_value1="";
+      for (var key in obj2) {
+        _value1 += key + "=" + obj2[key] + "&";
+      }
+      _value1 = _value1.substring(0, _value1.length - 1);
+      this.$axios.get("/api/app/so/myorder?" + _value1).then(res => {
             // Indicator.close();
             if (res.data.code == 0) {
               this.loadFlag = false;
               let _data = res.data.data;
-              this.orderNum = _data.total ? _data.total : 0;
+              // this.orderNum = _data.total ? _data.total : 0;
               if (_data) {
                 if (_data.length > 0) {
                   for (let j = 0; j < _data.length; j++) {

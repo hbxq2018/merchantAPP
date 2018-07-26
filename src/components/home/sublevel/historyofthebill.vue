@@ -16,7 +16,7 @@
             <div class="checkCtSublevel">
               <div class="roder_left">
                   <b>{{data.length-index}}<span>月账单</span></b>
-                  <p>&yen;{{item?item.totalService:'0'}}</p>
+                  <p>&yen;{{item.totalService | changemoney}}</p>
               </div>
               <div class="roder-right">
                   <span :class="!item.isBill?'actspan':''">{{item.isBill?'已缴清':item.totalService?'待打款':''}}</span>
@@ -50,6 +50,24 @@ export default {
       let mon = date.getFullYear();
       let _data = formatDate(date, "yyyy-MM-dd hh:mm");
       return mon;
+    },
+    changemoney:function(val){
+      val = val*1;
+      val=val.toFixed(2);
+      let result=addCommas(val),x='', x1=0,x2=0;
+      function addCommas(nStr){
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        } 
+        val = x1 + x2;
+        return val;
+      }
+      return result;
     }
   },
   store,

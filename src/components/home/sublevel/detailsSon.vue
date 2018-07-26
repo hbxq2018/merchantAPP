@@ -8,12 +8,12 @@
       </mt-header>
       <div v-if="isbill == 1" class="nodata">
         <p>本月服务已缴清</p>
-        <p>本月服务费：¥{{money}}</p>
+        <p>本月服务费：¥{{money | changemoney}}</p>
       </div>
       <div class="detailsSon_top"  v-if="isbill != 1">
         <p>{{this.$route.params.ind}}月剩余应缴服务费</p>
-        <p>¥{{diff}}</p>
-        <p>本月总服务费¥{{money}}，已缴¥{{service}}</p>
+        <p>¥{{diff  | changemoney}}</p>
+        <p>本月总服务费¥{{money}}，已缴¥{{service  | changemoney}}</p>
       </div>
       <div class="murcielago" v-if="first.totalService">
           <p>本月已核销<span>{{total}}</span>张代金券</p>
@@ -30,7 +30,7 @@
                     <p>{{item.updateTime}}</p>
                 </div>
                 <div class="roder-right">
-                    <span>&yen;{{item.servicePrice}}</span>
+                    <span>&yen;{{item.servicePrice | changemoney}}</span>
                 </div>
             </div>
         </li>
@@ -71,6 +71,27 @@ export default {
     };
   },
   store,
+  filters: {
+    changemoney:function(val){
+      val = val*1;
+      val=val.toFixed(2);
+      let result=addCommas(val),x='', x1=0,x2=0;
+      function addCommas(nStr){
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        console.log("x1:",x1,"x2:",x2)
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        } 
+        val = x1 + x2;
+        return val;
+      }
+      return result;
+    }
+  },
   computed: {
     ...mapState(["shopId"]),
     name() {

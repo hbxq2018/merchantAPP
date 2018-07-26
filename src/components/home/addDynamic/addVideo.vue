@@ -30,7 +30,7 @@
             <input class="moTitle" type="text" placeholder="标题" v-model="moTitle">
             <hr>
             
-            <div id="article-body">
+            <div id="article-body" v-if="motype==1">
               
             </div>
 
@@ -143,6 +143,7 @@ export default {
         Toast("视频播放时长不超过30秒");
           this.coverImg='';
           this.content='';
+          this.coverUrl='';
       } else if(!this.content && this.motype==1){
         Toast("请输入文章内容");
         this.content='';
@@ -194,30 +195,24 @@ export default {
     },
     // 获取文件
     getFile: function(e) {
-      let _text = "",
-        _Url = "",reg= /\.(jpg|bmp|gif)$/,_this = this,inputDOM = {};
+      let _text = "",_Url = "",reg= /\.(jpg|bmp|gif)$/,_this = this,inputDOM = {};
         // 1-文章  2-视频
       if (this.motype == 1) {
         _text = "图片上传中...";
-        _Url = "/api/app/img/upload";
       } else if (this.motype == 2) {
         _text = "视频上传中...";
-        _Url = "/api/app/img/uploadMp4";
       }
       inputDOM = this.$refs.mocover;
       // 通过DOM取文件数据
-      console.log("inputDOM:", inputDOM);
       this.file = inputDOM.files[0];
       this.errText = "";
 
       if (!this.file) {
         return false;
       }
-      console.log(this.file);
-      console.log(this.file.size);
-      console.log("10485760")
+
       if(this.file.size*1>10485760){
-        Toast("视频过大，请重新选择上传");
+        Toast("文件过大，请重新10M以内的文件上传");
         return false;
       }
       
@@ -240,17 +235,12 @@ export default {
       // 这里就可以获取到文件的名字了
       
       if (reg.test(this.file.name)) {
-        console.log("1111")
-        
-       this.getvideo();
+       this.uploadFile();
       }else{
-        console.log("222")
        this.getFileURL(this.file);
       }
-     
-      
     },
-    getvideo:function(){ //上传图片视频
+    uploadFile:function(){ //上传图片视频
       let _this= this, _text = "",_Url = "",timer=null;
       this.ispro = true;
       this.schedule = 0;
@@ -270,10 +260,8 @@ export default {
       getTotelNumber();
         // 1-文章  2-视频
       if (this.motype == 1) {
-        _text = "图片上传中...";
         _Url = "/api/app/img/upload";
       } else if (this.motype == 2) {
-        _text = "视频上传中...";
         _Url = "/api/app/img/uploadMp4";
       }
       
@@ -286,8 +274,8 @@ export default {
       form.append("userName", this.shopInfo.userName);
       this.$axios.post(_Url, form).then(res => {
           Indicator.close();
+           _this.ispro = false;
           if (res.data.code != 0) {
-            _this.ispro = false;
             Toast("系统繁忙请稍后再试");
             return false;
           }
@@ -328,7 +316,7 @@ export default {
            //获取视频时长
            if(videoId.duration){
             that.duration = videoId.duration;
-            that.getvideo();
+            that.uploadFile();
            }else{
              Indicator.close();
              Toast("请上传一个视频");
@@ -376,8 +364,6 @@ export default {
     overflow:scroll;
     border: 1px solid #7e6e6e;
     padding-bottom: 500px;
-    opacity: 0;
-    z-index: -1;
   }
   .content {
     width: 694px;
@@ -456,6 +442,7 @@ export default {
     }
     .moTitle {
       width: 100%;
+      height: 90px;
       border: none;
       font-size: 42px;
       margin: 30px 0;

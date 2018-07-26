@@ -23,7 +23,7 @@
                     <div class="dishinfo">
                         <p>{{item.actSkuName}}</p>
                         <p>{{item.skuCode}}号</p>
-                        <p><span>活动价: ¥{{item.jianAmount}}</span><span><s>原价：¥{{item.manAmount}}</s></span></p>
+                        <p><span>活动价: ¥{{item.jianAmount | changemoney}}</span><span><s>原价：¥{{item.manAmount | changemoney}}</s></span></p>
                     </div>
                     <div class="dishticket">
                         {{item.voteNum}}票
@@ -54,6 +54,30 @@ export default {
     };
   },
   store,
+  filters: {
+    changemoney:function(val){
+      val = val*1;
+      val=val.toFixed(2);
+      let result=addCommas(val),x='', x1=0,x2=0;
+      function addCommas(nStr){
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        console.log("x1:",x1,"x2:",x2)
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        } 
+        val = x1 + x2;
+        console.log(val)
+        return val;
+      }
+      console.log("result:",result)
+      return result;
+      
+    }
+  },
   computed: {
     ...mapState(["userInfo", "shopInfo"])
   },

@@ -4,7 +4,7 @@
           <img class="u_img" :src="userInfo.logoUrl" alt="用户头像">
           <p class="u_name">{{userInfo.shopName}}</p>
       </div>
-       <div class="list_ontrol" v-for="(item,index) in dataOne" :id="index" :key='index' @click="WeIntroduce">
+       <div class="list_ontrol" v-for="(item,index) in dataOne" :id="item.id" :key='index' @click="WeIntroduce">
           <div class="list_left">
               <img :src="item.src" :alt="item.name">
               <span>{{item.name}}</span>
@@ -38,23 +38,30 @@ export default {
             {
                 src: require("../../../static/images/juan-piao.png"),
                 name:'缴费服务',
+                id:0,
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
-            },{
-                src: require("../../../static/images/shiyongsc.png"),
-                name:'开店助手',
-                arrowDiagrams:require("../../../static/images/home_arrow.png")
-            },{
+            },
+            // {
+            //     src: require("../../../static/images/shiyongsc.png"),
+            //     name:'开店助手',
+            //     id:1,
+            //     arrowDiagrams:require("../../../static/images/home_arrow.png")
+            // },
+            {
                 src: require("../../../static/images/customer_service.png"),
                 name:'联系客服',
+                id:2,
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
                 tell:'027-59728176'
             },{
                 src: require("../../../static/images/guanyu-wm.png"),
                 name:'关于我们',
+                id:3,
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },{
                 src: require("../../../static/images/yueseaef.png"),
                 name:'店铺/收款码',
+                id:4,
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },
           ]

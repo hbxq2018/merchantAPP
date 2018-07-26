@@ -4,15 +4,15 @@
           <mt-button :class="isheader==1?'headerbut headerbut_active':'headerbut'" slot="right" @click="handHeader(1)">全部</mt-button>
           <mt-button :class="isheader==2?'headerbut headerbut_active':'headerbut'" slot="right" @click="handHeader(2)">视频</mt-button>
           <mt-button :class="isheader==3?'headerbut headerbut_active':'headerbut'" slot="right" @click="handHeader(3)">文章</mt-button>
-          <span slot="right" @click="handadd">+</span>
+          <span slot="right" @click="handadd"><img class="addact" :src="addImg" alt="添加动态"></span>
         </mt-header>
 
         <mt-popup
           v-model="popupVisible"
           popup-transition="popup-fade">
           <div class="modalPopup">
-              <p @click="handpopup(1)">文章</p>
-              <p @click="handpopup(2)">视频</p>
+              <p @click="handpopup(1)">发文章</p>
+              <p @click="handpopup(2)">发视频</p>
           </div>
         </mt-popup>
         <!-- <div id="mofillimg" class="mofillimg"></div> -->
@@ -64,6 +64,7 @@ export default {
       flag: true, //节流阀
       topicType: "",
       delImg: require("../../../static/images/more.png"),
+      addImg: require("../../../static/images/addact.png"),
       popupVisible: false,
       listData: [],
       playIcon: "https://xq-1256079679.file.myqcloud.com/test_播放_0.3.jpg"
@@ -375,6 +376,12 @@ export default {
     z-index: 999;
     & > span {
       font-size: 40px;
+    }
+    .addact{
+      width: 35px;
+      height: 35px;
+      position: relative;
+      top: 5px;
     }
     .headerbut {
       margin-right: 140px;
