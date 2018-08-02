@@ -165,7 +165,6 @@ export default {
       mui.plusReady(function() {
         plus.runtime.getProperty(plus.runtime.appid, function(inf) {
           this.data.versionNumber = inf.version;
-          console.log('versionNumber:',this.versionNumber)
           if (this.data.versionNumber.indexOf("v") == -1) {
             this.data.versionNumber = "v" + this.data.versionNumber;
             console.log('versionNumber11111111:',this.data.versionNumber)

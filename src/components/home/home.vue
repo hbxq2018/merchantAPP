@@ -2,15 +2,15 @@
   <div class="home">
       
       <Menu v-if="ismenu==1"></Menu>
-      <Moving v-if="ismenu==2 && isflag"></Moving>
+      <Moving v-if="ismenu==2 && isflags"></Moving>
       <Mine v-if="ismenu==3"></Mine>
      
-      <div :class="isflag?'h_but':'h_but_node'">
+      <div :class="isflags?'h_but':'h_but_node'">
           <div :class="ismenu==1?'h_bar h_bar_active':'h_bar'" @click="gomenu">
             <div class="icon iconfont iconfont-sye">&#xe629;</div>
             <div>首页</div>
           </div>
-          <div v-if="isflag" :class="ismenu==2?'h_bar h_bar_active':'h_bar'" @click="gomoving">
+          <div v-if="isflags" :class="ismenu==2?'h_bar h_bar_active':'h_bar'" @click="gomoving">
             <div class="icon iconfont iconfont-sye">&#xe684;</div>
             <div>动态</div>
           </div>
@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       ismenu: 1,
-      isflag:true
+      isflags:true
     };
   },
   components: {
@@ -99,8 +99,9 @@ export default {
     }
   },
   created: function() {
-    this.getflag();
+    // this.getflag();
     console.log('isflag123:',isflag)
+    this.isflags = isflag;
     quit = true;
     if (this.$route.query.ind == 2) {
       this.ismenu = 3;
