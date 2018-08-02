@@ -49,9 +49,9 @@ export default {
     },
     getshopimgs:function(){
       Indicator.open({
-  text: '图片加载中...',
-  spinnerType: 'fading-circle'
-})
+        text: '图片加载中...',
+        spinnerType: 'fading-circle'
+      })
       this.$axios.get("/api/app/shop/CreateCode?id=" + this.userInfo.id+'&shopCode='+this.userInfo.shopCode).then(res => {
         if(res.data.code == 0){
             Indicator.close();

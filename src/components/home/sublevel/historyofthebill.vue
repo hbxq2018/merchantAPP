@@ -1,7 +1,7 @@
 <template>
   <div class="billCheck">
         <mt-header fixed title="历史账单">
-          <router-link slot="left" :to="{path:'home',query:{'ind':index}}">
+          <router-link slot="left" :to="{path:'payment'}">
             <mt-button icon="back"></mt-button>
           </router-link>
         </mt-header>

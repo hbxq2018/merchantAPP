@@ -7,7 +7,7 @@
       <div class="edit_content">
         <mt-field class="indleft" v-show="ind == '0'" v-model="data.mobile" label="手机电话" placeholder="请输入手机号码" ref="phone" type="tel" ></mt-field>
         <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="座机电话" placeholder="请输入座机号码" ref="phone" type="tel" ></mt-field>
-        <div class="legend">座机号码和手机号码，请正确输入至少一个联系方式</div>
+        <div v-show="ind == '0'" class="legend">座机号码和手机号码，请正确输入至少一个联系方式</div>
         <!-- <mt-checklist  
             v-if="ind == '1' || ind == '2'" 
             :max="_max"

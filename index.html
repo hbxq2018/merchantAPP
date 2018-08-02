@@ -12,25 +12,33 @@
 	<script type="text/javascript" src="./static/igexinTool.js"></script>
 
 	<!-- 引入jQuery -->
-    <script src="./static/Eleditor/jquery.min.js"></script>
-	
+	<script src="./static/Eleditor/jquery.min.js"></script>
+
 	<script src="./static/Eleditor/webuploader.js"></script>
 	<!-- <script src="./static/Eleditor/webuploader.min.js"></script> -->
 	<!-- 上下不要使用min版 -->
 	<!-- 插件核心 -->
 	<!-- <script src="./static/Eleditor/Eleditor.min.js"></script> -->
-    <script src="./static/Eleditor/Eleditor.js"></script>
+	<script src="./static/Eleditor/Eleditor.js"></script>
 </head>
 
 <body>
 	<div id="app"></div>
 	<!-- built files will be auto injected -->
 	<script>
+		appUpdate();
+		var quit = false, ispush = false, pushinfo = {}, pushmsg = {}, wgtVer = null, isBack = false , isflag = true;
 
-		var quit = false;
-		var ispush = false, pushinfo = {}, pushmsg = {};
-		var isBack = false;
+
+		// if(window.plus){
+		// 	plusReady();
+		// }else{
+		// 	document.addEventListener('plusready',plusReady,false);
+		// }
+
+
 		document.addEventListener("plusready", function () {
+
 			message = document.getElementById("message");
 			console.log('index_message:')
 			// 监听点击消息事件
@@ -111,6 +119,109 @@
 					}
 				}
 			}
+		};
+
+
+		function appUpdate() {//判斷是否需要更新
+			mui.plusReady(function () {
+				plus.runtime.getProperty(plus.runtime.appid, function (inf) {
+					let ver = inf.version,
+						newVer = "",apkUrl="";
+					if (ver.indexOf("v") != -1) {
+						ver = ver.replace("v", "");
+					}
+					ver *= 1;
+					var btn = ["确定升级"];
+					var ua = navigator.userAgent.toLowerCase();
+					if (/iphone|ipad|ipod/.test(ua)) {
+						//苹果手机
+						mui.ajax({
+							type: "get",
+							dataType: "json",
+							url: "https://itunes.apple.com/lookup?id=1387428528", //获取当前上架APPStore版本信息
+							data: {
+								id: 1387428528 //APP唯一标识ID
+							},
+							contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+							success: function (data) {
+								var resultCount = data.resultCount;
+								for (var i = 0; i < resultCount; i++) {
+									var normItem = data.results[i].version,
+										_msg = "";
+									if (normItem.indexOf("v") != -1) {
+										normItem = normItem.replace("v", "");
+									}
+									if (normItem > ver) {
+										var _msg = "发现新版本:V" + normItem;
+										//plus.nativeUI.alert("发现新版本:V" + normItem);
+										mui.confirm(_msg, "升级确认", btn, function (e) {
+											if (e.index == 0) {
+												//执行升级操作
+												document.location.href =
+													"https://itunes.apple.com/cn/app/san-gu-hui/id1387428528?mt=8"; //上新APPStore下载地址
+											}
+										});
+										return;
+									}else{
+										mui.toast("当前版本号已是最新");
+										return;
+									}
+								}
+							}
+						});
+					} else if (ua.match(/android/i) == "android") {
+						//安卓手机
+						mui.ajax({
+							type: "get",
+							dataType: "json",
+							url: "https://www.hbxq001.cn/version.txt",
+							data: {},
+							contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+							success: function (data) {
+								newVer = data.version * 1;
+								version = data.version * 1;
+								apkUrl = data.apkUrl;
+								console.log('index-data:',data)
+								if(data.flag == 0){
+									isflag=true;
+								}else if(data.flag ==1){
+									isflag=false;
+								}
+								console.log('isflag:',isflag)
+								console.log('data-txt:',data);
+								if (newVer > ver) {
+									//mui.toast("发现新版本:V" + data.Data);//获取远程数据库中上新andriod版本号
+									var _msg = "发现新版本:V" + newVer;
+									mui.confirm(_msg, "升级确认", btn, function (e) {
+										if (e.index == 0) {
+											//执行升级操作
+											plus.nativeUI.toast("正在准备环境，请稍后！");
+											var dtask = plus.downloader.createDownload(apkUrl,{},
+												function (d, status) {
+													if (status == 200) {
+														var path = d.filename; //下载apk
+														plus.runtime.install(path); // 自动安装apk文件
+													} else {
+														plus.nativeUI.alert("版本更新失败:" + status);
+													}
+												}
+											);
+											dtask.start();
+										}
+									});
+								} else {
+									console.log("当前版本号已是最新");
+									mui.toast("当前版本号已是最新");
+									return;
+								}
+							},
+							error: function (xhr, type, errerThrown) {
+								mui.toast("网络异常,请稍候再试");
+							}
+						});
+					}
+				});
+			});
 		};
 	</script>
 </body>

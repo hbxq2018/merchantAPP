@@ -36,6 +36,12 @@ export default {
           },
           dataOne:[
             {
+                src: require("../../../static/images/moneys.png"),
+                name:'我的钱包',
+                id:5,
+                arrowDiagrams:require("../../../static/images/home_arrow.png"),
+            },
+            {
                 src: require("../../../static/images/juan-piao.png"),
                 name:'缴费服务',
                 id:0,
@@ -96,13 +102,16 @@ export default {
               this.$router.push('/aboutUs')
           }else if(listBoxID ==0){
             //   this.$router.push('/historyse')
-              this.$router.push('/historyofthebill')
+            //   this.$router.push('/historyofthebill')
+             this.$router.push('/payment')
           }else if(listBoxID ==2){
               window.location.href="tel:027-59728176"
           }else if(listBoxID ==1){
               this.$router.push('/serviceManual')
           }else if(listBoxID ==4){
               this.$router.push('/ihatetheqrcode')
+          }else if(listBoxID ==5){
+              this.$router.push('/wallet')
           }
       }
   },
@@ -171,6 +180,7 @@ export default {
             }
         }
         .list_ontrol:nth-child(2){margin: 20px 0px;}
+        .list_ontrol:nth-child(3){margin: 20px 0px;}
         .list_ontrol:nth-child(3){border-bottom: 1px solid #E0E0E0;}
         .list_ontrol:nth-child(4){border-bottom: 1px solid #E0E0E0;}
         .list_ontrol:nth-last-child(2){margin: 20px 0px;}

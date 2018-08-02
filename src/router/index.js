@@ -42,6 +42,14 @@ import Ihatetheqrcode from '@/components/home/ihatetheqrcode/ihatetheqrcode'
 import AddVideo from '@/components/home/addDynamic/addVideo'
 import Article from '@/components/home/addDynamic/article'
 import VideoDateil from '@/components/home/addDynamic/videoDateil'
+import Wallet from '@/components/home/wallet/wallet'
+import Notes from '@/components/home/wallet/notes'
+import Withdraw from '@/components/home/wallet/withdraw'
+import Withnodes from '@/components/home/wallet/withnodes'
+import Payment from '@/components/home/payment/payment'
+import Annal from '@/components/home/payment/annal'
+import Customize from '@/components/home/payment/customize'
+
 Vue.use(Router)
 
 export default new Router({
@@ -260,7 +268,42 @@ export default new Router({
       path:'/videoDateil',
       name:'VideoDateil',
       component:VideoDateil
+    },
+    {
+      path:'/wallet',
+      name:'Wallet',
+      component:Wallet
+    },
+    {
+      path:'/notes',
+      name:'Notes',
+      component:Notes
+    },
+    {
+      path:'/withdraw',
+      name:'Withdraw',
+      component:Withdraw
+    },
+    {
+      path:'/payment',
+      name:'Payment',
+      component:Payment
+    },
+    {
+      path:'/annal',
+      name:'Annal',
+      component:Annal
+    },
+    {
+      path:'/customize',
+      name:'Customize',
+      component:Customize
+    },
+    {
+      path:'/withnodes',
+      name:'Withnodes',
+      component:Withnodes
     }
   ]
 })
-
+  

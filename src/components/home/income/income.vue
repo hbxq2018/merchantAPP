@@ -26,7 +26,7 @@
                 </p>
             </div>
             <div class="income_operate_time" @click="turnmore(2)">
-                <img src="../../../../static/images/calendar.png" alt="">
+                <img src="../../../../static/images/calendar.png" alt="选择时间">
             </div>
         </div>
     </div>
@@ -424,7 +424,6 @@ export default {
                   _data.list[j].userName=_data.list[j].userName.slice(0,12);
                 }
                 this.votes.push(_data.list[j]);
-                
               }
                
               if (_data.list.length < 10) {

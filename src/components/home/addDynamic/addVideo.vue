@@ -163,7 +163,7 @@ export default {
                 userName: this.shopInfo.userName,
                 nickName: this.shopInfo.nickName
               }
-              $.post("/api//app/topic/add",_parms,function(res){
+              $.post("/api/app/topic/add",_parms,function(res){
                 if (res.code == 0) {
                   _this.EmptyData();
                   MessageBox("提示", "保存成功");

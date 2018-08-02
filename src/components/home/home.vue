@@ -55,16 +55,25 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo","setismine"]),
     getflag:function(){
-      this.$axios
-      .get("/api/act/flag")
-      .then(res => {
-        // 1不显示  0 显示 
-        if(res.data.data == 1){
-          this.isflag = false;
-        }else if(res.data.data == 0){
-          this.isflag = true;
-        }
-      });
+      console.log('getflag')
+      mui.ajax({
+          type: "get",
+          dataType: "json",
+          url: "https://www.hbxq001.cn/version.txt",
+          data: {},
+          contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+          success: function (data) {
+            if(data.flag == 0){
+              this.isflag=true;
+            }else if(data.flag ==1){
+              this.isflag=false;
+            }
+            console.log('home-isflag:',this.isflag)
+          },
+          error: function (xhr, type, errerThrown) {
+            mui.toast("网络异常,请稍候再试");
+          }
+        });
     },
     gomenu: function() {
       this.setismine(1);
@@ -90,8 +99,8 @@ export default {
     }
   },
   created: function() {
-    console.log(this.$route.query.ind)
     this.getflag();
+    console.log('isflag123:',isflag)
     quit = true;
     if (this.$route.query.ind == 2) {
       this.ismenu = 3;
@@ -155,7 +164,6 @@ export default {
       color: #fc5e2d;
     }
   }
-  
 }
 </style>
 
