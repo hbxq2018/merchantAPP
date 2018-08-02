@@ -3,6 +3,11 @@ import Router from 'vue-router'
 import Login from '@/components/login/login'
 import Home from '@/components/home/home'
 import Income from '@/components/home/income/income'
+import DailyRevenue from '@/components/home/income/dailyRevenue'
+import DataRecode from '@/components/home/income/dataRecode'
+import DataofStore from '@/components/home/income/dataofStore'  
+import OrderItem from '@/components/home/income/orderItem'
+import TicketItem from '@/components/home/income/ticketItem'
 import Writeoff from '@/components/home/income/writeoff'
 import Bill from '@/components/home/income/bill'
 import Process from '@/components/login/process'
@@ -138,6 +143,31 @@ export default new Router({
       path: '/income',
       name: 'Income',
       component: Income
+    },
+    {
+      path: '/dailyRevenue',
+      name: 'DailyRevenue',
+      component: DailyRevenue
+    },
+    {
+      path: '/dataRecode',
+      name: 'DataRecode',
+      component: DataRecode
+    },
+    {
+      path: '/dataofStore',
+      name: 'DataofStore',
+      component: DataofStore
+    },
+    {
+      path: '/orderItem',
+      name: 'OrderItem',
+      component: OrderItem
+    },
+    {
+      path: '/ticketItem',
+      name: 'TicketItem',
+      component: TicketItem
     },
     {
       path: '/writeoff',
