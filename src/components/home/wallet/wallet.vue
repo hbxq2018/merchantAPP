@@ -14,11 +14,13 @@
             <p class="digital">{{Balance | changemoney}}</p>
         </div>
 
-        <div class="available">可提现金额：<span>{{money | changemoney}}元</span></div>
+        <div class="available">可提现金额：<span>{{drawmoney | changemoney}}元</span></div>
 
         <div class="list">
             <div class="list-item" v-for="(item,index) in lists" :key='index' :id="item.id" @click="handclick">
-                <div class="item-color"></div>
+                <div class="item-color">
+                    <img :src="item.icon" :alt="item.name">
+                </div>
                 <div class="item-name">{{item.name}}</div>
                 <img class="item-more" :src="item.img" alt="更多"> 
             </div>
@@ -36,17 +38,19 @@ export default {
     data(){
         return {
             Balance:0,
-            money:1598,
+            drawmoney:0,
             lists:[
                 {
                     id:0,
                     name:'提现',
-                    img:require("../../../../static/images/home_arrow.png")
+                    img:require("../../../../static/images/home_arrow.png"),
+                    icon:require("../../../../static/images/draw.png")
                 },
                 {
                     id:1,
                     name:'明细',
-                    img:require("../../../../static/images/home_arrow.png")
+                    img:require("../../../../static/images/home_arrow.png"),
+                    icon:require("../../../../static/images/detes.png")
                 }
             ]
         }
@@ -83,6 +87,14 @@ export default {
                 }
             })
         },
+        getdrawAmount:function(){  //可提现金额
+            let _value = 'soStatus=2&isDui=0&shopId='+this.shopInfo.shopId;
+            this.$axios.get("api/app/so/totalAmount?"+_value).then(res=>{
+                if(res.data.code == 0){
+                    this.drawmoney = res.data.data;
+                }
+            })
+        },
         handclick:function(e){
             const id = e.currentTarget.id;
             console.log(id)
@@ -95,6 +107,7 @@ export default {
     },
     created:function(){
         this.getBalance();
+        this.getdrawAmount();
     }
 }
 </script>
@@ -138,16 +151,11 @@ export default {
             width: 750px;
             height: 160px;
             background: #fff;
-            .list-item:nth-child(1){
-                .item-color{
-                    background: #108EE9;
-                }
+            .item-color img{
+                width: 100%;
+                height: 100%;
             }
-            .list-item:nth-child(2){
-                .item-color{
-                    background: #F59901;
-                }
-            }
+            
             .list-item{
                 padding: 0px 28px 0 28px;
                 width:694px;

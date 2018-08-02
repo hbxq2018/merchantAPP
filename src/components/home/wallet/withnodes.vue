@@ -5,30 +5,31 @@
             <mt-button icon="back" slot="left"  @click="goback"></mt-button>
         </mt-header>
 
-        <div class="conten" v-show="!carrying">
-            <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" ref="loadmore">
-                <ul>
-                   <li class="item" v-for="(item,index) in list" :key="index" :id="index" @click="handlist">
+        <div class="conten" v-show="!carrying && list.length>0">
+            <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
+                <ul v-if="list">
+                   <li class="item" v-for="(item,index) in list" :key="index" :id="item.id" @click="handlist">
                         <p class="item-one">
-                            余额提现 <span class="item-left">({{item.bank}}-{{item.card}})</span> 
-                            <span class="item-right">{{item.money | changemoney}}</span>
+                            余额提现 <span class="item-left">(卡后四位-{{item.accountName}})</span> 
+                            <span class="item-right">{{item.cashAmount | changemoney}}</span>
                         </p>
                         <p class="item-two">
-                            <span class="item-left">{{item.date}}</span>
-                            <span class="item-right">{{item.status}}</span>
+                            <span class="item-left">{{item.updateTime | rendDate}}</span>
+                            <span class="item-right">{{item.applyStatus | rendStatus}}</span>
                         </p>
                     </li>
                 </ul>
             </mt-loadmore>
         </div>
+        <img v-if="list.length==0" class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
 
         <div v-if="carrying">
             <div class="carrying">
                 <div class="carrleft">
                     <p class="left-pone">提现</p>
-                    <p class="left-ptwo">2018-07-27 14:21</p>
+                    <p class="left-ptwo">{{actdata.createTime | rendDate}}</p>
                 </div>
-                <div class="carrright">{{money | changemoney}}</div>
+                <div class="carrright">{{actdata.cashAmount | changemoney}}</div>
             </div>
             <div class="carr-cont">
                 <div class="cstop">
@@ -38,17 +39,17 @@
                     </div>
                     <div class="carright">
                         <p>已发起提现申请，等待银行处理</p>
-                        <p>2018-07-27 14:21</p>
+                        <p>{{actdata.createTime | rendDate}}</p>
                     </div>
                 </div>
                 <div class="csbottom">
                     <div class="carleft">
-                        <div class="erect"></div>
-                        <div class="round"></div>
+                        <div :class="actdata.applyStatus==2?'erect actload':'erect'"></div>
+                        <div :class="actdata.applyStatus==2?'round actload':'round'"></div>
                     </div>
                     <div class="carright">
-                        <p>到账成功</p>
-                        <p>预计到账时间2018-07-28 23:59</p>
+                        <p>{{actdata.applyStatus | rendStatus}}</p>
+                        <p>{{actdata.applyStatus!=2?'预计到账时间':'到账时间'}}{{actdata.arrivalTime | rendDate}}</p>
                     </div>
                 </div>
             </div>
@@ -59,49 +60,27 @@
 <script>
 import Vue from "vue";
 import { Loadmore } from "mint-ui";
+import store from "@/vuex/store";
+import { mapState, mapMutations } from "vuex";
 Vue.component(Loadmore.name, Loadmore);
 export default {
   name: "notes",
   data() {
     return {
-      carrying:false,
-      allLoaded:false,
-      allLoaded:false,
-      title:'提现记录',
-      money: 2312,
-      list: [
-        {
-          bank: "建设银行",
-          card: "3461",
-          date: "2018-07-25 14:32",
-          money: "200",
-          status: "审核中"
-        },
-        {
-          bank: "邮政银行",
-          card: "3371",
-          date: "2018-07-16 18:32",
-          money: "1730",
-          status: "审核中"
-        },
-        {
-          bank: "民生银行",
-          card: "1198",
-          date: "2018-07-21 11:32",
-          money: "1400",
-          status: "提现失败"
-        },
-        {
-          bank: "工商银行",
-          card: "0943",
-          date: "2018-07-06 07:32",
-          money: "280",
-          status: "提现成功"
-        }
-      ]
+      carrying: false,
+      allLoaded: false,
+      page: 1,
+      title: "提现记录",
+      list: [],
+      actdata: {}
     };
   },
+  store,
+  computed: {
+    ...mapState(["shopInfo", "userInfo"])
+  },
   filters: {
+    //数字格式化
     changemoney: function(val) {
       val = val * 1;
       val = val.toFixed(2);
@@ -122,56 +101,127 @@ export default {
         return val;
       }
       return result;
+    },
+     //翻译状态
+    rendStatus: function(val) {
+      /**
+       * 审批状态 1 待审批 2 审批通过 3 审批不通过 4 取消 5 终止
+       */
+      if (val == 1) {
+        return "待审批";
+      } else if (val == 2) {
+        return "审批通过";
+      } else if (val == 3) {
+        return "审批不通过";
+      } else if (val == 4) {
+        return "取消";
+      } else if (val == 5) {
+        return "终止";
+      }
+    },
+    //时间格式化
+    rendDate: function(val) {
+      val = new Date(val);
+      val =
+        val.getFullYear() +
+        "-" +
+        (val.getMonth() + 1) +
+        "-" +
+        val.getDate() +
+        " " +
+        val.getHours() +
+        ":" +
+        val.getMinutes()+
+        ":" +
+        val.getSeconds();
+      return val;
     }
   },
   methods: {
+    //点击某条数据，查看该数据详情
     handlist: function(e) {
       let id = e.currentTarget.id;
       this.carrying = true;
       for (let i in this.list) {
-        this.money = this.list[id].money;
-        this.title='提现详情';
+        if (id == this.list[i].id) {
+          this.actdata = this.list[i];
+        }
+        this.title = "提现详情";
       }
     },
+    //点击左上角返回图标
     goback: function() {
       if (this.carrying) {
-        this.title='提现记录';
+        this.title = "提现记录";
         this.carrying = false;
       } else {
         this.$router.push("/withdraw");
       }
     },
+     //下拉
     loadTop() {
-        console.log('loadTop')
-        this.allLoaded = false;
-        this.list=this.list.slice(0,4);
-        this.$refs.loadmore.onTopLoaded();
+      this.page = 1;
+      this.allLoaded = false;
+      this.list = [];
+      this.gettxlist();
+      this.$refs.loadmore.onTopLoaded();
     },
+    //上拉
     loadBottom() {
-        console.log('loadBottom123')
-        for(let i in this.list){
-            this.list[i].money = this.list[i].money*1+1;
-            this.list.push(this.list[i])
+      this.page += 1;
+      this.gettxlist();
+      this.$refs.loadmore.onBottomLoaded();
+    },
+     //获取提现记录数据
+    gettxlist() {
+      let _parms = {
+          userId: this.shopInfo.id,
+          page: this.page,
+          row: 10
+        },
+        _value = "";
+      for (var key in _parms) {
+        _value += key + "=" + _parms[key] + "&";
+      }
+      _value = _value.substring(0, _value.length - 1);
+      this.$axios.get("/api/app/tx/list?" + _value).then(res => {
+        if (res.data.code == 0) {
+          if (res.data.data.list && res.data.data.list.length > 0) {
+            let _list = res.data.data.list;
+            for (let i in _list) {
+              _list[i].arrivalTime = _list[i].createTime + 86400 * 2 * 1000;
+              _list[i].accountName = _list[i].accountName.substr(
+                _list[i].accountName.length - 4,
+                4
+              );
+              this.list.push(_list[i]);
+            }
+          } else {
+            this.allLoaded = true; // 若数据已全部获取完毕
+          }
+        } else {
+          this.allLoaded = true; // 若数据已全部获取完毕
         }
-        console.log(this.list.length)
-        if(this.list.length>30){
-            this.allLoaded = true;
-        }
-        // this.allLoaded = true;// 若数据已全部获取完毕
-        this.$refs.loadmore.onBottomLoaded();
+      });
     }
+  },
+  created: function() {
+    this.gettxlist();
   }
 };
 </script>
 
 <style lang="less">
-
 .withnotes {
   position: fixed;
   width: 100%;
   height: 100%;
   background: #ebebeb;
   overflow: scroll;
+  .empty{
+    width: 50%;
+    margin-top: 40%;
+  }
   .conten {
     width: 100%;
     padding-top: 80px;
@@ -239,23 +289,23 @@ export default {
       height: 122.5px;
       position: relative;
     }
-    .round{
-        width: 30px;
-        height: 30px;
-        background: #B1B1B1;
-        border-radius: 50%;
-    } 
-    .erect{
-        width: 4px;
-        height: 92px;
-        background: #B1B1B1;
-        position: relative;
-        left: 13px;
+    .round {
+      width: 30px;
+      height: 30px;
+      background: #b1b1b1;
+      border-radius: 50%;
     }
-    .actload{
-        background: #FC5E2D;
+    .erect {
+      width: 4px;
+      height: 92px;
+      background: #b1b1b1;
+      position: relative;
+      left: 13px;
     }
-    
+    .actload {
+      background: #fc5e2d;
+    }
+
     .carleft {
       width: 10%;
       height: 100%;
