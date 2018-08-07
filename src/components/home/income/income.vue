@@ -37,7 +37,7 @@
           </div>
           <img class="list_item_r" src="../../../../static/images/home_arrow.png" alt="">
         </div>
-        <div class="list_item" @click="toDataofStore">
+        <div class="list_item" @click="toDataofStore" v-if="isSub == 1">
           <div class="list_item_l">
             <img src="../../../../static/images/account_sub.png" alt="">
             <div>分店数据</div>
@@ -55,11 +55,14 @@ import { DatetimePicker, Toast, Loadmore, Indicator } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker);
 Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "Income",
   data() {
     return {
+      isSub: 0,
+      today: '',
+      yesterday: '',
       income: [
         {
           name: '今日营收',
@@ -78,22 +81,21 @@ export default {
       ]
     };
   },
-  created: function() {
-    
-  },
-  components: {
-    newtime: function() {
-      return (newtime = this.start + this.end);
-    }
-  },
-  watch: {
-    
-  },
   store,
   computed: {
-    ...mapState(["shopId"])
+    ...mapState(["userInfo"])
   },
   methods: {
+    ...mapMutations(["setuserInfo"]),
+    orderNum() {
+      let _value = "shopId="+this.userInfo.id+"&beginTime="+this.yesterday+"&endTime=" + this.today;
+      this.$axios.get("/api/app/so/soAllTotle?" + _value).then(res => {
+        let data = res.data;
+        if (data.code == 0) {
+          
+        }
+      });
+    },
     toDetail() {
       this.$router.push({
         name: "DailyRevenue"
@@ -111,7 +113,26 @@ export default {
         name: "DataofStore"
         // params: { id: "1"}
       });
+    },
+    //yyyy-MM-dd时间转换
+    formatDate(data) {
+      var month = data.getMonth() + 1;
+      var strDate = data.getDate();
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+      }
+      var currentdate = data.getFullYear() + "-" + month + "-" + strDate;
+      return currentdate;
     }
+  },
+  created() {
+    this.isSub = this.userInfo.isSub;
+    this.today = this.formatDate(new Date());
+    this.yesterday = this.formatDate(new Date(new Date().setDate(new Date().getDate()-1)));
+    this.orderNum();
   }
 };
 </script>

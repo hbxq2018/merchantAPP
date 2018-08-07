@@ -15,8 +15,8 @@
 					<span class="money_data">300.00</span>
 				</div>
 				<div class="top_data">
-					订单数<span>3</span>
-					，核销券数<span>24</span>
+					收款<span>3</span>笔
+					，核销券数<span>24</span>张
 				</div>
 			</div>
 			<div class="top_tab">
@@ -186,7 +186,7 @@ export default {
         color: #808080;
         span {
           color: #000;
-          padding-left: 6px;
+          padding: 0 6px;
         }
       }
     }

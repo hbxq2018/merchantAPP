@@ -17,7 +17,7 @@
             <div class="date_inp" @click="openPicker(2)">{{endDate}}</div>
             <div class="tit_btn">查询</div>
           </div>
-          <div class="top_order">订单数23412，核销券数124552，总计</div>
+          <div class="top_order">收款23412笔，核销券数124552张，总计</div>
           <div class="top_money">
             <span>￥</span>
             <span class="moneyNum">301,240.00</span>
