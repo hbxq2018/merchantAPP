@@ -103,8 +103,15 @@ export default {
           "&beginTime=" +
           this.yesterday +
           "&endTime=" +
-          this.today;
-      this.$axios.get(this.$GLOBAL.API+"app/shop/getByShopId?" + _param).then(res => {
+          this.today,
+        _val =
+          "id=" +
+          _this.userInfo.id +
+          "&beginTime=" +
+          _this.today +
+          "&endTime=" +
+          _this.tomorrow;
+      this.$axios.get("/api/app/shop/getByShopId?" + _param).then(res => {
         if (res.data.code == 0) {
           let data = res.data.data;
           for (let i = 0; i < data.length; i++) {
@@ -116,26 +123,19 @@ export default {
               preSoWriteoffList: data[i].soWriteoffList
             });
           }
-          let _val =
-            "id=" +
-            _this.userInfo.id +
-            "&beginTime=" +
-            _this.today +
-            "&endTime=" +
-            _this.tomorrow;
-          _this.$axios.get(this.$GLOBAL.API+"app/shop/getByShopId?" + _val).then(res => {
-            if (res.data.code == 0) {
-              let list = res.data.data;
-              _this.totalMoney = _this.changemoney(list[0].allsoAmount);
-              _this.totalOrder = list[0].allsolist;
-              _this.totalCode = list[0].allsoWritelist;
-              for (let i = 0; i < list.length; i++) {
-                _this.subList[i].soAmount = _this.changemoney(list[i].soAmount);
-                _this.subList[i].solist = list[i].solist;
-                _this.subList[i].soWriteoffList = list[i].soWriteoffList;
-              }
-            }
-          });
+        }
+      });
+      _this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
+        if (res.data.code == 0) {
+          let list = res.data.data;
+          _this.totalMoney = _this.changemoney(list[0].allsoAmount);
+          _this.totalOrder = list[0].allsolist;
+          _this.totalCode = list[0].allsoWritelist;
+          for (let i = 0; i < list.length; i++) {
+            _this.subList[i].soAmount = _this.changemoney(list[i].soAmount);
+            _this.subList[i].solist = list[i].solist;
+            _this.subList[i].soWriteoffList = list[i].soWriteoffList;
+          }
         }
       });
     },

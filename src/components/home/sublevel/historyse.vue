@@ -114,7 +114,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get(this.$GLOBAL.API+"app/hx/list?" + _value).then(res => {
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let _data = res.data.data;
         let lists = [];
         if (_data.list) {
@@ -268,7 +268,7 @@ export default {
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
     }
-    this.$axios.get(this.$GLOBAL.API+"app/act/getDate").then(res => {
+    this.$axios.get("/api/app/act/getDate").then(res => {
      res.data.data =res.data.data.replace(/(-)/g, '/');
       this.today = res.data.data;
       this.getdata();

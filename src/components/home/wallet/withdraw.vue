@@ -241,7 +241,7 @@ export default {
       } else if (this.isbankno && this.cardnumber && this.drawmoney > 0) {
         //如果有银行卡且银行卡号正确且可提现金额大于零,则继续提现流程
         this.$axios
-          .get(this.$GLOBAL.API+"app/tx/selectByShopId?shopId=" + this.userInfo.id)
+          .get("/api/app/tx/selectByShopId?shopId=" + this.userInfo.id)
           .then(res => {
             //查询当前是否符合提现的其它条件
             if (res.data.code == 0) {
@@ -257,7 +257,7 @@ export default {
     //提现
     tixian: function() {
       this.$axios
-        .get(this.$GLOBAL.API+"app/tx/selectCashTime?shopId=" + this.userInfo.id)
+        .get("/api/app/tx/selectCashTime?shopId=" + this.userInfo.id)
         .then(res => {
           //查询开始时间
           if (res.data.code == 0) {
@@ -298,7 +298,7 @@ export default {
               _value += key + "=" + _parms[key] + "&";
             }
             _value = _value.substring(0, _value.length - 1);
-            this.$axios.post(this.$GLOBAL.API+"app/tx/create?" + _value).then(res => {
+            this.$axios.post("/api/app/tx/create?" + _value).then(res => {
               if (res.data.code == 0) {
                 Toast("申请提现成功");
               }

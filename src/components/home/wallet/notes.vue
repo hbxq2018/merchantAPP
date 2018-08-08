@@ -115,7 +115,7 @@ export default {
       for (var key in _parms) {
         _value += key + "=" + _parms[key] + "&";
       }
-      this.$axios.get(this.$GLOBAL.API+"app/account/listTrading?" + _value).then(res => {
+      this.$axios.get("/api/app/account/listTrading?" + _value).then(res => {
         if (res.data.code == 0) {
           if (res.data.data.list && res.data.data.list.length > 0) {
             let _list = res.data.data.list;

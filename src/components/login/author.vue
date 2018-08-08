@@ -60,7 +60,7 @@ export default {
                       _this.headImage = jsonObj.headimgurl;
                       //通过openId查询用户信息
                       let openId = "o16Di01-jZ8yxr5AliPQpSp7a4uQ";
-                      _this.$axios.get(this.$GLOBAL.API+"app/user/findByOpenId/" + openId, {})
+                      _this.$axios.get("/api/app/user/findByOpenId/" + openId, {})
                       .then(res => {
                           console.log(res);
                       }).catch(err => {

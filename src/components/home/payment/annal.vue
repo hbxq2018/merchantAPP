@@ -70,8 +70,8 @@ export default {
     amountList() {
       let _this = this;
       this.$axios
-      // .get(this.$GLOBAL.API+"app/serviceAmount/allByShopId?shopId="+this.userInfo.id+"&&page="+this.page+"&rows=10")
-        .get(this.$GLOBAL.API+"app/serviceAmount/allByShopId?shopId=278&page="+this.page+"&rows=10")
+      // .get("/api/app/serviceAmount/allByShopId?shopId="+this.userInfo.id+"&&page="+this.page+"&rows=10")
+        .get("/api/app/serviceAmount/allByShopId?shopId=278&page="+this.page+"&rows=10")
         .then(res => {
           if (res.data.code == 0) {
             if (res.data.data && res.data.data.length > 0) {

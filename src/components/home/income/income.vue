@@ -16,8 +16,9 @@
           </div>
           <div class="item_money"><span>￥</span>{{item.money}}</div>
           <div class="item_rate">
-            <span>{{item.rate}}</span>
-            <img src="../../../../static/images/up.png" alt="">
+            <span v-if="index == 0" :class="item.rate < 0 ? 'down' : ''">{{Math.abs(item.rate)}}%</span>
+            <img v-if="index == 0 && item.rate > 0" src="../../../../static/images/up.png" alt="">
+            <img v-if="index == 0 && item.rate < 0" src="../../../../static/images/down.png" alt="">
           </div>
           <div class="item_order">
             <span>订单数</span>
@@ -61,22 +62,23 @@ export default {
   data() {
     return {
       isSub: 0,
-      today: '',
-      yesterday: '',
+      today: "",
+      yesterday: "",
+      tomorrow: "",
       income: [
         {
-          name: '今日营收',
-          money: '3,500.00',
-          orderNum: '24',
-          qrcodeNum: '30',
-          rate: '16.7%'
+          name: "今日营收",
+          money: 0,
+          orderNum: 0,
+          qrcodeNum: 0,
+          rate: "0%"
         },
         {
-          name: '昨日营收',
-          money: '600.00',
-          orderNum: '16',
-          qrcodeNum: '12',
-          rate: '4.1%'
+          name: "昨日营收",
+          money: 0,
+          orderNum: 0,
+          qrcodeNum: 0,
+          rate: ""
         }
       ]
     };
@@ -87,12 +89,95 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
+    //营业额
+    moneyNum() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.userInfo.id +
+          "&beginTime=" +
+          this.today +
+          "&endTime=" +
+          this.tomorrow,
+        _param =
+          "shopId=" +
+          this.userInfo.id +
+          "&beginTime=" +
+          this.yesterday +
+          "&endTime=" +
+          this.today;
+      this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
+        if (res.data.code == 0 && res.data.data) {
+          _this.income[0].money = res.data.data ? res.data.data : 0;
+        }
+      });
+      this.$axios.get("/api/app/so/totalAmount?" + _param).then(res => {
+        if (res.data.code == 0 && res.data.data) {
+          _this.income[1].money = res.data.data ? res.data.data : 0;
+        }
+      });
+      let today = +_this.income[0].money, yester = +_this.income[1].money;
+      _this.income[0].rate = ((today - yester) / (yester == 0 ? 1 : yester) * 100).toFixed(2);
+    },
+    //订单数
     orderNum() {
-      let _value = "shopId="+this.userInfo.id+"&beginTime="+this.yesterday+"&endTime=" + this.today;
-      this.$axios.get(this.$GLOBAL.API+"app/so/soAllTotle?" + _value).then(res => {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.userInfo.id +
+          "&beginTime=" +
+          this.today +
+          "&endTime=" +
+          this.tomorrow,
+        _param =
+          "shopId=" +
+          this.userInfo.id +
+          "&beginTime=" +
+          this.yesterday +
+          "&endTime=" +
+          this.today;
+      this.$axios.get("/api/app/so/soAllTotle?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
-          
+          _this.income[0].orderNum = data.data ? data.data : 0;
+        }
+      });
+      this.$axios.get("/api/app/so/soAllTotle?" + _param).then(res => {
+        let data = res.data;
+        if (data.code == 0) {
+          _this.income[1].orderNum = data.data ? data.data : 0;
+        }
+      });
+    },
+    //核销券数
+    codeNum() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.userInfo.id +
+          "&begainTime=" +
+          this.today +
+          "&endTime=" +
+          this.tomorrow,
+        _param =
+          "shopId=" +
+          this.userInfo.id +
+          "&begainTime=" +
+          this.yesterday +
+          "&endTime=" +
+          this.today;
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        if (res.data.code == 0) {
+          _this.income[0].qrcodeNum = res.data.data.total
+            ? res.data.data.total
+            : 0;
+        }
+      });
+      this.$axios.get("/api/app/hx/list?" + _param).then(res => {
+        if (res.data.code == 0) {
+          _this.income[1].qrcodeNum = res.data.data.total
+            ? res.data.data.total
+            : 0;
         }
       });
     },
@@ -104,8 +189,13 @@ export default {
     },
     toDataRecode() {
       this.$router.push({
-        name: "DataRecode"
-        // params: { id: "1"}
+        name: "DataRecode",
+        params: { 
+          shopId: this.userInfo.id,
+          money: this.income[0].money,
+          orderNum: this.income[0].orderNum,
+          qrcodeNum: this.income[0].qrcodeNum
+        }
       });
     },
     toDataofStore() {
@@ -131,8 +221,15 @@ export default {
   created() {
     this.isSub = this.userInfo.isSub;
     this.today = this.formatDate(new Date());
-    this.yesterday = this.formatDate(new Date(new Date().setDate(new Date().getDate()-1)));
+    this.yesterday = this.formatDate(
+      new Date(new Date().setDate(new Date().getDate() - 1))
+    );
+    this.tomorrow = this.formatDate(
+      new Date(new Date().setDate(new Date().getDate() + 1))
+    );
+    this.moneyNum();
     this.orderNum();
+    this.codeNum();
   }
 };
 </script>
@@ -179,15 +276,19 @@ export default {
         }
         .item_money {
           font-size: 42px;
-          color: #E4B03F;
+          color: #e4b03f;
           span {
             font-size: 36px;
           }
         }
         .item_rate {
-          color: #FF0000;
-          margin: 30px 0 30px 0;
+          color: #ff0000;
+          height: 90px;
+          line-height: 90px;
           font-size: 24px;
+          .down {
+            color: #16db32;
+          }
           img {
             width: 22px;
             height: 20px;
@@ -229,9 +330,8 @@ export default {
           }
         }
         .list_item_r {
-            width: 12px;
-            height: 22px;
-
+          width: 12px;
+          height: 22px;
         }
       }
     }

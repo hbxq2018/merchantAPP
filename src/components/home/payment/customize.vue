@@ -115,7 +115,7 @@ export default {
           _this.endTime;
           _this._beginTime = _this.beginTime;
           _this._endTime = _this.endTime;
-      _this.$axios.get(this.$GLOBAL.API+"app/hx/amount?" + _value).then(res => {
+      _this.$axios.get("/api/app/hx/amount?" + _value).then(res => {
         if (res.data.code == 0) {
           let service = res.data.data[1].totalNoService;
           _this.money = service ? service : 0;
@@ -135,7 +135,7 @@ export default {
         "&page=" +
         this.page +
         "&rows=10";
-      _this.$axios.get(this.$GLOBAL.API+"app/hx/list?" + _value).then(res => {
+      _this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
           _this.total = data.data.total;

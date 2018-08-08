@@ -44,7 +44,7 @@ export default {
     },
     getPhoto() {
       this.$axios
-        .get(this.$GLOBAL.API+"app/shopTopPic/selectPic?shopId=" + this.shopId)
+        .get("/api/app/shopTopPic/selectPic?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == 0) {
             this.list = res.data.data;
@@ -75,7 +75,7 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
       this.$axios
-        .post(this.$GLOBAL.API+"app/img/upload", form)
+        .post("/api/app/img/upload", form)
         .then(res => {
           Indicator.close();
           if (res.data.code != 0) {
@@ -97,7 +97,7 @@ export default {
         attachementId: id
       };
       this.$axios
-        .post(this.$GLOBAL.API+"app/shopTopPic/add", qs.stringify(_parms))
+        .post("/api/app/shopTopPic/add", qs.stringify(_parms))
         .then(res => {
           if(res.data.code == 0) {
               this.getPhoto();
@@ -107,7 +107,7 @@ export default {
     },
     delPhoto(id) {
       this.$axios
-        .post(this.$GLOBAL.API+"app/shopTopPic/delete?id=" + id)
+        .post("/api/app/shopTopPic/delete?id=" + id)
         .then(res => {
           if(res.data.code == 0) {
               this.getPhoto();

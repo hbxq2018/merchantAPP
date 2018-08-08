@@ -1,19 +1,19 @@
 <template>
     <div class="order_item" @click="toDetail">
       <div class="list_item_l">
-          <div>{{orderList.date}}</div>
-          <div class="item_money">￥{{orderList.maney}}</div>
+          <div>{{orderList.hxTime}}</div>
+          <div class="item_money">￥{{orderList.soAmount}}</div>
       </div>
       <div class="list_item_r">
-          <div class="item_key">
-              <div>付款单号</div>
+          <div class="item_key" :class="orderList.skuName ? '' : 'active'">
+              <div>订单号</div>
               <div>付款人</div>
-              <div>代金券</div>
+              <div v-if="orderList.skuName">代金券</div>
           </div>
-          <div class="item_val">
-              <div>{{orderList.orderNum}}</div>
-              <div>{{orderList.phone}}</div>
-              <div>{{orderList.name}}</div>
+          <div class="item_val" :class="orderList.skuName ? '' : 'active'">
+              <div>{{orderList.id}}</div>
+              <div>{{orderList.mobile}}</div>
+              <div v-if="orderList.skuName">{{orderList.skuName}}</div>
           </div>
       </div>
     </div>
@@ -78,10 +78,16 @@ export default {
       div {
         margin-bottom: 16px;
       }
+      &.active {
+        margin-top: 20px;
+      }
     }
     .item_val {
       div {
         margin-bottom: 16px;
+      }
+      &.active {
+        margin-top: 20px;
       }
     }
   }

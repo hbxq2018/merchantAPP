@@ -15,12 +15,12 @@
             <div class="date_inp" @click="openPicker(1)">{{startDate}}</div>
             <div class="tit_txt">至</div>
             <div class="date_inp" @click="openPicker(2)">{{endDate}}</div>
-            <div class="tit_btn">查询</div>
+            <div class="tit_btn" @click="inquiry">查询</div>
           </div>
-          <div class="top_order">收款23412笔，核销券数124552张，总计</div>
+          <div class="top_order">收款{{order}}笔，核销券数{{qrcodeNum}}张，总计</div>
           <div class="top_money">
             <span>￥</span>
-            <span class="moneyNum">301,240.00</span>
+            <span class="moneyNum">{{money}}</span>
           </div>
         </div>
         <div class="top_tab">
@@ -36,23 +36,8 @@
             <div class="selected_r">核销券数24</div>
           </div>
           <div class="sel_option" v-if="isSelected">
-            <div class="active">
-              <span>全部</span>
-            </div>
-            <div>
-              <span>享7券</span>
-            </div>
-            <div>
-              <span>套餐券</span>
-            </div>
-            <div>
-              <span>套餐折扣券</span>
-            </div>
-            <div>
-              <span>10元食典券</span>
-            </div>
-            <div>
-              <span>80元食典券</span>
+            <div :class="item.isSelected==1?'active':''" v-for="(item,index) in options" :key="index" :obj="item">
+              <span>{{item.name}}</span>
             </div>
           </div>
         </div>
@@ -60,8 +45,10 @@
       <div class="content_list">
         <div class="shadowBox" v-if="isSelected"></div>
         <div class="list_inner">
-          <orderItem v-if="switchFlag" v-for="(item,index) in orderObj" :key="index" :obj="item"></orderItem>
-          <ticketItem v-if="!switchFlag" v-for="(item,index) in ticketObj" :key="index" :obj="item"></ticketItem>
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="custom">
+            <orderItem v-if="switchFlag" v-for="(item,index) in orderObj" :key="index" :obj="item"></orderItem>
+            <ticketItem v-if="!switchFlag" v-for="(item,index) in ticketObj" :key="index" :obj="item"></ticketItem>
+          </mt-loadmore>
         </div>
       </div>
     </div>
@@ -81,53 +68,48 @@
 import Vue from "vue";
 import orderItem from "./orderItem";
 import ticketItem from "./ticketItem";
-import { DatetimePicker, Toast } from "mint-ui";
-Vue.component(DatetimePicker.name, DatetimePicker);
+import { DatetimePicker, Toast, Loadmore } from "mint-ui";
+Vue.component(DatetimePicker.name, DatetimePicker, Loadmore.name, Loadmore);
 import store from "@/vuex/store";
 export default {
   name: "DataRecode",
   data() {
     return {
       id: 1,
+      shopId: 0,
       startDate: "开始时间",
       endDate: "结束时间",
+      money: 0,
+      order: 0,
+      qrcodeNum: 0,
       isSelected: false, //点击option
       switchFlag: true, //tab栏切换
-      orderObj: [
+      allLoaded: false,
+      orderPage: 1,
+      codePage: 1,
+      rows: 5,
+      options: [
         {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "100.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        },
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "100.00",
-          orderNum: "245125667752",
-          phone: "186******21"
+          name: "全部",
+          isSelected: 1
         }
       ],
-      ticketObj: [
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "1.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        },
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "1.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        }
-      ]
+      orderObj: [],
+      ticketObj: []
     };
   },
-  created: function() {},
+  created: function() {
+    this.shopId = this.$route.params.shopId;
+    this.money = this.$route.params.money;
+    this.order = this.$route.params.orderNum;
+    this.qrcodeNum = this.$route.params.qrcodeNum;
+    this.startDate = this.formatDate(new Date());
+    this.endDate = this.formatDate(
+      new Date(new Date().setDate(new Date().getDate() + 1))
+    );
+    this.orderList();
+    this.tickType();
+  },
   components: {
     orderItem,
     ticketItem
@@ -135,6 +117,167 @@ export default {
   watch: {},
   store,
   methods: {
+    //营业额
+    moneyNum() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&beginTime=" +
+          this.startDate +
+          "&endTime=" +
+          this.endDate;
+      this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
+        if (res.data.code == 0 && res.data.data) {
+          _this.money = res.data.data ? res.data.data : 0;
+        }
+      });
+    },
+    //订单数
+    orderNum() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&beginTime=" +
+          this.startDate +
+          "&endTime=" +
+          this.endDate;
+      this.$axios.get("/api/app/so/soAllTotle?" + _value).then(res => {
+        let data = res.data;
+        if (data.code == 0) {
+          _this.order = data.data ? data.data : 0;
+        }
+      });
+    },
+    //核销券数
+    codeList() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&begainTime=" +
+          this.startDate +
+          "&endTime=" +
+          this.endDate +
+          "&page=" +
+          this.codePage +
+          "&rows=5";
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        if (res.data.code == 0) {
+          _this.qrcodeNum = res.data.data.total ? res.data.data.total : 0;
+          let list = res.data.data.list;
+          if (_this.codePage == 1) {
+            list = list.slice(1);
+          }
+          for (let i = 0; i < list.length; i++) {
+            // list[i].hxTime = list[i].hxTime ? list[i].hxTime : list[i].paidTime;
+            // list[i].mobile = list[i].mobile ? list[i].mobile : list[i].userName;
+            // list[i].mobile = _this.dealWithTel(list[i].mobile);
+            _this.ticketObj.push(list[i]);
+          }
+        } else {
+          this.allLoaded = true; // 若数据已全部获取完毕
+        }
+      });
+    },
+    //订单列表
+    orderList() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&page=" +
+          this.orderPage +
+          "&rows=" +
+          this.rows +
+          "&beginTime=" +
+          this.startDate +
+          "&endTime=" +
+          this.endDate;
+      //商家订单列表
+      this.$axios
+        .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
+        .then(res => {
+          if (res.data.code == 0 && res.data.data.list) {
+            let list = res.data.data.list;
+            for (let i = 0; i < list.length; i++) {
+              list[i].hxTime = list[i].hxTime
+                ? list[i].hxTime
+                : list[i].paidTime;
+              list[i].mobile = list[i].mobile
+                ? list[i].mobile
+                : list[i].userName;
+              list[i].mobile = _this.dealWithTel(list[i].mobile);
+              _this.orderObj.push(list[i]);
+            }
+          }
+        });
+      //食典券列表
+      this.$axios
+        .get("/api/app/so/myorder?" + _value + "&soStatus=3")
+        .then(res => {
+          if (res.data.code == 0 && res.data.data) {
+            let list = res.data.data;
+            for (let i = 0; i < list.length; i++) {
+              list[i].hxTime = list[i].hxTime
+                ? list[i].hxTime
+                : list[i].paidTime;
+              list[i].mobile = list[i].mobile
+                ? list[i].mobile
+                : list[i].userName;
+              list[i].mobile = _this.dealWithTel(list[i].mobile);
+              _this.orderObj.push(list[i]);
+            }
+          }
+        });
+    },
+    //下拉
+    loadTop() {
+      this.orderPage = 1;
+      this.allLoaded = false;
+      this.orderObj = [];
+      this.orderList();
+      this.$refs.custom.onTopLoaded();
+    },
+    //上拉
+    loadBottom() {
+      this.orderPage += 1;
+      this.orderList();
+      this.$refs.custom.onBottomLoaded();
+    },
+    // 核销券的种类
+    tickType() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&begainTime=" +
+          this.startDate +
+          "&endTime=" +
+          this.endDate +
+          "&isBill=1";
+      //商家订单列表
+      this.$axios.get("/api/app/hx/sotype?" + _value).then(res => {
+        if (res.data.code == 0 && res.data.data) {
+          let data = res.data.data;
+          for (let i = 0; i < data.length; i++) {
+            _this.options.push({
+              name: data[i].skuName,
+              isSelected: 0
+            });
+          }
+        }
+      });
+    },
+    //查询
+    inquiry() {
+      this.moneyNum();
+      this.orderNum();
+      this.codeList();
+      this.orderList();
+      this.tickType();
+    },
     openPicker(id) {
       this.$refs.picker.open();
       this.id = id;
@@ -183,6 +326,16 @@ export default {
       }
       var currentdate = data.getFullYear() + "-" + month + "-" + strDate;
       return currentdate;
+    },
+    //隐藏手机信息
+    dealWithTel(cellValue) {
+      if (Number(cellValue) && String(cellValue).length === 11) {
+        var mobile = String(cellValue);
+        var reg = /^(\d{3})\d{4}(\d{4})$/;
+        return mobile.replace(reg, "$1****$2");
+      } else {
+        return cellValue;
+      }
     }
   }
 };
@@ -192,6 +345,7 @@ export default {
 .dataRecode {
   background-color: #ebebeb;
   box-sizing: border-box;
+  height: auto !important;
   .daily_header {
     position: fixed;
     top: 0;
@@ -206,6 +360,8 @@ export default {
   }
   .daily_content {
     padding-top: 80px;
+    height: 100%;
+    box-sizing: border-box;
     .content_top {
       background-color: #fff;
       .top_cont {

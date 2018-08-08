@@ -105,7 +105,7 @@ export default {
                 _value += key + "=" + _parms[key] + "&";
             }
             _value = _value.substring(0, _value.length - 1);
-            this.$axios.get(this.$GLOBAL.API+"app/topic/getTopicByZan?" + _value).then(res => {
+            this.$axios.get("/api/app/topic/getTopicByZan?" + _value).then(res => {
                 if (res.data.code == 0) {
                 let _Data = res.data.data;
                 _Data.content = JSON.parse(_Data.content);
@@ -140,7 +140,7 @@ export default {
                 _value += key + "=" + _parms[key] + "&";
             }
             _value = _value.substring(0, _value.length - 1);
-            this.$axios.get(this.$GLOBAL.API+"app/cmt/list?" + _value).then(res => {
+            this.$axios.get("/api/app/cmt/list?" + _value).then(res => {
                 if (res.data.code == 0) {
                 let _Data = res.data.data.list;
                 for(let i in _Data){
@@ -194,7 +194,7 @@ export default {
         handdel:function(){
             MessageBox.confirm("是否确认删除？").then(action => {
             if (action == "confirm") {
-                this.$axios.get(this.$GLOBAL.API+"app/topic/delete/" + this.artId).then(res => {
+                this.$axios.get("/api/app/topic/delete/" + this.artId).then(res => {
                     if (res.data.code == 0) {
                         history.go(-1)//回退到上一页面
                         Toast("删除成功！");

@@ -1,6 +1,6 @@
 <template>
     <div class="ticket_item">
-        <div class="ticket_name">{{ticketObj.name}}</div>
+        <div class="ticket_name">{{ticketObj.skuName}}</div>
         <div class="ticket_info">
             <div class="item_key">
                 <div>券码:</div>
@@ -9,10 +9,10 @@
                 <div>核销时间:</div>
             </div>
             <div class="item_val">
-                <div>{{ticketObj.orderNum}}</div>
+                <div>{{ticketObj.couponCode}}</div>
                 <div>已核销</div>
-                <div>{{ticketObj.maney}}元</div>
-                <div>{{ticketObj.date}}</div>
+                <div>{{ticketObj.servicePrice}}元</div>
+                <div>{{ticketObj.updateTime}}</div>
             </div>
         </div>
     </div>

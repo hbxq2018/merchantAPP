@@ -81,7 +81,7 @@ export default {
           'cancel'
         ],
         upload:{
-          server: this.$GLOBAL.API+"app/img/upload",
+          server: "/api/app/img/upload",
           fileSizeLimit: 10,
           formName: 'file',
           options :{formData:{userName:this.shopInfo.userName}},
@@ -162,7 +162,7 @@ export default {
                 userName: this.shopInfo.userName,
                 nickName: this.shopInfo.nickName
               }
-              $.post(this.$GLOBAL.API+"app/topic/add",_parms,function(res){
+              $.post("/api/app/topic/add",_parms,function(res){
                 if (res.code == 0) {
                   _this.EmptyData();
                   MessageBox("提示", "保存成功");
@@ -259,9 +259,9 @@ export default {
       getTotelNumber();
         // 1-文章  2-视频
       if (this.motype == 1) {
-        _Url = this.$GLOBAL.API+"app/img/upload";
+        _Url = "/api/app/img/upload";
       } else if (this.motype == 2) {
-        _Url = this.$GLOBAL.API+"app/img/uploadMp4";
+        _Url = "/api/app/img/uploadMp4";
       }
       
       this.fileName = this.file.name;

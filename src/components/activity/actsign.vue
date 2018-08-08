@@ -136,7 +136,7 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post(this.$GLOBAL.API+"app/sku/addSku?" + _value).then(res => {
+        this.$axios.post("/api/app/sku/addSku?" + _value).then(res => {
           if (res.data.code == 0) {
             this.skugId = res.data.data;
             this.skuupdata();
@@ -176,7 +176,7 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post(this.$GLOBAL.API+"app/sku/update?" + _value).then(res => {
+        this.$axios.post("/api/app/sku/update?" + _value).then(res => {
           if (res.data.code == 0) {
             this.insertByRules();
           }
@@ -208,7 +208,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get(this.$GLOBAL.API+"app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
           // this.dishdata = res.data.data.list;
            let len = res.data.data.list.length;
@@ -238,7 +238,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post(this.$GLOBAL.API+"app/actSku/insertByRules?" + _value).then(res => {
+      this.$axios.post("/api/app/actSku/insertByRules?" + _value).then(res => {
         if (res.data.code == 0) {
           Toast("报名成功！");
           this.resetdata();
@@ -298,7 +298,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get(this.$GLOBAL.API+"app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
           let _list = res.data.data.list;
           console.log('list:',_list)
@@ -310,7 +310,7 @@ export default {
     }
   },
   created: function() {
-    this.$axios.get(this.$GLOBAL.API+"app/act/getDate").then(res => {
+    this.$axios.get("/api/app/act/getDate").then(res => {
       res.data.data =res.data.data.replace(/(-)/g, '/');
       this.today = res.data.data;
     })
