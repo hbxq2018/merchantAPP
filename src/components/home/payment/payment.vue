@@ -18,7 +18,7 @@
         </div>
         <div class="pay-date">
             <div class="date-left">
-                <p class="date-pone">{{beginTime}}至{{endTime}}</p>
+                <p class="date-pone">{{beginTime | changetime}}至{{endTime | changetime}}</p>
                 <p class="data-ptwo">服务费{{total}}笔，共{{money | changemoney}}元</p>
             </div>
             <div class="date-right" @click="handdate">
@@ -27,19 +27,24 @@
             </div>
         </div>
         <div class="pay-cont">
-            <div class="item" v-for="(item,index) in lists" :key='index' :id='index'>
-                <div class="item-left">
-                    <p class="left-one">{{item.skuName}}</p>
-                    <p class="left-two">{{item.updateTime ? item.updateTime : item.createTime}}</p>
-                </div>
-                <div class="item-right">{{item.servicePrice | changemoney}}</div>
-            </div>
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="payment">
+            <ul>
+              <li class="item" v-for="(item,index) in lists" :key='index' :id='index'>
+                  <div class="item-left">
+                      <p class="left-one">{{item.skuName}}</p>
+                      <p class="left-two">{{item.updateTime ? item.updateTime : item.createTime}}</p>
+                  </div>
+                  <div class="item-right">{{item.servicePrice | changemoney}}</div>
+              </li>
+            </ul>
+          </mt-loadmore>
         </div>
     </div>
 </template>
 
 <script>
 import store from "@/vuex/store";
+import { Toast } from "mint-ui";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "payment",
@@ -49,7 +54,10 @@ export default {
       total: 0,
       beginTime: "2018-01-01",
       endTime: "",
+      _startTime: "",
+      _endTime: "",
       page: 1,
+      allLoaded: false,
       lists: []
     };
   },
@@ -74,28 +82,41 @@ export default {
         return val;
       }
       return result;
+    },
+    changetime: function(val) {
+      let arr = val.split(" ");
+      return arr[0];
     }
   },
   store,
   computed: {
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo", "shopInfo"])
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
+    //通过shopId查询商家的缴费记录(通过此接口来判断发起缴纳服务费的开始时间和结束时间)
     getBeginTime() {
       let _this = this;
       this.$axios
-        .get("/api/app/serviceAmount/selectByShopId?shopId=" + this.userInfo.id)
+        .get(
+          this.$GLOBAL.API +
+            "app/serviceAmount/selectByShopId?shopId=" +
+            this.userInfo.id
+        )
         .then(res => {
           if (res.data.code == 0) {
             if (res.data.data) {
               _this.beginTime = res.data.data.beginTime;
+              _this.endTime = res.data.data.endTime;
+              _this._startTime = res.data.data.beginTime;
+              _this._endTime = res.data.data.endTime;
             }
           }
           _this.amount();
           _this.amountList();
         });
     },
+    //查询某个时间段的服务费信息
     amount() {
       let _this = this,
         _value =
@@ -105,49 +126,146 @@ export default {
           _this.beginTime +
           "&endTime=" +
           _this.endTime;
-      _this.$axios.get("/api/app/hx/amount?" + _value).then(res => {
-        if (res.data.code == 0) {
-          let service = res.data.data[1].totalNoService;
-          _this.money = service ? service : 0;
-        }
-      });
+      _this.$axios
+        .get(this.$GLOBAL.API + "app/hx/amount?" + _value)
+        .then(res => {
+          if (res.data.code == 0) {
+            let service = res.data.data[1].totalNoService;
+            _this.money = service ? service : 0;
+          }
+        });
     },
+    //获取列表数据
     amountList() {
       let _this = this;
-      let _value = "shopId="+this.userInfo.id+"&begainTime="+_this.beginTime+"&endTime="+_this.endTime+"&page="+this.page+"&rows=10";
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      let _value =
+        "shopId=" +
+        this.userInfo.id +
+        "&begainTime=" +
+        _this.beginTime +
+        "&endTime=" +
+        _this.endTime +
+        "&page=" +
+        this.page +
+        "&rows=10";
+      this.$axios.get(this.$GLOBAL.API + "app/hx/list?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
           _this.total = data.data.total;
-          let list = data.data.list;
-          if(list) {
-            if(_this.page == 1) {
-              list = list.slice(1);
+          if (data.data.list && data.data.list.length > 0) {
+            let _list = data.data.list;
+            if (_this.page == 1) {
+              _list = _list.slice(1);
             }
-            for(let i = 0; i < list.length; i++) {
-              _this.lists.push(list[i]);
+            for (let i = 0; i < _list.length; i++) {
+              if (_list[i].skuName && _list[i].servicePrice) {
+                _this.lists.push(_list[i]);
+              }
             }
+          } else {
+            this.allLoaded = true; // 若数据已全部获取完毕
           }
+        } else {
+          this.allLoaded = true; // 若数据已全部获取完毕
         }
       });
     },
+    //点击立即交费
     handPayment: function() {
-      //点击立即交费
+      // console.log(this._startTime, this._endTime, this.money);
+      // console.log("userInfo:",this.shopInfo);
+      // console.log('shopInfo:',this.userInfo)
+      // if (this.money <= 0) {
+      //   Toast("暂不需要缴纳服务费");
+      // } else {
+
+      let id = "wxpay";
+      this.pay(id);
+      // }
     },
+    //支付
+    pay(id) {
+      // 从服务器请求支付订单
+      var WXPAYSERVER =
+        this.$GLOBAL.API +
+        "app/wxpay/payForShopApp?shopId=" +
+        this.userInfo.id +
+        "&servicePrice=0.1&beginTime=" +
+        this._startTime +
+        "&endTime=" +
+        this._endTime +
+        "&userId=" +
+        this.shopInfo.id;
+      var PAYSERVER = "";
+      var channel = null; //支付通道
+      var wxChannel = null; // 微信支付
+
+      PAYSERVER = WXPAYSERVER;
+      mui.plusReady(function() {
+        // 获取支付通道
+        plus.payment.getChannels(
+          function(channels) {
+            console.log('channels:',channels)
+            for (var i in channels) {
+              if (channels[i].id == "wxpay") {
+                wxChannel = channels[i];
+                channel = wxChannel;
+                console.log('channel:',channel)
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                  console.log('xhr.readyState:',xhr.readyState)
+                  switch (xhr.readyState) {
+                    case 4:
+                      if (xhr.status == 200) {
+                        plus.payment.request(
+                          channel,
+                          xhr.responseText,
+                          function(result) {
+                            console.log('result:',result)
+                            plus.nativeUI.alert("支付成功: ", function() {
+                              back();
+                            });
+                          },
+                          function(error) {
+                            console.log('error:',error)
+                            plus.nativeUI.alert("支付失败：" + error.code);
+                          }
+                        );
+                      } else {
+                        alert("获取订单信息失败！");
+                      }
+                      break;
+                      default:
+                      break;
+                  }
+                };
+                xhr.open("POST", PAYSERVER);
+                xhr.send();
+              } else {
+                aliChannel = channels[i];
+              }
+            }
+          },
+          function(e) {
+            alert("获取支付通道失败：" + e.message);
+          }
+        );
+      });
+    },
+    //点击缴费记录
     handRecord: function() {
-      //点击缴费记录
       this.$router.push("/annal");
     },
+    //点击月份账单
     handBill: function() {
-      //点击月份账单
       this.$router.push("/historyofthebill");
     },
+    //点击日历图标
     handdate: function() {
-      //点击日历图标
       this.$router.push("/customize");
     },
+    //yyyy-MM-dd
     formatDate(data) {
-      //yyyy-MM-dd
       var month = data.getMonth() + 1;
       var strDate = data.getDate();
       if (month >= 1 && month <= 9) {
@@ -158,6 +276,20 @@ export default {
       }
       var currentdate = data.getFullYear() + "-" + month + "-" + strDate;
       return currentdate;
+    },
+    //下拉
+    loadTop() {
+      this.page = 1;
+      this.allLoaded = false;
+      this.lists = [];
+      this.amountList();
+      this.$refs.payment.onTopLoaded();
+    },
+    //上拉
+    loadBottom() {
+      this.page += 1;
+      this.amountList();
+      this.$refs.payment.onBottomLoaded();
     }
   },
   created() {
@@ -173,6 +305,16 @@ export default {
   width: 100%;
   height: 100%;
   background: #ebebeb;
+  overflow: scroll;
+  .mint-header,
+  .pay-top,
+  .pay-date {
+    position: fixed;
+    z-index: 100;
+  }
+  .mint-header {
+    z-index: 101;
+  }
   .pay-top {
     padding-top: 80px;
     width: 100%;
@@ -209,6 +351,8 @@ export default {
     width: 672px;
     padding: 0 39px;
     height: 113px;
+    top: 524px;
+    background: #ebebeb;
     .date-left {
       width: 70%;
       height: 100%;
@@ -252,6 +396,9 @@ export default {
   .pay-cont {
     width: 672px;
     padding: 0 39px;
+    position: relative;
+    top: 637px;
+    z-index: 50;
     background: #fff;
     .item {
       width: 100%;

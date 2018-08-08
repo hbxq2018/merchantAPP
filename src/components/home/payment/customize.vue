@@ -11,18 +11,22 @@
         <div class="inquiry" @click="inquiry">查询</div>
         
         <div class="cus-date" v-if="isShow">
-            <p class="date-pone">{{beginTime}}至{{endTime}}</p>
+            <p class="date-pone">{{_beginTime}}至{{_endTime}}</p>
             <p class="date-ptwo">服务费{{total}}笔，共{{money | changemoney}}元</p>
         </div>
         
         <div class="cus-cont">
-            <div class="item" v-for="(item,index) in lists" :key="index">
-                <div class="item-left">
-                    <p class="leftpone">{{item.skuName}}</p>
-                    <p class="lefttwo">{{item.updateTime ? item.updateTime : item.createTime}}</p>
-                </div>
-                <div class="item-right">{{item.servicePrice | changemoney}}</div>
-            </div>
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="custom">
+            <ul>
+              <li class="item" v-for="(item,index) in lists" :key="index">
+                  <div class="item-left">
+                      <p class="leftpone">{{item.skuName}}</p>
+                      <p class="lefttwo">{{item.updateTime ? item.updateTime : item.createTime}}</p>
+                  </div>
+                  <div class="item-right">{{item.servicePrice | changemoney}}</div>
+              </li>
+            </ul>
+          </mt-loadmore>
         </div>
     </div>
 </template>
@@ -37,9 +41,12 @@ export default {
     return {
       beginTime: "",
       endTime: "",
+      _beginTime: "",
+      _endTime: "",
       money: 0,
       total: 0,
       isShow: false,
+      allLoaded: false,
       page: 1,
       lists: []
     };
@@ -73,19 +80,30 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
-    inquiry: function() {
+    //点击查询
+    inquiry: function() {  
       let d1 = this.beginTime,
-        d2 = this.endTime;
+        d2 = this.endTime,
+        diff = 0;
       if (new Date(d1.replace(/-/g, "/")) < new Date(d2.replace(/-/g, "/"))) {
-        this.amount();
-        this.amountList();
-        this.isShow = true;
+        diff = new Date(d2.replace(/-/g, "/"))-new Date(d1.replace(/-/g, "/"));
+        if(diff < 2678410000){
+          this.lists = [];
+          this.amount();
+          this.amountList();
+          this.isShow = true;
+        }else{
+          this.beginTime = "";
+          this.endTime = "";
+          Toast("最多查询31天的数据");
+        }
       } else {
         this.beginTime = "";
         this.endTime = "";
         Toast("开始时间不得比结束时间晚");
       }
     },
+    //获取已核销总额与总数量
     amount() {
       let _this = this,
         _value =
@@ -95,13 +113,16 @@ export default {
           _this.beginTime +
           "&endTime=" +
           _this.endTime;
-      _this.$axios.get("/api/app/hx/amount?" + _value).then(res => {
+          _this._beginTime = _this.beginTime;
+          _this._endTime = _this.endTime;
+      _this.$axios.get(this.$GLOBAL.API+"app/hx/amount?" + _value).then(res => {
         if (res.data.code == 0) {
           let service = res.data.data[1].totalNoService;
           _this.money = service ? service : 0;
         }
       });
     },
+    //获取核销列表数据
     amountList() {
       let _this = this;
       let _value =
@@ -114,21 +135,36 @@ export default {
         "&page=" +
         this.page +
         "&rows=10";
-      _this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      _this.$axios.get(this.$GLOBAL.API+"app/hx/list?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
           _this.total = data.data.total;
-          let list = data.data.list;
-          if (list) {
-            if (_this.page == 1) {
-              list = list.slice(1);
+          let _list = data.data.list;
+          if (_list && _list.length>0) {
+            for (let i = 0; i < _list.length; i++) {
+              if(_list[i].shopName && _list[i].skuName){
+                _this.lists.push(_list[i]);
+              }
             }
-            for (let i = 0; i < list.length; i++) {
-              _this.lists.push(list[i]);
-            }
+          }else {
+            this.allLoaded = true; // 若数据已全部获取完毕
           }
         }
       });
+    },
+     //下拉
+    loadTop() {
+      this.page = 1;
+      this.allLoaded = false;
+      this.lists = [];
+      this.amountList();
+      this.$refs.custom.onTopLoaded();
+    },
+    //上拉
+    loadBottom() {
+      this.page += 1;
+      this.amountList();
+      this.$refs.custom.onBottomLoaded();
     }
   }
 };

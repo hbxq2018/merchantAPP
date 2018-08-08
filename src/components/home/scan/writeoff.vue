@@ -97,7 +97,7 @@ export default {
         }
         _value = _value.substring(0, _value.length-1);
 
-        this.$axios.post("/api/app/hx/add?"+_value)
+        this.$axios.post(this.$GLOBAL.API+"app/hx/add?"+_value)
             .then((res) => {
               console.log('res:',res)
               if(res.data.code == '0'){
@@ -114,7 +114,7 @@ export default {
     },
     getbycode: function(val) { //获取票券信息
       this.$axios
-        .get("/api/app/cp/getByCode/" + val)
+        .get(this.$GLOBAL.API+"app/cp/getByCode/" + val)
         .then(res => {
           let data = res.data;
           console.log('res:',res)
@@ -151,7 +151,7 @@ export default {
     searchShopId: function() {//查询商家是否参加某一活动
       let _this = this;
       this.$axios
-        .get("/api/app/actshop/searchForShopId?userId=" + this.shopId)
+        .get(this.$GLOBAL.API+"app/actshop/searchForShopId?userId=" + this.shopId)
         .then(res => {
           console.log("res:", res);
           if (res.data.code == "-1") {

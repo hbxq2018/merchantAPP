@@ -284,7 +284,7 @@ export default {
             _value += key + "=" + obj[key] + "&";
           }
           _value = _value.substring(0, _value.length - 1);
-          this.$axios.post("/api/app/shop/update?" + _value).then(res => {
+          this.$axios.post(this.$GLOBAL.API+"app/shop/update?" + _value).then(res => {
             if (res.data.code == "0") {
               Toast({
                 message: '保存成功',

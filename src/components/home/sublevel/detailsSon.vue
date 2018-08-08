@@ -128,7 +128,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/hx/list?" + _value).then(res => {
         if (res.data.code == 0) {
           this.total = res.data.data.total;
           if (res.data.data.list) {

@@ -86,7 +86,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/topic/getTopicByZan?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/topic/getTopicByZan?" + _value).then(res => {
         if (res.data.code == "0") {
           let _Data = res.data.data;
 
@@ -121,7 +121,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/cmt/list?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/cmt/list?" + _value).then(res => {
         if (res.data.code == 0) {
           let _Data = res.data.data.list;
           for (let i in _Data) {

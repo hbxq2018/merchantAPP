@@ -118,7 +118,7 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       this.$axios
-        .get("/api/app/shopCashier/adminByShopId?" + _value)
+        .get(this.$GLOBAL.API+"app/shopCashier/adminByShopId?" + _value)
         .then(res => {
           if (res.data.code == "0") {
             if (res.data.data && res.data.data.id) {
@@ -187,7 +187,7 @@ export default {
             _value += key + "=" + obj[key] + "&";
           }
           _value = _value.substring(0, _value.length - 1);
-          this.$axios.post("/api/app/shop/update?" + _value).then(res => {
+          this.$axios.post(this.$GLOBAL.API+"app/shop/update?" + _value).then(res => {
             if (res.data.code == "0") {
               MessageBox("提示", "保存成功");
               this.issave = true;
@@ -202,7 +202,7 @@ export default {
     },
     //获取商家信息
     getshopinfo: function() {
-      this.$axios.get("/api/app/shop/get/" + this.shopId).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/shop/get/" + this.shopId).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.setuserInfo(data);
@@ -252,7 +252,7 @@ export default {
         _value1 += key + "=" + obj1[key] + "&";
       }
       _value1 = _value1.substring(0, _value1.length - 1);
-      this.$axios.get("/api/app/user/findUserByMobile?" + _value1).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/user/findUserByMobile?" + _value1).then(res => {
         if (res.data.code == "0") {
           hxdata = res.data.data;
           if (hxdata.userType == 2 && hxdata.shopId) {
@@ -287,7 +287,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post("/api/app/user/addHxUser?" + _value).then(res => {
+      this.$axios.post(this.$GLOBAL.API+"app/user/addHxUser?" + _value).then(res => {
         if (res.data.code == "0") {
           this.getWritelist(1);
         } else {
@@ -313,7 +313,7 @@ export default {
       } else if (type == 2) {
         url = "app/shopCashier/delete?";
       }
-      this.$axios.post("/api/" + url + _value).then(res => {
+      this.$axios.post(this.$GLOBAL.API+"" + url + _value).then(res => {
         if (res.data.code == "0") {
 
         } else {
@@ -349,7 +349,7 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.post("/api/app/user/deleteHxUser?" + _value).then(res => {
+      this.$axios.post(this.$GLOBAL.API+"app/user/deleteHxUser?" + _value).then(res => {
         if (res.data.code == "0") {
           this.getWritelist(2);
         }
@@ -366,7 +366,7 @@ export default {
     getWritelist: function(val) {
       //获取核销员列表
       this.$axios
-        .post("/api/app/user/listForShopId?shopId=" + this.shopId)
+        .post(this.$GLOBAL.API+"app/user/listForShopId?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == "0") {
             this.writedata = res.data.data;
@@ -432,7 +432,7 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
       this.$axios
-        .post("/api/app/img/upload", form)
+        .post(this.$GLOBAL.API+"app/img/upload", form)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
@@ -459,7 +459,7 @@ export default {
     },
     getPhoto() {
       this.$axios
-        .get("/api/app/shopTopPic/selectPic?shopId=" + this.shopId)
+        .get(this.$GLOBAL.API+"app/shopTopPic/selectPic?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == 0) {
             this.photoNum = res.data.data.length;

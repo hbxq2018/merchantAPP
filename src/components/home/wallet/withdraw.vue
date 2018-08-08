@@ -12,7 +12,7 @@
             <div class="start-one">
                 <div class="ont-top" @click="handtop">
                     <div class="ont-top-left">
-                        <p class="p-one" v-if="isbankno">建设银行（尾号{{Lastfour}}）</p>
+                        <p class="p-one" v-if="isbankno && bankName">{{bankName}}（尾号{{Lastfour}}）</p>
                         <p class="p-one" v-if="!isbankno">添加银行卡</p>
                         <p class="p-two">48小时内到账</p>
                     </div>
@@ -64,12 +64,14 @@ import { Button, Actionsheet, Toast } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Actionsheet.name, Actionsheet);
+ 
+import getBank from "../../../../static/bankCardAttribution.js" //校验银行卡
 export default {
   nama: "withdraw",
   data() {
     return {
       title: "提现",
-      money: 1232,
+      bankName:'',
       Lastfour: "",
       drawmoney: 0, //可提现金额
       username: "", //持卡人
@@ -202,8 +204,8 @@ export default {
         // return false;
       }
     },
+    //点击保存，保存持卡人和银行卡号信息
     handleSave: function() {
-      //点击保存，保存持卡人和银行卡号信息
       if (!this.username) {
         Toast("请输入持卡人姓名");
       } else if (!this.cardnumber) {
@@ -230,8 +232,8 @@ export default {
         });
       }
     },
+    //点击提现按钮，申请提现
     handwithdraw: function() {
-      //点击提现按钮，申请提现
       if (!this.cardnumber) {
         Toast("请先输入卡号再申请提现");
       } else if (this.drawmoney <= 0) {
@@ -239,7 +241,7 @@ export default {
       } else if (this.isbankno && this.cardnumber && this.drawmoney > 0) {
         //如果有银行卡且银行卡号正确且可提现金额大于零,则继续提现流程
         this.$axios
-          .get("/api/app/tx/selectByShopId?shopId=" + this.userInfo.id)
+          .get(this.$GLOBAL.API+"app/tx/selectByShopId?shopId=" + this.userInfo.id)
           .then(res => {
             //查询当前是否符合提现的其它条件
             if (res.data.code == 0) {
@@ -252,9 +254,10 @@ export default {
         return false;
       }
     },
+    //提现
     tixian: function() {
       this.$axios
-        .get("/api/app/tx/selectCashTime?shopId=" + this.userInfo.id)
+        .get(this.$GLOBAL.API+"app/tx/selectCashTime?shopId=" + this.userInfo.id)
         .then(res => {
           //查询开始时间
           if (res.data.code == 0) {
@@ -295,8 +298,7 @@ export default {
               _value += key + "=" + _parms[key] + "&";
             }
             _value = _value.substring(0, _value.length - 1);
-            this.$axios.post("/api/app/tx/create?" + _value).then(res => {
-              console.log("create_res:", res);
+            this.$axios.post(this.$GLOBAL.API+"app/tx/create?" + _value).then(res => {
               if (res.data.code == 0) {
                 Toast("申请提现成功");
               }
@@ -315,23 +317,24 @@ export default {
         this.iseditbank = true;
       }
     },
+    //进行修改银行卡
     handchange: function() {
-      //进行修改银行卡
       this.title = "修改银行卡";
       this.sheetVisible = false;
       this.iseditbank = true;
     },
+     //点击左上角返回图标
     goback: function() {
-      //点击左上角返回图标
       if (this.iseditbank) {
         this.iseditbank = false;
+        this.getaccountInfo();
         this.title = "提现";
       } else {
         this.$router.push("/wallet");
       }
     },
+    //查询可提现金额
     getdrawAmount: function() {
-      //查询可提现金额
       let _value = "soStatus=2&isDui=0&shopId=" + this.shopInfo.shopId;
       this.$axios.get("api/app/so/totalAmount?" + _value).then(res => {
         if (res.data.code == 0) {
@@ -339,22 +342,26 @@ export default {
         }
       });
     },
+    //根据用户id查询账户信息
     getaccountInfo: function() {
-      //根据用户id查询账户信息
-      // app/account/getByUserId
       let _value = "userId=" + this.shopInfo.id;
       this.$axios.get("api/app/account/getByUserId?" + _value).then(res => {
-        console.log("account_res:", res);
         if (res.data.code == 0) {
           let _data = res.data.data;
           this.cardnumber = _data.accountName;
           this.username = _data.accountCardholder;
+          this.checkBanks(_data.accountName);
           this.Lastfour = _data.accountName.substr(
             _data.accountName.length - 4,
             4
           );
         }
       });
+    },
+    // 查询银行卡信息
+    checkBanks:function(val){
+      let bankInfo = getBank.bankCardAttribution(val);
+      this.bankName = bankInfo.bankName;
     }
   },
   created: function() {

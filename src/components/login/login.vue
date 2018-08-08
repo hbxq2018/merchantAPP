@@ -90,7 +90,7 @@ export default {
         // this.$GLOBAL.API  <==> /api/    上线时所有替换
         this.$axios
           .post(
-            "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
+            this.$GLOBAL.API+"app/sms/sendForShopAppRegister?shopMobile=" + this.telephone
           )
           .then(res => {
             let data = res.data;
@@ -149,7 +149,7 @@ export default {
         }
         value = value.substring(0, value.length - 1);
         this.$axios
-          .get("/api/app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
+          .get(this.$GLOBAL.API+"app/sms/isVerifyForShopApp?" + value, qs.stringify(_parms))
           .then(res => {
             if (res.data.code == 0) {
               if (_this.wxType == 0) {
@@ -171,7 +171,7 @@ export default {
       let _this = this;
       let mobile = val ? val : this.telephone;
       this.$axios
-        .get("/api/app/user/findUserByMobile?mobile=" + mobile)
+        .get(this.$GLOBAL.API+"app/user/findUserByMobile?mobile=" + mobile)
         .then(res => {
           _this.setshopInfo(res.data.data);
           if (res.data.code == 0) {
@@ -213,7 +213,7 @@ export default {
         unionId: this.unionId //微信unionId
       };
       this.$axios
-        .post("/api/app/user/addAppUser", qs.stringify(_parms))
+        .post(this.$GLOBAL.API+"app/user/addAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.upDateUserInfo();
@@ -234,7 +234,7 @@ export default {
         sex: this.sex
       };
       this.$axios
-        .post("/api/app/user/updateByMobile", qs.stringify(_parms))
+        .post(this.$GLOBAL.API+"app/user/updateByMobile", qs.stringify(_parms))
         .then(res => {
           console.log(res);
           if (res.data.code == 0) {
@@ -251,7 +251,7 @@ export default {
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
-        .post("/api/app/user/addShopAppUser", qs.stringify(_parms))
+        .post(this.$GLOBAL.API+"app/user/addShopAppUser", qs.stringify(_parms))
         .then(res => {
           if (res.data.code == 0) {
             _this.$router.push({
@@ -267,7 +267,7 @@ export default {
     getshopinfo: function(id) {
       //获取商家信息
       let _this = this;
-      this.$axios.get("/api/shop/get/" + id).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"shop/get/" + id).then(res => {
         if (res.data.code == "0") {
           let data = res.data.data;
           this.$router.push({ name: "Home" });
@@ -279,7 +279,7 @@ export default {
       //判断商家是否在审核中
       let _this = this;
       this.$axios
-        .get("/api/app/shopEnter/searchByUserId?userId=" + id)
+        .get(this.$GLOBAL.API+"app/shopEnter/searchByUserId?userId=" + id)
         .then(res => {
           if (res.data.code == 0) {
             //0待审核  1审核通过  2审核不通过
@@ -348,7 +348,7 @@ export default {
                       ? s.userInfo.unionid
                       : "";
                     _this.isSignWX = true;
-                    // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
+                    // _this.$axios.get(this.$GLOBAL.API+"app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
                         _this.$GLOBAL.API+"app/user/findByOpIdAndUnId/?openId=" +
@@ -411,7 +411,7 @@ export default {
                       ? s.userInfo.unionid
                       : "";
                     _this.isSignWX = true;
-                    // _this.$axios.get("/api/"app/user/findByOpenId/" + _this.openId, {})
+                    // _this.$axios.get(this.$GLOBAL.API+""app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
                         _this.$GLOBAL.API+"app/user/findByOpIdAndUnId/?openId=" +
@@ -482,7 +482,7 @@ export default {
     this.setScroll();
     let userId = localStorage.getItem("userId");
     if (userId) {
-      this.$axios.get("/api/app/user/get/" + userId).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/user/get/" + userId).then(res => {
         if (
           res.data.code == "0" &&
           res.data.data != null &&

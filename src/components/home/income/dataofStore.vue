@@ -104,7 +104,7 @@ export default {
           this.yesterday +
           "&endTime=" +
           this.today;
-      this.$axios.get("/api/app/shop/getByShopId?" + _param).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/shop/getByShopId?" + _param).then(res => {
         if (res.data.code == 0) {
           let data = res.data.data;
           for (let i = 0; i < data.length; i++) {
@@ -123,7 +123,7 @@ export default {
             _this.today +
             "&endTime=" +
             _this.tomorrow;
-          _this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
+          _this.$axios.get(this.$GLOBAL.API+"app/shop/getByShopId?" + _val).then(res => {
             if (res.data.code == 0) {
               let list = res.data.data;
               _this.totalMoney = _this.changemoney(list[0].allsoAmount);

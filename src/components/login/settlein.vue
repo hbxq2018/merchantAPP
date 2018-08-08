@@ -300,7 +300,7 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", "test");
       this.$axios
-        .post("/api/app/img/upload", form)
+        .post(this.$GLOBAL.API+"app/img/upload", form)
         .then(res => {
           if (res.data.code != 0) {
             Toast("系统繁忙请稍后再试");
@@ -466,7 +466,7 @@ export default {
         _parms.logoPic = this.LogoUrl;
       }
       this.$axios
-        .post("/api/app/shopEnter/add", qs.stringify(_parms))
+        .post(this.$GLOBAL.API+"app/shopEnter/add", qs.stringify(_parms))
         .then(res => {
           if (res.data.code != 0) {
             Toast(res.data.message);

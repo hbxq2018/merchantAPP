@@ -89,7 +89,7 @@ export default {
     ...mapMutations(["setuserInfo"]),
     orderNum() {
       let _value = "shopId="+this.userInfo.id+"&beginTime="+this.yesterday+"&endTime=" + this.today;
-      this.$axios.get("/api/app/so/soAllTotle?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/so/soAllTotle?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
           

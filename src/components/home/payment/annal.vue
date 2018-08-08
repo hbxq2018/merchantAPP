@@ -6,15 +6,19 @@
           </router-link>
         </mt-header>
         <div class="ann-cont">
-            <div class="item" v-for="(item,index) in lists" :key="index" :id='index'>
-                <div class="item-left">
-                    <p class="left-one">{{item.name}}</p>
-                    <p class="left-two">{{item.date}}</p>
-                </div>
-                <div class="item-right">
-                    {{item.money  | changemoney}}
-                </div>
-            </div>
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="annal">
+            <ul>
+              <li class="item" v-for="(item,index) in list" :key="index" :id='index'>
+                  <div class="item-left">
+                      <p class="left-one">缴费</p>
+                      <p class="left-two">{{item.updateTime}}</p>
+                  </div>
+                  <div class="item-right">
+                      {{item.servicePrice  | changemoney}}
+                  </div>
+              </li>
+            </ul>
+          </mt-loadmore>
         </div>
     </div>
 </template>
@@ -28,33 +32,9 @@ export default {
     return {
       beginTime: "",
       endTime: "",
-      lists: [
-        {
-          name: "缴费",
-          date: "2018-07-23 12:43",
-          money: 20
-        },
-        {
-          name: "缴费",
-          date: "2018-07-23 12:43",
-          money: 20
-        },
-        {
-          name: "缴费",
-          date: "2018-07-23 12:43",
-          money: 20
-        },
-        {
-          name: "缴费",
-          date: "2018-07-23 12:43",
-          money: 20
-        },
-        {
-          name: "缴费",
-          date: "2018-07-23 12:43",
-          money: 20
-        }
-      ]
+      page: 1,
+      allLoaded: false,
+      list: []
     };
   },
   filters: {
@@ -86,21 +66,45 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
+    //获取缴费记录列表数据
     amountList() {
       let _this = this;
-    //   this.$axios
-    //     .get("/api/app/serviceAmount/selectByShopId?shopId=" + this.userInfo.id)
-    //     .then(res => {
-    //       if (res.data.code == 0) {
-    //         if (res.data.data) {
-    //           _this.beginTime = res.data.data.beginTime;
-    //         }
-    //       }
-    //     });
+      this.$axios
+      // .get(this.$GLOBAL.API+"app/serviceAmount/allByShopId?shopId="+this.userInfo.id+"&&page="+this.page+"&rows=10")
+        .get(this.$GLOBAL.API+"app/serviceAmount/allByShopId?shopId=278&page="+this.page+"&rows=10")
+        .then(res => {
+          if (res.data.code == 0) {
+            if (res.data.data && res.data.data.length > 0) {
+              let _list = res.data.data;
+              for (let i in _list) {
+                this.list.push(_list[i]);
+              }
+            } else {
+              console.log('23')
+              this.allLoaded = true; // 若数据已全部获取完毕
+            }
+          } else {
+            this.allLoaded = true; // 若数据已全部获取完毕
+          }
+        });
+    },
+    //下拉
+    loadTop() {
+      this.page = 1;
+      this.allLoaded = false;
+      this.list = [];
+      this.amountList();
+      this.$refs.annal.onTopLoaded();
+    },
+    //上拉
+    loadBottom() {
+      this.page += 1;
+      this.amountList();
+      this.$refs.annal.onBottomLoaded();
     }
   },
   created() {
-      this.amountList();
+    this.amountList();
   }
 };
 </script>
@@ -111,6 +115,7 @@ export default {
   width: 100%;
   height: 100%;
   background: #ebebeb;
+  overflow: scroll;
   .ann-cont {
     padding-top: 80px;
     width: 100%;

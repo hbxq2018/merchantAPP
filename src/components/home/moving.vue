@@ -130,7 +130,7 @@ export default {
     handdel: function(id) {
       MessageBox.confirm("是否确认删除？").then(action => {
         if (action == "confirm") {
-          this.$axios.get("/api/app/topic/delete/" + id).then(res => {
+          this.$axios.get(this.$GLOBAL.API+"app/topic/delete/" + id).then(res => {
             if (res.data.code == "0") {
               Toast("删除成功！");
               this.page = 1;
@@ -156,7 +156,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/topic/myList?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/topic/myList?" + _value).then(res => {
         if (res.data.code == 0) {
 
           if (this.page == 1) {

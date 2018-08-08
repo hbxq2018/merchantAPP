@@ -98,7 +98,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/act/detail?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/act/detail?" + _value).then(res => {
         if (res.data.code == 0) {
           Indicator.close();
           this.actdata = res.data.data;
@@ -132,7 +132,7 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      this.$axios.get("/api/app/actSku/listNewAct?" + _value).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/actSku/listNewAct?" + _value).then(res => {
         if (res.data.code == 0) {
           this.dishdata = res.data.data.list;
         }
@@ -159,7 +159,7 @@ export default {
     }
   },
   created() {
-    this.$axios.get("/api/app/act/getDate").then(res => {
+    this.$axios.get(this.$GLOBAL.API+"app/act/getDate").then(res => {
       res.data.data =res.data.data.replace(/(-)/g, '/');
       this.today = res.data.data;
       this.getactdata();

@@ -112,7 +112,7 @@ export default {
           _value += key + "=" + obj[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("/api/app/pnr/add?" + _value).then(res => {
+        this.$axios.post(this.$GLOBAL.API+"app/pnr/add?" + _value).then(res => {
           if (res.data.code == "0") {
             this.money = '';
             this.actvalue = {};
@@ -125,7 +125,7 @@ export default {
     },
     delticket: function(e) {
       const ind = e.currentTarget.id;
-      this.$axios.get("/api/app/pnr/delete/" + ind).then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/pnr/delete/" + ind).then(res => {
         if (res.data.code == "0") {
           Toast("删除成功");
           this.getticketlist();
@@ -133,7 +133,7 @@ export default {
       });
     },
     getticketlist: function() {
-      this.$axios.get("/api/app/pnr/selectByShopId?shopId=" + this.shopId)
+      this.$axios.get(this.$GLOBAL.API+"app/pnr/selectByShopId?shopId=" + this.shopId)
         .then(res => {
           if (res.data.code == "0") {
             let data = res.data.data;
@@ -148,7 +148,7 @@ export default {
         });
     },
     getskulist: function() {
-      this.$axios.get("/api/app/sku/list?page=1&rows=30").then(res => {
+      this.$axios.get(this.$GLOBAL.API+"app/sku/list?page=1&rows=30").then(res => {
         if (res.data.code == "0") {
           let data = res.data.data.list.slice(1);
           let _arr = [];
