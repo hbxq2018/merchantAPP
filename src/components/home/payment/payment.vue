@@ -213,7 +213,6 @@ export default {
                 console.log('channel:',channel)
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {
-                  console.log('xhr.readyState:',xhr.readyState)
                   switch (xhr.readyState) {
                     case 4:
                       if (xhr.status == 200) {
