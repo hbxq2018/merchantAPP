@@ -10,9 +10,9 @@
     <div class="daily_content">
       <div class="content_top">
         <div class="top_day">
-            <span>2018-07-01</span>
-            <span>至</span>
-            <span>2018-07-01</span>
+            <span>{{today}}(今日)</span>
+            <!-- <span>至</span>
+            <span>{{tomorrow}}</span> -->
         </div>
         <div class="top_order">订单数{{totalOrder}}，核销券数{{totalCode}}，总计</div>
         <div class="top_money">
@@ -25,18 +25,20 @@
         <div class="list_item" v-for="(item,index) in subList" :key="index">
           <div class="item_top">
             <span class="item_top_l">{{item.shopName}}</span>
-            <span>历史数据</span>
+            <span @click="historyData(item.id)">历史数据</span>
           </div>
           <div class="item_cont">
             <div class="item_cont_sub">
-              <div class="item_tit">
+              <div class="item_tit" @click="incomeDetail(1, item.id, '今日')">
                 <span>今日营收</span>
                 <img src="../../../../static/images/home_arrow.png" alt="">
               </div>
               <div class="item_money"><span>￥</span>{{item.soAmount}}</div>
               <div class="item_rate">
-                <span>16.7%</span>
-                <img src="../../../../static/images/up.png" alt="">
+                <span :class="item.rate > 0 ? '' : 'down'">{{item.rate==0?'持平':Math.abs(item.rate)+'%'}}</span>
+                <img v-if="item.rate > 0" src="../../../../static/images/up.png" alt="">
+                <img v-if="item.rate < 0" src="../../../../static/images/down.png" alt="">
+                <img v-if="item.rate == 0" src="../../../../static/images/levelOff.png" alt="" style="height: 4px;vertical-align: middle;">
               </div>
               <div class="item_order">
                 <span>订单数</span>
@@ -48,7 +50,7 @@
               </div>
             </div>
             <div class="item_cont_sub">
-              <div class="item_tit">
+              <div class="item_tit" @click="incomeDetail(2, item.id, '昨日')">
                 <span>昨日营收</span>
                 <img src="../../../../static/images/home_arrow.png" alt="">
               </div>
@@ -95,47 +97,96 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
+    // 查询分店数据
     subbranch() {
       let _this = this,
-        _param =
-          "id=" +
-          this.userInfo.id +
-          "&beginTime=" +
-          this.yesterday +
-          "&endTime=" +
-          this.today,
         _val =
           "id=" +
           _this.userInfo.id +
           "&beginTime=" +
           _this.today +
           "&endTime=" +
-          _this.tomorrow;
-      this.$axios.get("/api/app/shop/getByShopId?" + _param).then(res => {
+          _this.tomorrow,
+        _param =
+          "id=" +
+          this.userInfo.id +
+          "&beginTime=" +
+          this.yesterday +
+          "&endTime=" +
+          this.today;
+      this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
         if (res.data.code == 0) {
           let data = res.data.data;
-          for (let i = 0; i < data.length; i++) {
+          _this.totalMoney = _this.changemoney(data[0].allsoAmount);
+          _this.totalOrder = data[0].allsolist;
+          _this.totalCode = data[0].allsoWritelist;
+           for (let i = 0; i < data.length; i++) {
             _this.subList.push({
               id: data[i].id,
               shopName: data[i].shopName,
-              preSoAmount: _this.changemoney(data[i].soAmount),
-              preSolist: data[i].solist,
-              preSoWriteoffList: data[i].soWriteoffList
+              soAmount: _this.changemoney(data[i].soAmount),
+              solist: data[i].solist,
+              soWriteoffList: data[i].soWriteoffList,
+              preSoAmount: "",
+              preSolist: "",
+              preSoWriteoffList: ""
             });
           }
+          _this.$axios.get("/api/app/shop/getByShopId?" + _param).then(res => {
+            if (res.data.code == 0) {
+              let list = res.data.data;
+              for (let i = 0; i < list.length; i++) {
+                _this.subList[i].preSoAmount = _this.changemoney(list[i].soAmount);
+                _this.subList[i].preSolist = list[i].solist;
+                _this.subList[i].preSoWriteoffList = list[i].soWriteoffList;
+                let today = +_this.subList[i].soAmount, yester = +_this.subList[i].preSoAmount;
+                _this.subList[i].rate = ((today - yester) / (yester == 0 ? 1 : yester) * 100).toFixed(2);
+              }
+            }
+          });
         }
       });
-      _this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
-        if (res.data.code == 0) {
-          let list = res.data.data;
-          _this.totalMoney = _this.changemoney(list[0].allsoAmount);
-          _this.totalOrder = list[0].allsolist;
-          _this.totalCode = list[0].allsoWritelist;
-          for (let i = 0; i < list.length; i++) {
-            _this.subList[i].soAmount = _this.changemoney(list[i].soAmount);
-            _this.subList[i].solist = list[i].solist;
-            _this.subList[i].soWriteoffList = list[i].soWriteoffList;
-          }
+    },
+    //查看历史数据
+    historyData(id) {
+      let money = "", orderNum = "", qrcodeNum = "";
+      for(let i = 0; i < this.subList.length; i++) {
+        if(this.subList[i].id == id) {
+          money = this.subList[i].soAmount;
+          orderNum = this.subList[i].solist;
+          qrcodeNum = this.subList[i].soWriteoffList;
+        }
+      }
+      this.$router.push({
+        name: "DataRecode",
+        params: { 
+          shopId: id,
+          money: money,
+          orderNum: orderNum,
+          qrcodeNum: qrcodeNum
+        }
+      });
+    },
+    // 查看今日/昨日数据
+    incomeDetail(time, id, dateName) {
+      let money = "", orderNum = "", qrcodeNum = "";
+      for(let i = 0; i < this.subList.length; i++) {
+        if(this.subList[i].id == id) {
+          money = this.subList[i].soAmount;
+          orderNum = this.subList[i].solist;
+          qrcodeNum = this.subList[i].soWriteoffList;
+        }
+      }
+      this.$router.push({
+        name: "DailyRevenue",
+        params: {
+          shopId: id,
+          beginTime: time == 1 ? this.today : this.yesterday,
+          endTime: time == 1 ? this.tomorrow : this.today,
+          money: money,
+          orderNum: orderNum,
+          qrcodeNum: qrcodeNum,
+          name: dateName
         }
       });
     },
@@ -297,6 +348,9 @@ export default {
               height: 92px;
               line-height: 92px;
               font-size: 24px;
+              .down {
+                color: #16db32;
+              }
               img {
                 width: 22px;
                 height: 20px;

@@ -85,7 +85,7 @@
             <div class="form_inner">
                 <div class="form_inner_li" v-for="(item,index) in remarkObj" :key="index">
                     <div class="form_item remark clearfix">
-                        <span class="fl">菜品名称</span>
+                        <span class="fl">备注名称</span>
                         <input class="fr" type="text" placeholder="例如：免费提供餐巾纸" v-model="item.dish" maxlength="13">
                     </div>
                 </div>

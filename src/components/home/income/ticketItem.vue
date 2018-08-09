@@ -1,5 +1,5 @@
 <template>
-    <div class="ticket_item">
+    <li class="ticket_item">
         <div class="ticket_name">{{ticketObj.skuName}}</div>
         <div class="ticket_info">
             <div class="item_key">
@@ -15,7 +15,7 @@
                 <div>{{ticketObj.updateTime}}</div>
             </div>
         </div>
-    </div>
+    </li>
 </template>
 
 <script>

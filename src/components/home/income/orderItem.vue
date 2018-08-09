@@ -1,8 +1,8 @@
 <template>
-    <div class="order_item" @click="toDetail">
+    <li class="order_item" @click="toDetail">
       <div class="list_item_l">
           <div>{{orderList.hxTime}}</div>
-          <div class="item_money">￥{{orderList.soAmount}}</div>
+          <div class="item_money">￥{{orderList.realAmount}}</div>
       </div>
       <div class="list_item_r">
           <div class="item_key" :class="orderList.skuName ? '' : 'active'">
@@ -16,7 +16,7 @@
               <div v-if="orderList.skuName">{{orderList.skuName}}</div>
           </div>
       </div>
-    </div>
+    </li>
 </template>
 
 <script>

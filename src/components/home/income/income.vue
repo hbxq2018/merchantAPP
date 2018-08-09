@@ -10,15 +10,16 @@
     <div class="income_content">
       <div class="content_top">
         <div class="content_top_item" v-for="(item,index) in income" :key="index">
-          <div class="item_tit" @click="toDetail">
+          <div class="item_tit" @click="toDetail(index)">
             <span>{{item.name}}</span>
             <img src="../../../../static/images/home_arrow.png" alt="">
           </div>
           <div class="item_money"><span>￥</span>{{item.money}}</div>
           <div class="item_rate">
-            <span v-if="index == 0" :class="item.rate < 0 ? 'down' : ''">{{Math.abs(item.rate)}}%</span>
+            <span v-if="index == 0" :class="item.rate > 0 ? '' : 'down'">{{item.rate==0?'持平':Math.abs(item.rate)+'%'}}</span>
             <img v-if="index == 0 && item.rate > 0" src="../../../../static/images/up.png" alt="">
             <img v-if="index == 0 && item.rate < 0" src="../../../../static/images/down.png" alt="">
+            <img v-if="index == 0 && item.rate == 0" src="../../../../static/images/levelOff.png" alt="" style="height: 4px;vertical-align: middle;">
           </div>
           <div class="item_order">
             <span>订单数</span>
@@ -52,8 +53,7 @@
 
 <script>
 import Vue from "vue";
-import { DatetimePicker, Toast, Loadmore, Indicator } from "mint-ui";
-Vue.component(DatetimePicker.name, DatetimePicker);
+import { Toast, Loadmore, Indicator } from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
@@ -181,10 +181,26 @@ export default {
         }
       });
     },
-    toDetail() {
+    toDetail(idx) {
+      let beginTime = '', endTime = '';
+      if(idx == 0) {
+        beginTime = this.today;
+        endTime = this.tomorrow;
+      } else if(idx == 1) {
+        beginTime = this.yesterday;
+        endTime = this.today;
+      }
       this.$router.push({
-        name: "DailyRevenue"
-        // params: { id: "1"}
+        name: "DailyRevenue",
+        params: {
+          shopId: this.userInfo.id,
+          beginTime: beginTime,
+          endTime: endTime,
+          money: this.income[idx].money,
+          orderNum: this.income[idx].orderNum,
+          qrcodeNum: this.income[idx].qrcodeNum,
+          name: this.income[idx].name
+        }
       });
     },
     toDataRecode() {
@@ -201,7 +217,6 @@ export default {
     toDataofStore() {
       this.$router.push({
         name: "DataofStore"
-        // params: { id: "1"}
       });
     },
     //yyyy-MM-dd时间转换

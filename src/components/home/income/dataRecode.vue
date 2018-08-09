@@ -5,7 +5,7 @@
           <router-link to="/income" slot="left">
               <mt-button icon="back"></mt-button>
           </router-link>
-          <mt-button slot="right">导出Excel</mt-button>
+          <mt-button slot="right" @click="ExcelDown">导出Excel</mt-button>
       </mt-header>
     </div>
     <div class="daily_content">
@@ -14,10 +14,10 @@
           <div class="top_tit">
             <div class="date_inp" @click="openPicker(1)">{{startDate}}</div>
             <div class="tit_txt">至</div>
-            <div class="date_inp" @click="openPicker(2)">{{endDate}}</div>
+            <div class="date_inp" @click="openPicker(2)">{{endTime}}</div>
             <div class="tit_btn" @click="inquiry">查询</div>
           </div>
-          <div class="top_order">收款{{order}}笔，核销券数{{qrcodeNum}}张，总计</div>
+          <div class="top_order">收款{{order}}笔，核销券数{{totalCodeNum}}张，总计</div>
           <div class="top_money">
             <span>￥</span>
             <span class="moneyNum">{{money}}</span>
@@ -30,14 +30,14 @@
         <div class="cont_select" :hidden="switchFlag">
           <div class="selected">
             <div class="selected_l" @click="selectOpt">
-              <span>全部</span>
+              <span>{{selectedName}}</span>
               <img :class="isSelected ? 'active' : ''" src="../../../../static/images/home_arrow.png" alt="">
             </div>
-            <div class="selected_r">核销券数24</div>
+            <div class="selected_r">核销券数{{subCodeNum}}</div>
           </div>
           <div class="sel_option" v-if="isSelected">
             <div :class="item.isSelected==1?'active':''" v-for="(item,index) in options" :key="index" :obj="item">
-              <span>{{item.name}}</span>
+              <span @click="selectedType(item.skuId)">{{item.skuName}}</span>
             </div>
           </div>
         </div>
@@ -45,9 +45,11 @@
       <div class="content_list">
         <div class="shadowBox" v-if="isSelected"></div>
         <div class="list_inner">
-          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="custom">
-            <orderItem v-if="switchFlag" v-for="(item,index) in orderObj" :key="index" :obj="item"></orderItem>
-            <ticketItem v-if="!switchFlag" v-for="(item,index) in ticketObj" :key="index" :obj="item"></ticketItem>
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="dataRecode">
+            <ul>
+              <orderItem v-if="switchFlag" v-for="(item,index) in orderObj" :key="index" :obj="item"></orderItem>
+              <ticketItem v-if="!switchFlag" v-for="(item,index) in ticketObj" :key="index" :obj="item"></ticketItem>
+            </ul>
           </mt-loadmore>
         </div>
       </div>
@@ -70,7 +72,6 @@ import orderItem from "./orderItem";
 import ticketItem from "./ticketItem";
 import { DatetimePicker, Toast, Loadmore } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker, Loadmore.name, Loadmore);
-import store from "@/vuex/store";
 export default {
   name: "DataRecode",
   data() {
@@ -78,22 +79,22 @@ export default {
       id: 1,
       shopId: 0,
       startDate: "开始时间",
-      endDate: "结束时间",
+      endTime: "结束时间",
       money: 0,
       order: 0,
-      qrcodeNum: 0,
+      totalCodeNum: 0,
+      subCodeNum: 0,
       isSelected: false, //点击option
       switchFlag: true, //tab栏切换
-      allLoaded: false,
+      allLoaded: false, //是否禁止上拉加载
+      shopListLoad: false, //是否禁止加载myorderForShop
+      listLoad: false, //是否禁止加载myorder
       orderPage: 1,
       codePage: 1,
       rows: 5,
-      options: [
-        {
-          name: "全部",
-          isSelected: 1
-        }
-      ],
+      skuId: "",
+      selectedName: "全部",
+      options: [],
       orderObj: [],
       ticketObj: []
     };
@@ -102,20 +103,17 @@ export default {
     this.shopId = this.$route.params.shopId;
     this.money = this.$route.params.money;
     this.order = this.$route.params.orderNum;
-    this.qrcodeNum = this.$route.params.qrcodeNum;
+    this.totalCodeNum = this.subCodeNum = this.$route.params.qrcodeNum;
     this.startDate = this.formatDate(new Date());
-    this.endDate = this.formatDate(
+    this.endTime = this.formatDate(
       new Date(new Date().setDate(new Date().getDate() + 1))
     );
     this.orderList();
-    this.tickType();
   },
   components: {
     orderItem,
     ticketItem
   },
-  watch: {},
-  store,
   methods: {
     //营业额
     moneyNum() {
@@ -126,7 +124,7 @@ export default {
           "&beginTime=" +
           this.startDate +
           "&endTime=" +
-          this.endDate;
+          this.endTime;
       this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
         if (res.data.code == 0 && res.data.data) {
           _this.money = res.data.data ? res.data.data : 0;
@@ -142,7 +140,7 @@ export default {
           "&beginTime=" +
           this.startDate +
           "&endTime=" +
-          this.endDate;
+          this.endTime;
       this.$axios.get("/api/app/so/soAllTotle?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
@@ -159,25 +157,32 @@ export default {
           "&begainTime=" +
           this.startDate +
           "&endTime=" +
-          this.endDate +
+          this.endTime +
           "&page=" +
           this.codePage +
           "&rows=5";
+      if (this.skuId) {
+        _value += "&skuId=" + this.skuId;
+      }
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
-        if (res.data.code == 0) {
-          _this.qrcodeNum = res.data.data.total ? res.data.data.total : 0;
-          let list = res.data.data.list;
-          if (_this.codePage == 1) {
-            list = list.slice(1);
-          }
-          for (let i = 0; i < list.length; i++) {
-            // list[i].hxTime = list[i].hxTime ? list[i].hxTime : list[i].paidTime;
-            // list[i].mobile = list[i].mobile ? list[i].mobile : list[i].userName;
-            // list[i].mobile = _this.dealWithTel(list[i].mobile);
-            _this.ticketObj.push(list[i]);
-          }
+        if (_this.skuId == "") {
+          _this.totalCodeNum = _this.subCodeNum = res.data.data.total
+            ? res.data.data.total
+            : 0;
         } else {
-          this.allLoaded = true; // 若数据已全部获取完毕
+          _this.subCodeNum = res.data.data.total ? res.data.data.total : 0;
+        }
+        if (_this.switchFlag == false) {
+          if (res.data.code == 0 && res.data.data.list != null) {
+            let list = res.data.data.list;
+            list = list.slice(1);
+            for (let i = 0; i < list.length; i++) {
+              _this.ticketObj.push(list[i]);
+            }
+            _this.allLoaded = list.length < 5 ? true : false;
+          } else {
+            _this.allLoaded = true;
+          }
         }
       });
     },
@@ -194,57 +199,80 @@ export default {
           "&beginTime=" +
           this.startDate +
           "&endTime=" +
-          this.endDate;
+          this.endTime;
       //商家订单列表
-      this.$axios
-        .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
-        .then(res => {
-          if (res.data.code == 0 && res.data.data.list) {
-            let list = res.data.data.list;
-            for (let i = 0; i < list.length; i++) {
-              list[i].hxTime = list[i].hxTime
-                ? list[i].hxTime
-                : list[i].paidTime;
-              list[i].mobile = list[i].mobile
-                ? list[i].mobile
-                : list[i].userName;
-              list[i].mobile = _this.dealWithTel(list[i].mobile);
-              _this.orderObj.push(list[i]);
+      if (!this.shopListLoad) {
+        this.$axios
+          .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
+          .then(res => {
+            if (res.data.code == 0 && res.data.data.list != null) {
+              let list = res.data.data.list;
+              for (let i = 0; i < list.length; i++) {
+                list[i].hxTime = list[i].hxTime
+                  ? list[i].hxTime
+                  : list[i].paidTime;
+                list[i].mobile = list[i].mobile
+                  ? list[i].mobile
+                  : list[i].userName;
+                list[i].mobile = _this.dealWithTel(list[i].mobile);
+                _this.orderObj.push(list[i]);
+              }
+              _this.shopListLoad = list.length < 5 ? true : false;
+            } else {
+              _this.shopListLoad = true;
             }
-          }
-        });
-      //食典券列表
-      this.$axios
-        .get("/api/app/so/myorder?" + _value + "&soStatus=3")
-        .then(res => {
-          if (res.data.code == 0 && res.data.data) {
-            let list = res.data.data;
-            for (let i = 0; i < list.length; i++) {
-              list[i].hxTime = list[i].hxTime
-                ? list[i].hxTime
-                : list[i].paidTime;
-              list[i].mobile = list[i].mobile
-                ? list[i].mobile
-                : list[i].userName;
-              list[i].mobile = _this.dealWithTel(list[i].mobile);
-              _this.orderObj.push(list[i]);
+          });
+      }
+      if (!this.listLoad) {
+        //食典券列表
+        this.$axios
+          .get("/api/app/so/myorder?" + _value + "&soStatus=3")
+          .then(res => {
+            if (res.data.code == 0 && res.data.data) {
+              let list = res.data.data;
+              for (let i = 0; i < list.length; i++) {
+                list[i].hxTime = list[i].hxTime
+                  ? list[i].hxTime
+                  : list[i].paidTime;
+                list[i].mobile = list[i].mobile
+                  ? list[i].mobile
+                  : list[i].userName;
+                list[i].mobile = _this.dealWithTel(list[i].mobile);
+                _this.orderObj.push(list[i]);
+              }
+              _this.listLoad = list.length < 5 ? true : false;
+            } else {
+              _this.listLoad = true;
             }
-          }
-        });
+          });
+      }
+      if (this.shopListLoad && this.listLoad) {
+        this.allLoaded = true;
+      }
     },
     //下拉
     loadTop() {
-      this.orderPage = 1;
-      this.allLoaded = false;
-      this.orderObj = [];
-      this.orderList();
-      this.$refs.custom.onTopLoaded();
+      if (this.switchFlag) {
+        this.orderPage = 1;
+        this.orderObj = [];
+        this.orderList();
+      } else {
+        this.codePage = 1;
+        this.ticketObj = [];
+        this.codeList();
+      }
+      this.$refs.dataRecode.onTopLoaded();
     },
     //上拉
     loadBottom() {
-      this.orderPage += 1;
-      this.orderList();
-      this.$refs.custom.onBottomLoaded();
+      if (this.switchFlag) {
+        this.orderPage += 1;
+        this.orderList();
+      } else {
+        this.codePage += 1;
+        this.codeList();
+      }
+      this.$refs.dataRecode.onBottomLoaded();
     },
     // 核销券的种类
     tickType() {
@@ -255,28 +283,63 @@ export default {
           "&begainTime=" +
           this.startDate +
           "&endTime=" +
-          this.endDate +
-          "&isBill=1";
+          this.endTime;
       //商家订单列表
       this.$axios.get("/api/app/hx/sotype?" + _value).then(res => {
         if (res.data.code == 0 && res.data.data) {
           let data = res.data.data;
+          _this.options = [
+            {
+              skuId: "",
+              skuName: "全部",
+              isSelected: 1
+            }
+          ];
           for (let i = 0; i < data.length; i++) {
             _this.options.push({
-              name: data[i].skuName,
+              skuId: data[i].skuId,
+              skuName: data[i].skuName,
               isSelected: 0
             });
           }
         }
       });
     },
+    //查询对应核销券的数据
+    selectedType(id) {
+      this.isSelected = false;
+      this.allLoaded = false;
+      this.skuId = id;
+      this.codePage = 1;
+      this.ticketObj = [];
+      this.codeList();
+      for (let i = 0; i < this.options.length; i++) {
+        if (this.options[i].skuId == this.skuId) {
+          this.options[i].isSelected = 1;
+          this.selectedName = this.options[i].skuName;
+        } else {
+          this.options[i].isSelected = 0;
+        }
+      }
+    },
     //查询
     inquiry() {
+      this.isSelected = false;
+      this.allLoaded = false;
       this.moneyNum();
       this.orderNum();
+      if (this.switchFlag) {
+        this.orderPage = 1;
+        this.orderObj = [];
+        this.shopListLoad = false;
+        this.listLoad = false;
+        this.orderList();
+      } else {
+        this.codePage = 1;
+        this.ticketObj = [];
+        this.tickType();
+      }
       this.codeList();
-      this.orderList();
-      this.tickType();
     },
     openPicker(id) {
       this.$refs.picker.open();
@@ -284,10 +347,10 @@ export default {
     },
     handleConfirm(data) {
       if (this.id == 1) {
-        if (this.endDate) {
+        if (this.endTime) {
           if (
             new Date(this.formatDate(data)).getTime() >
-            new Date(this.endDate).getTime()
+            new Date(this.endTime).getTime()
           ) {
             Toast("开始时间不能大于结束时间");
             return false;
@@ -304,18 +367,44 @@ export default {
             return false;
           }
         }
-        this.endDate = this.formatDate(data);
+        this.endTime = this.formatDate(data);
       }
     },
     tabSwitch(id) {
       this.switchFlag = id == 1 ? true : false;
       this.isSelected = false;
+      this.allLoaded = false;
+      if (this.switchFlag) {
+        this.orderPage = 1;
+        this.orderObj = [];
+        this.shopListLoad = false;
+        this.listLoad = false;
+        this.orderList();
+      } else {
+        this.codePage = 1;
+        this.ticketObj = [];
+        this.tickType();
+      }
+      this.codeList();
     },
     selectOpt() {
       this.isSelected = !this.isSelected;
     },
+    //导出Excel
+    ExcelDown() {
+      let _value =
+        "shopId=" +
+        this.shopId +
+        "&soStatus=2&beginTime=" +
+        this.startDate +
+        "&endTime=" +
+        this.endTime;
+      this.$axios.get("/api/app/so/soDetailExport?" + _value).then(res => {
+        
+      });
+    },
+    //yyyy-MM-dd
     formatDate(data) {
-      //yyyy-MM-dd
       var month = data.getMonth() + 1;
       var strDate = data.getDate();
       if (month >= 1 && month <= 9) {
@@ -343,9 +432,11 @@ export default {
 
 <style lang="less">
 .dataRecode {
+  position: fixed;
   background-color: #ebebeb;
   box-sizing: border-box;
-  height: auto !important;
+  height: 100%;
+  overflow: scroll;
   .daily_header {
     position: fixed;
     top: 0;
@@ -498,7 +589,7 @@ export default {
       position: relative;
       .shadowBox {
         width: 100%;
-        height: 800px;
+        height: 740px;
         background-color: #191919;
         opacity: 0.3;
         position: absolute;

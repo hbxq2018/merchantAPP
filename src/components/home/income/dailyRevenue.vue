@@ -9,14 +9,14 @@
     </div>
 		<div id="content_top" class="content_top">
 			<div class="content_banner">
-				<div class="top_day">7月24日(今天)</div>
+				<div class="top_day">{{beginTime}}({{name}})</div>
 				<div class="top_money">
 					<span>￥</span>
-					<span class="money_data">300.00</span>
+					<span class="money_data">{{money}}</span>
 				</div>
 				<div class="top_data">
-					收款<span>3</span>笔
-					，核销券数<span>24</span>张
+					收款<span>{{orderNum}}</span>笔
+					，核销券数<span>{{totalCodeNum}}</span>张
 				</div>
 			</div>
 			<div class="top_tab">
@@ -26,38 +26,27 @@
       <div class="cont_select" :hidden="switchFlag">
         <div class="selected">
           <div class="selected_l" @click="selectOpt">
-            <span>全部</span>
+            <span>{{selectedName}}</span>
             <img :class="isSelected ? 'active' : ''" src="../../../../static/images/home_arrow.png" alt="">
           </div>
-          <div class="selected_r">核销券数24</div>
+          <div class="selected_r">核销券数{{subCodeNum}}</div>
         </div>
         <div class="sel_option" v-if="isSelected">
-          <div class="active">
-            <span>全部</span>
-          </div>
-          <div>
-            <span>享7券</span>
-          </div>
-          <div>
-            <span>套餐券</span>
-          </div>
-          <div>
-            <span>套餐折扣券</span>
-          </div>
-          <div>
-            <span>10元食典券</span>
-          </div>
-          <div>
-            <span>80元食典券</span>
+          <div :class="item.isSelected==1?'active':''" v-for="(item,index) in options" :key="index" :obj="item">
+            <span @click="selectedType(item.skuId)">{{item.skuName}}</span>
           </div>
         </div>
       </div>
 		</div>
     <div class="content_list">
-      <div class="shadowBox" v-if="isSelected" :style="{height: shadowHeight + 'px'}"></div>
+      <div class="shadowBox" v-if="isSelected"></div>
       <div class="list_inner">
-        <orderItem v-if="switchFlag" v-for="(item,index) in orderObj" :key="index" :obj="item"></orderItem>
-        <ticketItem v-if="!switchFlag" v-for="(item,index) in ticketObj" :key="index" :obj="item"></ticketItem>
+        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="dataRecode">
+          <ul>
+            <orderItem v-if="switchFlag" v-for="(item,index) in orderObj" :key="index" :obj="item"></orderItem>
+            <ticketItem v-if="!switchFlag" v-for="(item,index) in ticketObj" :key="index" :obj="item"></ticketItem>
+          </ul>
+        </mt-loadmore>
       </div>
     </div>
   </div>
@@ -67,46 +56,33 @@
 import Vue from "vue";
 import orderItem from "./orderItem";
 import ticketItem from "./ticketItem";
-import store from "@/vuex/store";
+import { Loadmore } from "mint-ui";
+Vue.component(Loadmore.name, Loadmore);
 export default {
   name: "DailyRevenue",
   data() {
     return {
+      shopId: 0,
+      beginTime: "",
+      endTime: "",
+      money: "",
+      orderNum: "",
+      name: "",
+      totalCodeNum: 0,
+      subCodeNum: 0,
       switchFlag: true, //tab栏切换
-      isSelected: false,     //点击option
-      shadowHeight: 0,     //阴影的高度
-      orderObj: [
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "100.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        },
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "100.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        }
-      ],
-      ticketObj: [
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "1.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        },
-        {
-          name: "10元代金券",
-          date: "2018-06-06 12:23:58",
-          maney: "1.00",
-          orderNum: "245125667752",
-          phone: "186******21"
-        }
-      ]
+      isSelected: false, //点击option
+      allLoaded: false, //是否禁止上拉加载
+      shopListLoad: false, //是否禁止加载myorderForShop
+      listLoad: false, //是否禁止加载myorder
+      orderPage: 1,
+      codePage: 1,
+      rows: 5,
+      skuId: "",
+      selectedName: "全部",
+      options: [],
+      orderObj: [],
+      ticketObj: []
     };
   },
   components: {
@@ -114,34 +90,220 @@ export default {
     ticketItem
   },
   created: function() {
-
+    this.shopId = this.$route.params.shopId;
+    this.beginTime = this.$route.params.beginTime;
+    this.endTime = this.$route.params.endTime;
+    this.money = this.$route.params.money;
+    this.orderNum = this.$route.params.orderNum;
+    this.totalCodeNum = this.subCodeNum = this.$route.params.qrcodeNum;
+    this.name = this.$route.params.name.substring(0, 2);
+    this.orderList();
   },
-  mounted() {
-    var content_top = document.getElementById("content_top");
-    console.log(content_top);
-    console.log(content_top.offsetHeight);
-    this.shadowHeight = this.getWindowHeight() - content_top.offsetHeight - 40;
-    console.log(this.shadowHeight)
-  },
-  watch: {},
-  store,
   methods: {
+    //核销券数
+    codeList() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&begainTime=" +
+          this.beginTime +
+          "&endTime=" +
+          this.endTime +
+          "&page=" +
+          this.codePage +
+          "&rows=5";
+      if (this.skuId) {
+        _value += "&skuId=" + this.skuId;
+      }
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        if (_this.skuId == "") {
+          _this.totalCodeNum = _this.subCodeNum = res.data.data.total
+            ? res.data.data.total
+            : 0;
+        } else {
+          _this.subCodeNum = res.data.data.total ? res.data.data.total : 0;
+        }
+        if (_this.switchFlag == false) {
+          if (res.data.code == 0 && res.data.data.list != null) {
+            let list = res.data.data.list;
+            list = list.slice(1);
+            for (let i = 0; i < list.length; i++) {
+              _this.ticketObj.push(list[i]);
+            }
+            _this.allLoaded = list.length < 5 ? true : false;
+          } else {
+            _this.allLoaded = true;
+          }
+        }
+      });
+    },
+    //订单列表
+    orderList() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&page=" +
+          this.orderPage +
+          "&rows=" +
+          this.rows +
+          "&beginTime=" +
+          this.beginTime +
+          "&endTime=" +
+          this.endTime;
+      //商家订单列表
+      if (!this.shopListLoad) {
+        this.$axios
+          .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
+          .then(res => {
+            if (res.data.code == 0 && res.data.data.list != null) {
+              let list = res.data.data.list;
+              for (let i = 0; i < list.length; i++) {
+                list[i].hxTime = list[i].hxTime
+                  ? list[i].hxTime
+                  : list[i].paidTime;
+                list[i].mobile = list[i].mobile
+                  ? list[i].mobile
+                  : list[i].userName;
+                list[i].mobile = _this.dealWithTel(list[i].mobile);
+                _this.orderObj.push(list[i]);
+              }
+              _this.shopListLoad = list.length < 5 ? true : false;
+            } else {
+              _this.shopListLoad = true;
+            }
+          });
+      }
+      if (!this.listLoad) {
+        //食典券列表
+        this.$axios
+          .get("/api/app/so/myorder?" + _value + "&soStatus=3")
+          .then(res => {
+            if (res.data.code == 0 && res.data.data) {
+              let list = res.data.data;
+              for (let i = 0; i < list.length; i++) {
+                list[i].hxTime = list[i].hxTime
+                  ? list[i].hxTime
+                  : list[i].paidTime;
+                list[i].mobile = list[i].mobile
+                  ? list[i].mobile
+                  : list[i].userName;
+                list[i].mobile = _this.dealWithTel(list[i].mobile);
+                _this.orderObj.push(list[i]);
+              }
+              _this.listLoad = list.length < 5 ? true : false;
+            } else {
+              _this.listLoad = true;
+            }
+          });
+      }
+      if (this.shopListLoad && this.listLoad) {
+        this.allLoaded = true;
+      }
+    },
+    //下拉
+    loadTop() {
+      if (this.switchFlag) {
+        this.orderPage = 1;
+        this.orderObj = [];
+        this.orderList();
+      } else {
+        this.codePage = 1;
+        this.ticketObj = [];
+        this.codeList();
+      }
+      this.$refs.dataRecode.onTopLoaded();
+    },
+    //上拉
+    loadBottom() {
+      if (this.switchFlag) {
+        this.orderPage += 1;
+        this.orderList();
+      } else {
+        this.codePage += 1;
+        this.codeList();
+      }
+      this.$refs.dataRecode.onBottomLoaded();
+    },
+    // 核销券的种类
+    tickType() {
+      let _this = this,
+        _value =
+          "shopId=" +
+          this.shopId +
+          "&begainTime=" +
+          this.beginTime +
+          "&endTime=" +
+          this.endTime;
+      //商家订单列表
+      this.$axios.get("/api/app/hx/sotype?" + _value).then(res => {
+        if (res.data.code == 0 && res.data.data) {
+          let data = res.data.data;
+          _this.options = [
+            {
+              skuId: "",
+              skuName: "全部",
+              isSelected: 1
+            }
+          ];
+          for (let i = 0; i < data.length; i++) {
+            _this.options.push({
+              skuId: data[i].skuId,
+              skuName: data[i].skuName,
+              isSelected: 0
+            });
+          }
+        }
+      });
+    },
+    //查询对应核销券的数据
+    selectedType(id) {
+      this.isSelected = false;
+      this.allLoaded = false;
+      this.skuId = id;
+      this.codePage = 1;
+      this.ticketObj = [];
+      this.codeList();
+      for (let i = 0; i < this.options.length; i++) {
+        if (this.options[i].skuId == this.skuId) {
+          this.options[i].isSelected = 1;
+          this.selectedName = this.options[i].skuName;
+        } else {
+          this.options[i].isSelected = 0;
+        }
+      }
+    },
     tabSwitch(id) {
       this.switchFlag = id == 1 ? true : false;
       this.isSelected = false;
+      this.allLoaded = false;
+      if (this.switchFlag) {
+        this.orderPage = 1;
+        this.orderObj = [];
+        this.shopListLoad = false;
+        this.listLoad = false;
+        this.orderList();
+      } else {
+        this.codePage = 1;
+        this.ticketObj = [];
+        this.options = [];
+        this.tickType();
+      }
+      this.codeList();
     },
     selectOpt() {
       this.isSelected = !this.isSelected;
     },
-    //屏幕可视高度
-    getWindowHeight() {
-      var windowHeight = 0;
-      if (document.compatMode == "CSS1Compat") {
-        windowHeight = document.documentElement.clientHeight;
+    //隐藏手机信息
+    dealWithTel(cellValue) {
+      if (Number(cellValue) && String(cellValue).length === 11) {
+        var mobile = String(cellValue);
+        var reg = /^(\d{3})\d{4}(\d{4})$/;
+        return mobile.replace(reg, "$1****$2");
       } else {
-        windowHeight = document.body.clientHeight;
+        return cellValue;
       }
-      return windowHeight;
     }
   }
 };
@@ -149,8 +311,11 @@ export default {
 
 <style lang="less">
 .DailyRevenue {
+  position: fixed;
   background-color: #ebebeb;
   box-sizing: border-box;
+  height: 100%;
+  overflow: scroll;
   .daily_header {
     position: fixed;
     top: 0;
@@ -281,6 +446,7 @@ export default {
     position: relative;
     .shadowBox {
       width: 100%;
+      height: 800px;
       background-color: #191919;
       opacity: 0.3;
       position: absolute;
