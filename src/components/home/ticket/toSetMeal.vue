@@ -4,7 +4,7 @@
         <router-link to="/setMeal" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
-        <mt-button slot="right" @click="save">完成</mt-button>
+        <mt-button slot="right" @click.native="save">完成</mt-button>
     </mt-header>
     <div class="form toSetMealBox">
         <div class="addPicBox">
@@ -121,6 +121,7 @@ export default {
       id: "",
       name: "添加套餐",
       picUrl: "",
+      file:"",
       skuName: "",
       sellPrice: "",
       agioPrice: "",
@@ -163,23 +164,25 @@ export default {
       });
     },
     getFile: function(e) {
-      Indicator.open({
-        text: "图片上传中...",
-        spinnerType: "triple-bounce"
-      });
-      //上传图片
       //上传图片
       let _this = this,
         inputDOM = {};
       inputDOM = this.$refs.foodsPic;
       // 通过DOM取文件数据
       this.file = inputDOM.files[0];
+      if(!this.file) {
+        Indicator.close();
+        return false;
+      }else{
+        Indicator.open({
+          text: "图片上传中...",
+          spinnerType: "triple-bounce"
+        });
+      }
       this.errText = "";
       // 触发这个组件对象的input事件
       this.$emit("input", this.file);
-      if(!this.file) {
-        return false;
-      }
+      
       // 这里就可以获取到文件的名字了
       this.fileName = this.file.name;
       // 这里加个回调也是可以的
@@ -345,6 +348,9 @@ export default {
 .toSetMeal {
   background-color: #ebebeb;
   height: 100%;
+  .mint-header{
+    z-index: 9999;
+  }
   .toSetMealBox {
     padding-top: 80px;
     .addPicBox {

@@ -26,9 +26,9 @@
                 <p class="data-pthree">自定义查询</p>
             </div>
         </div>
-        <div class="pay-cont">
+        <div :class="lists.length?'pay-cont':'pay-cont actpay-cont'">
           <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="payment">
-            <ul>
+            <ul v-if="lists.length>0">
               <li class="item" v-for="(item,index) in lists" :key='index' :id='index'>
                   <div class="item-left">
                       <p class="left-one">{{item.skuName}}</p>
@@ -37,6 +37,7 @@
                   <div class="item-right">{{item.servicePrice | changemoney}}</div>
               </li>
             </ul>
+            <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
           </mt-loadmore>
         </div>
     </div>
@@ -97,21 +98,32 @@ export default {
     //通过shopId查询商家的缴费记录(通过此接口来判断发起缴纳服务费的开始时间和结束时间)
     getBeginTime() {
       let _this = this;
+      _this.lists=[];
       this.$axios
         .get(
-          this.$GLOBAL.API +
-            "app/serviceAmount/selectByShopId?shopId=" +
+          "/api/app/serviceAmount/selectByShopId?shopId=" +
             this.userInfo.id
         )
         .then(res => {
           if (res.data.code == 0) {
+            //使用查询到的结束时间做为入参的开始时间，入参结束时间则今天（当前日期_endTime），但显示结束时间使用昨天（当前日期的前一天）
             if (res.data.data) {
-              _this.beginTime = res.data.data.beginTime;
-              _this.endTime = res.data.data.endTime;
-              _this._startTime = res.data.data.beginTime;
-              _this._endTime = res.data.data.endTime;
+              let newstart = res.data.data.endTime; 
+              newstart = ((new Date(newstart)).getTime()- 24 * 60 * 60 * 1000); 
+              newstart = new Date(newstart);
+              _this.beginTime =  _this.formatDate(newstart);
+              _this._startTime = res.data.data.endTime;
+            }else{
+              _this.beginTime = "2018-01-01"; 
+              _this._startTime = "2018-01-01";
             }
           }
+          let yesterday = new Date();
+          _this._endTime = _this.formatDate(new Date());
+          yesterday.setTime(yesterday.getTime() - 24 * 60 * 60 * 1000);
+          this.endTime =  _this.formatDate(yesterday);
+
+
           _this.amount();
           _this.amountList();
         });
@@ -125,9 +137,9 @@ export default {
           "&begainTime=" +
           _this.beginTime +
           "&endTime=" +
-          _this.endTime;
+          _this._endTime;
       _this.$axios
-        .get(this.$GLOBAL.API + "app/hx/amount?" + _value)
+        .get("/api/app/hx/amount?" + _value)
         .then(res => {
           if (res.data.code == 0) {
             let service = res.data.data[1].totalNoService;
@@ -144,11 +156,11 @@ export default {
         "&begainTime=" +
         _this.beginTime +
         "&endTime=" +
-        _this.endTime +
+        _this._endTime +
         "&page=" +
         this.page +
         "&rows=10";
-      this.$axios.get(this.$GLOBAL.API + "app/hx/list?" + _value).then(res => {
+      this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {
           _this.total = data.data.total;
@@ -172,25 +184,22 @@ export default {
     },
     //点击立即交费
     handPayment: function() {
-      // console.log(this._startTime, this._endTime, this.money);
-      // console.log("userInfo:",this.shopInfo);
-      // console.log('shopInfo:',this.userInfo)
-      // if (this.money <= 0) {
-      //   Toast("暂不需要缴纳服务费");
-      // } else {
-
-      let id = "wxpay";
-      this.pay(id);
-      // }
+      if (this.money <= 0) {
+        Toast("暂不需要缴纳服务费");
+      } else {
+        let id = "wxpay";// 微信支付
+        this.pay(id);
+      }
     },
     //支付
     pay(id) {
       // 从服务器请求支付订单
+      let _this = this;
       var WXPAYSERVER =
-        this.$GLOBAL.API +
-        "app/wxpay/payForShopApp?shopId=" +
+        "/api/app/wxpay/payForShopApp?shopId=" +
         this.userInfo.id +
-        "&servicePrice=0.1&beginTime=" +
+        "&servicePrice="+this.money+
+        "&beginTime=" +
         this._startTime +
         "&endTime=" +
         this._endTime +
@@ -205,29 +214,45 @@ export default {
         // 获取支付通道
         plus.payment.getChannels(
           function(channels) {
-            console.log('channels:',channels)
             for (var i in channels) {
               if (channels[i].id == "wxpay") {
                 wxChannel = channels[i];
                 channel = wxChannel;
-                console.log('channel:',channel)
                 var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = function() {//3
                   switch (xhr.readyState) {
+                      // 1\2\3\4
                     case 4:
                       if (xhr.status == 200) {
+                        let obj = JSON.parse(xhr.responseText);
                         plus.payment.request(
                           channel,
-                          xhr.responseText,
+                          obj.data,
                           function(result) {
-                            console.log('result:',result)
+                            console.log("result:", result);
                             plus.nativeUI.alert("支付成功: ", function() {
+                              _this.getBeginTime();
                               back();
                             });
                           },
                           function(error) {
-                            console.log('error:',error)
-                            plus.nativeUI.alert("支付失败：" + error.code);
+                            console.log("error:", error);
+                            let str = error.message,msg='';
+                            if(str.indexOf("-1") != -1){
+                              msg = '一般错误，请联系客服';
+                            }else if(str.indexOf("-2") != -1){
+                              msg = '支付取消，请重新支付';
+                            }else if(str.indexOf("-3") != -1){
+                              msg = '发送失败，请稍后再试';
+                            }else if(str.indexOf("-4") != -1){
+                              msg = '认证被否决';
+                            }else if(str.indexOf("-5") != -1){
+                              msg = '不支持错误';
+                            }
+                            if(msg){
+                              _this.getBeginTime();
+                              plus.nativeUI.alert(msg);
+                            }
                           }
                         );
                       } else {
@@ -238,8 +263,8 @@ export default {
                       break;
                   }
                 };
-                xhr.open("POST", PAYSERVER);
-                xhr.send();
+                xhr.open("POST", PAYSERVER);//1
+                xhr.send();//2
               } else {
                 aliChannel = channels[i];
               }
@@ -261,19 +286,20 @@ export default {
     },
     //点击日历图标
     handdate: function() {
+      //选择自定义时间查询只可查询（看），不能进行缴费等其它操作
       this.$router.push("/customize");
     },
     //yyyy-MM-dd
     formatDate(data) {
-      var month = data.getMonth() + 1;
-      var strDate = data.getDate();
+      let month = data.getMonth() + 1;
+      let strDate = data.getDate();
       if (month >= 1 && month <= 9) {
         month = "0" + month;
       }
       if (strDate >= 0 && strDate <= 9) {
         strDate = "0" + strDate;
       }
-      var currentdate = data.getFullYear() + "-" + month + "-" + strDate;
+      let currentdate = data.getFullYear() + "-" + month + "-" + strDate;
       return currentdate;
     },
     //下拉
@@ -292,7 +318,6 @@ export default {
     }
   },
   created() {
-    this.endTime = this.formatDate(new Date());
     this.getBeginTime();
   }
 };
@@ -399,6 +424,10 @@ export default {
     top: 637px;
     z-index: 50;
     background: #fff;
+    .empty{
+      width: 50%;
+      margin-top: 20%;
+    }
     .item {
       width: 100%;
       height: 90px;
@@ -436,6 +465,9 @@ export default {
         text-align: right;
       }
     }
+  }
+  .actpay-cont{
+    background: none;
   }
 }
 </style>

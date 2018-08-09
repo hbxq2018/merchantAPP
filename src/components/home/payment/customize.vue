@@ -6,8 +6,11 @@
           </router-link>
         </mt-header>
         <div class="legend">目前仅支持查询最多31天数据</div>
-        <mt-field label="开始时间" placeholder="选择开始时间" type="date" v-model="beginTime"></mt-field>
-        <mt-field label="结束时间" placeholder="选择结束时间" type="date" v-model="endTime"></mt-field>
+        <div class="seldate">
+             <mt-field label="开始时间" placeholder="选择开始时间" type="date" v-model="beginTime"></mt-field>
+            <mt-field label="结束时间" placeholder="选择结束时间" type="date" v-model="endTime"></mt-field>
+        </div>
+       
         <div class="inquiry" @click="inquiry">查询</div>
         
         <div class="cus-date" v-if="isShow">
@@ -15,9 +18,9 @@
             <p class="date-ptwo">服务费{{total}}笔，共{{money | changemoney}}元</p>
         </div>
         
-        <div class="cus-cont">
+        <div :class="lists.length>0?'cus-cont':'cus-cont actcus-cont'">
           <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="custom">
-            <ul>
+            <ul v-if="lists.length>0">
               <li class="item" v-for="(item,index) in lists" :key="index">
                   <div class="item-left">
                       <p class="leftpone">{{item.skuName}}</p>
@@ -26,6 +29,7 @@
                   <div class="item-right">{{item.servicePrice | changemoney}}</div>
               </li>
             </ul>
+            <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
           </mt-loadmore>
         </div>
     </div>
@@ -82,6 +86,7 @@ export default {
     ...mapMutations(["setuserInfo"]),
     //点击查询
     inquiry: function() {  
+      //选择自定义时间查询只可查询（看），不能进行缴费等其它操作
       let d1 = this.beginTime,
         d2 = this.endTime,
         diff = 0;
@@ -117,7 +122,7 @@ export default {
           _this._endTime = _this.endTime;
       _this.$axios.get("/api/app/hx/amount?" + _value).then(res => {
         if (res.data.code == 0) {
-          let service = res.data.data[1].totalNoService;
+          let service = res.data.data[1].totalService;
           _this.money = service ? service : 0;
         }
       });
@@ -176,16 +181,30 @@ export default {
   width: 100%;
   height: 100%;
   background: #ebebeb;
+  overflow: scroll;
   .legend {
+    position: fixed;
+    top: 80px;
     width: 674px;
-    padding: 80px 38px 0 38px;
+    padding: 0px 38px 0 38px;
     height: 62px;
     line-height: 62px;
     color: #555;
     font-size: 24px;
     text-align: left;
+    background: #ebebeb;
+    z-index: 100;
+  }
+  .seldate{
+    position: fixed;
+    top: 140px;
+    width: 100%;
+    z-index: 100;
   }
   .inquiry {
+    position: fixed;
+    left: 0;
+    top: 340px;
     width: 100%;
     height: 100px;
     line-height: 100px;
@@ -193,11 +212,17 @@ export default {
     background: #fff;
     text-align: center;
     color: #fc5e2d;
+    z-index: 100;
   }
   .cus-date {
+    position: fixed;
+    top: 440px;
+    left: 0;
     width: 674px;
     height: 80px;
     padding: 17px 38px;
+    background: #ebebeb;
+    z-index: 100;
     & > p {
       width: 100%;
       height: 40px;
@@ -216,6 +241,11 @@ export default {
   .cus-cont {
     width: 100%;
     background: #fff;
+    margin-top: 580px;
+    .empty{
+      width: 50%;
+      margin-top: 40%;
+    }
     .item {
       width: 674px;
       height: 110px;
@@ -245,6 +275,9 @@ export default {
         line-height: 110px;
       }
     }
+  }
+  .actcus-cont{
+    background: none;
   }
 }
 </style>

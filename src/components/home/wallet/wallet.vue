@@ -80,29 +80,67 @@ export default {
         ...mapState(["userInfo", "shopInfo"])
     },
     methods:{
-        getBalance:function(){  //钱包余额
-            this.$axios.get("api/app/account/balance?userId="+this.shopInfo.id).then(res=>{
+        //查询钱包余额
+        getBalance:function(){  
+            this.$axios.get("/api/app/account/balance?userId="+this.shopInfo.id).then(res=>{
                 if(res.data.code == 0){
                     this.Balance = res.data.data;
                 }
             })
         },
-        getdrawAmount:function(){  //可提现金额
-            let _value = 'soStatus=2&isDui=0&shopId='+this.shopInfo.shopId;
-            this.$axios.get("api/app/so/totalAmount?"+_value).then(res=>{
-                if(res.data.code == 0){
-                    this.drawmoney = res.data.data;
+        //查询可提现金额
+        getdrawAmount: function() {
+            let _this = this;
+           
+            this.$axios
+            .get("/api/app/tx/selectCashTime?shopId=" + this.userInfo.id)
+            .then(res => {
+            //查询开始时间
+                if (res.data.code == 0) {
+                    let begtime = "",
+                    _beginTime = "",
+                    _endTime = "";
+                    if (res.data.data && res.data.data.endTime) {
+                        begtime = res.data.data.endTime;
+                    } else {
+                        begtime = 1514736000 * 1000; //首次提现以2018-01-01 0：00：00为开始时间
+                    }
+                    begtime = new Date(begtime);
+                    _beginTime = this.formatDate(begtime);
+ 
+                    let today = new Date();
+                    _endTime = this.formatDate(today);
+                    let _value = "soStatus=2&isDui=0&shopId=" + this.shopInfo.shopId+"&beginTime="+_beginTime+"&endTime="+_endTime;
+                    this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
+                        if (res.data.code == 0) {
+                            this.drawmoney = res.data.data;
+                        }
+                    });
                 }
             })
         },
+        //点击提现或明细
         handclick:function(e){
             const id = e.currentTarget.id;
             console.log(id)
-            if(id == 0){
+            if(id == 0){  //提现
                 this.$router.push('/withdraw')
-            }else if(id == 1){
+            }else if(id == 1){ //明细
                 this.$router.push('/notes')
             }
+        },
+        //yyyy-mm-dd
+        formatDate(data) {
+            let month = data.getMonth() + 1;
+            let strDate = data.getDate();
+            if (month >= 1 && month <= 9) {
+                month = "0" + month;
+            }
+            if (strDate >= 0 && strDate <= 9) {
+                strDate = "0" + strDate;
+            }
+            let currentdate = data.getFullYear() + "-" + month + "-" + strDate;
+            return currentdate;
         }
     },
     created:function(){

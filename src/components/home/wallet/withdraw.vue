@@ -223,7 +223,7 @@ export default {
           _value += key + "=" + _parms[key] + "&";
         }
         _value = _value.substring(0, _value.length - 1);
-        this.$axios.post("api/app/account/update?" + _value).then(res => {
+        this.$axios.post("/api/app/account/update?" + _value).then(res => {
           if (res.data.code == 0) {
             Toast("保存成功");
             this.iseditbank = !this.iseditbank;
@@ -247,8 +247,10 @@ export default {
             if (res.data.code == 0) {
               this.tixian();
             } else {
-              res.data.message = res.data.message.replace("该", "");
-              Toast(res.data.message);
+              if(res.data.message){
+                res.data.message = res.data.message.replace("该", "");
+                Toast(res.data.message);
+              }
             }
           });
         return false;
@@ -270,21 +272,23 @@ export default {
             }
 
             begtime = new Date(begtime);
-            let _beginTime =
-              begtime.getFullYear() +
-              "-" +
-              (begtime.getMonth() + 1) +
-              "-" +
-              begtime.getDate();
 
-            var day1 = new Date();
-            day1.setTime(day1.getTime() - 24 * 60 * 60 * 1000);
-            _endTime =
-              day1.getFullYear() +
-              "-" +
-              (day1.getMonth() + 1) +
-              "-" +
-              day1.getDate();
+            let _beginTime = this.formatDate(begtime);
+              // begtime.getFullYear() +
+              // "-" +
+              // (begtime.getMonth() + 1) +
+              // "-" +
+              // begtime.getDate();
+
+            let yesterday = new Date();
+            yesterday.setTime(yesterday.getTime() - 24 * 60 * 60 * 1000);
+            _endTime =this.formatDate(yesterday);
+            console.log('287-_endTime:',_endTime)
+              // day1.getFullYear() +
+              // "-" +
+              // (day1.getMonth() + 1) +
+              // "-" +
+              // day1.getDate();
             
             let _parms = {
                 userId: this.shopInfo.id,
@@ -305,6 +309,19 @@ export default {
             });
           }
         });
+    },
+    //yyyy-MM-dd
+    formatDate(data) {
+      let month = data.getMonth() + 1;
+      let strDate = data.getDate();
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+      }
+      let currentdate = data.getFullYear() + "-" + month + "-" + strDate;
+      return currentdate;
     },
     handtop: function() {
       //点击编辑银行卡上部，
@@ -335,17 +352,39 @@ export default {
     },
     //查询可提现金额
     getdrawAmount: function() {
-      let _value = "soStatus=2&isDui=0&shopId=" + this.shopInfo.shopId;
-      this.$axios.get("api/app/so/totalAmount?" + _value).then(res => {
-        if (res.data.code == 0) {
-          this.drawmoney = res.data.data;
-        }
-      });
+      let _this = this;
+      this.$axios
+        .get("/api/app/tx/selectCashTime?shopId=" + this.userInfo.id)
+        .then(res => {
+          //查询开始时间
+          if (res.data.code == 0) {
+            let begtime = "",
+            _beginTime = "",
+              _endTime = "";
+            if (res.data.data && res.data.data.endTime) {
+              begtime = res.data.data.endTime;
+            } else {
+              begtime = 1514736000 * 1000; //首次提现以2018-01-01 0：00：00为开始时间
+            }
+
+            begtime = new Date(begtime);
+             _beginTime = this.formatDate(begtime);
+
+            let today = new Date();
+            _endTime =_this.formatDate(today);
+            let _value = "soStatus=2&isDui=0&shopId=" + this.shopInfo.shopId+"&beginTime="+_beginTime+"&endTime="+_endTime;
+            this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
+              if (res.data.code == 0) {
+                this.drawmoney = res.data.data;
+              }
+            });
+          }
+        })
     },
     //根据用户id查询账户信息
     getaccountInfo: function() {
       let _value = "userId=" + this.shopInfo.id;
-      this.$axios.get("api/app/account/getByUserId?" + _value).then(res => {
+      this.$axios.get("/api/app/account/getByUserId?" + _value).then(res => {
         if (res.data.code == 0) {
           let _data = res.data.data;
           this.cardnumber = _data.accountName;

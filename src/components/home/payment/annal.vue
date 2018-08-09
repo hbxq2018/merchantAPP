@@ -5,9 +5,9 @@
             <mt-button icon="back"></mt-button>
           </router-link>
         </mt-header>
-        <div class="ann-cont">
+        <div :class="list.length?'ann-cont':'ann-cont actann-cont'">
           <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="annal">
-            <ul>
+            <ul v-if="list.length>0">
               <li class="item" v-for="(item,index) in list" :key="index" :id='index'>
                   <div class="item-left">
                       <p class="left-one">缴费</p>
@@ -18,6 +18,7 @@
                   </div>
               </li>
             </ul>
+            <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
           </mt-loadmore>
         </div>
     </div>
@@ -62,7 +63,7 @@ export default {
   },
   store,
   computed: {
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo","shopInfo"])
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
@@ -71,7 +72,7 @@ export default {
       let _this = this;
       this.$axios
       // .get("/api/app/serviceAmount/allByShopId?shopId="+this.userInfo.id+"&&page="+this.page+"&rows=10")
-        .get("/api/app/serviceAmount/allByShopId?shopId=278&page="+this.page+"&rows=10")
+        .get("/api/app/serviceAmount/allByShopId?shopId="+this.shopInfo.shopId+"&page="+this.page+"&rows=10")
         .then(res => {
           if (res.data.code == 0) {
             if (res.data.data && res.data.data.length > 0) {
@@ -120,6 +121,10 @@ export default {
     padding-top: 80px;
     width: 100%;
     background: #fff;
+    .empty{
+      width: 50%;
+      margin-top: 40%;
+    }
     .item {
       width: 676px;
       height: 90px;
@@ -146,6 +151,9 @@ export default {
         float: right;
       }
     }
+  }
+  .actann-cont{
+    background: none;
   }
 }
 </style>

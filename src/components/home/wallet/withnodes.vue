@@ -5,7 +5,7 @@
             <mt-button icon="back" slot="left"  @click="goback"></mt-button>
         </mt-header>
 
-        <div class="conten" v-show="!carrying && list.length>0">
+        <div class="conten" v-show="list.length>0">
             <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
                 <ul v-if="list">
                    <li class="item" v-for="(item,index) in list" :key="index" :id="item.id" @click="handlist">
@@ -14,7 +14,7 @@
                             <span class="item-right">{{item.cashAmount | changemoney}}</span>
                         </p>
                         <p class="item-two">
-                            <span class="item-left">{{item.updateTime | rendDate}}</span>
+                            <span class="item-left">{{item.createTime | rendDate}}</span>
                             <span class="item-right">{{item.applyStatus | rendStatus}}</span>
                         </p>
                     </li>
@@ -23,43 +23,49 @@
         </div>
         <img v-if="list.length==0" class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
 
-        <div v-if="carrying">
-            <div class="carrying">
-                <div class="carrleft">
-                    <p class="left-pone">提现</p>
-                    <p class="left-ptwo">{{actdata.createTime | rendDate}}</p>
-                </div>
-                <div class="carrright">{{actdata.cashAmount | changemoney}}</div>
+        <mt-popup
+          v-model="carrying"
+          popup-transition="popup-fade">
+            <div class="modal" @click="closemodal">
+              <div class="carrying">
+                  <div class="carrleft">
+                      <p class="left-pone">提现</p>
+                      <p class="left-ptwo">{{actdata.createTime | rendDate}}</p>
+                  </div>
+                  <div class="carrright">¥{{actdata.cashAmount | changemoney}}</div>
+              </div>
+              <div class="carr-cont">
+                  <div class="cstop">
+                      <div class="carleft">
+                          <div class="round actload"></div>
+                          <div class="erect actload"></div>
+                      </div>
+                      <div class="carright">
+                          <p>已发起提现申请，等待银行处理</p>
+                          <p>{{actdata.createTime | rendDate}}</p>
+                      </div>
+                  </div>
+                  <div class="csbottom">
+                      <div class="carleft">
+                          <div :class="actdata.applyStatus==2?'erect actload':'erect'"></div>
+                          <div :class="actdata.applyStatus==2?'round actload':'round'"></div>
+                      </div>
+                      <div class="carright carrtwo">
+                          <p>{{actdata.applyStatus | rendStatus}}</p>
+                          <p v-if="actdata.applyStatus==2">预计到账时间{{actdata.arrivalTime | rendDate}}</p>
+                      </div>
+                  </div>
+              </div>
             </div>
-            <div class="carr-cont">
-                <div class="cstop">
-                    <div class="carleft">
-                        <div class="round actload"></div>
-                        <div class="erect actload"></div>
-                    </div>
-                    <div class="carright">
-                        <p>已发起提现申请，等待银行处理</p>
-                        <p>{{actdata.createTime | rendDate}}</p>
-                    </div>
-                </div>
-                <div class="csbottom">
-                    <div class="carleft">
-                        <div :class="actdata.applyStatus==2?'erect actload':'erect'"></div>
-                        <div :class="actdata.applyStatus==2?'round actload':'round'"></div>
-                    </div>
-                    <div class="carright">
-                        <p>{{actdata.applyStatus | rendStatus}}</p>
-                        <p>{{actdata.applyStatus!=2?'预计到账时间':'到账时间'}}{{actdata.arrivalTime | rendDate}}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </mt-popup>
+
+        
     </div>
 </template>
 
 <script>
 import Vue from "vue";
-import { Loadmore } from "mint-ui";
+import { Loadmore,Popup } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Loadmore.name, Loadmore);
@@ -122,18 +128,19 @@ export default {
     //时间格式化
     rendDate: function(val) {
       val = new Date(val);
-      val =
-        val.getFullYear() +
-        "-" +
-        (val.getMonth() + 1) +
-        "-" +
-        val.getDate() +
-        " " +
-        val.getHours() +
-        ":" +
-        val.getMinutes()+
-        ":" +
-        val.getSeconds();
+      
+      let month = val.getMonth() + 1;
+      let strDate = val.getDate();
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+      }
+
+      val =val.getFullYear() + "-" + month+ "-" + strDate +
+      " " + val.getHours() +":" + val.getMinutes()+":" + val.getSeconds();
+
       return val;
     }
   },
@@ -172,14 +179,14 @@ export default {
       this.gettxlist();
       this.$refs.loadmore.onBottomLoaded();
     },
-     //获取提现记录数据
+     //查询提现记录数据
     gettxlist() {
       let _parms = {
           userId: this.shopInfo.id,
           page: this.page,
           row: 10
         },
-        _value = "";
+        _value = "",_this = this;
       for (var key in _parms) {
         _value += key + "=" + _parms[key] + "&";
       }
@@ -189,7 +196,10 @@ export default {
           if (res.data.data.list && res.data.data.list.length > 0) {
             let _list = res.data.data.list;
             for (let i in _list) {
-              _list[i].arrivalTime = _list[i].createTime + 86400 * 2 * 1000;
+              let _createTime= _list[i].createTime;
+              _createTime=new Date(_createTime);
+              _createTime.setTime(_createTime.getTime() + 86400 * 2 * 1000);
+              _list[i].arrivalTime = _createTime;
               _list[i].accountName = _list[i].accountName.substr(
                 _list[i].accountName.length - 4,
                 4
@@ -203,6 +213,26 @@ export default {
           this.allLoaded = true; // 若数据已全部获取完毕
         }
       });
+    },
+    //关闭弹框
+    closemodal:function(){
+      this.carrying = !this.carrying;
+    },
+    // yyyy-mm-dd hh:MM:ss
+    formatDate:function(date){
+      let month = date.getMonth() + 1;
+      let strDate = date.getDate();
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+      }
+      let Hours = date.getHours();
+      let Minutes = date.getMinutes();
+      let Seconds = date.getSeconds();
+      let currentdate = date.getFullYear() + "-" + month + "-" + strDate+" "+Hours+":"+Minutes+":"+Seconds;
+      return currentdate;
     }
   },
   created: function() {
@@ -222,6 +252,7 @@ export default {
     width: 50%;
     margin-top: 40%;
   }
+  
   .conten {
     width: 100%;
     padding-top: 80px;
@@ -253,10 +284,14 @@ export default {
       }
     }
   }
+  .mint-popup{
+    border-radius: 30px;
+  }
   .carrying {
     width: 100%;
     height: 90px;
-    padding: 95px 0 15px 0;
+    padding: 15px 0 15px 0;
+    border-radius: 30px;
     background: #fff;
     .carrleft {
       width: 400px;
@@ -280,10 +315,11 @@ export default {
   }
   .carr-cont {
     width: 674px;
-    height: 245px;
-    padding: 38px 56px;
+    height: 305px;
+    padding: 38px 16px;
     margin-top: 20px;
     background: #fff;
+    border-radius: 30px;
     & > div {
       width: 100%;
       height: 122.5px;
@@ -324,6 +360,9 @@ export default {
       p:nth-child(2) {
         margin-top: 20px;
       }
+    }
+    .carrtwo{
+      margin-top: 90px;
     }
   }
 }

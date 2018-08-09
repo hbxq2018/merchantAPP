@@ -12,9 +12,9 @@
             <div :class="acttop?'':'actdiv'">转入</div>
         </div>
         <!-- <div style="height:90px;"></div> -->
-        <div class="conten">
+        <div :class="list.length?'conten':'conten actconten'">
              <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="notesmore">
-                <ul>
+                <ul v-if="list.length>0">
                     <li class="item" v-for="(item,index) in list" :key="index" :id="index">
                         <div class="item-one">
                             <p class="item-p"> {{acttop?'转出':'转入'}}</p>
@@ -23,6 +23,7 @@
                         <div class="item-two">{{item.operateAmount | changemoney}}</div>
                     </li>
                 </ul>
+                <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
             </mt-loadmore>
         </div>
     </div>
@@ -114,7 +115,9 @@ export default {
         _value = "";
       for (var key in _parms) {
         _value += key + "=" + _parms[key] + "&";
-      }
+      };
+      _value = _value.substring(0, _value.length - 1);
+      if(this.page == 1){this.list = [];}
       this.$axios.get("/api/app/account/listTrading?" + _value).then(res => {
         if (res.data.code == 0) {
           if (res.data.data.list && res.data.data.list.length > 0) {
@@ -134,7 +137,6 @@ export default {
     handTop: function() {
       this.page = 1;
       this.allLoaded = false;
-      this.list = [];
       this.acttop = !this.acttop;
       if (this.acttop) {
         this.operateType == 1;
@@ -166,24 +168,26 @@ export default {
     height: 90px;
     z-index: 9999;
     & > div {
-      width: 49.5%;
+      width: 50%;
       float: left;
       text-align: center;
       height: 90px;
       line-height: 90px;
-    }
-    & > div:nth-child(1) {
-      border-right: 1px solid #ebebeb;
     }
     .actdiv {
       color: #fc5e2d;
       border-bottom: #fc5e2d 1px solid;
     }
   }
+
   .conten {
     width: 100%;
     margin-top: 20px;
     background: #fff;
+    .empty{
+      width: 50%;
+      margin-top: 40%;
+    }
     .item {
       width: 694px;
       height: 100px;
@@ -221,6 +225,9 @@ export default {
         }
       }
     }
+  }
+  .actconten{
+    background: none;
   }
 }
 </style>
