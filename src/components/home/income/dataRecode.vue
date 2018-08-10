@@ -345,6 +345,7 @@ export default {
       this.$refs.picker.open();
       this.id = id;
     },
+    //判断时间大小
     handleConfirm(data) {
       if (this.id == 1) {
         if (this.endTime) {
@@ -370,6 +371,7 @@ export default {
         this.endTime = this.formatDate(data);
       }
     },
+    //切换banner
     tabSwitch(id) {
       this.switchFlag = id == 1 ? true : false;
       this.isSelected = false;
@@ -381,6 +383,8 @@ export default {
         this.listLoad = false;
         this.orderList();
       } else {
+        this.skuId = "";
+        this.selectedName = "全部";
         this.codePage = 1;
         this.ticketObj = [];
         this.tickType();

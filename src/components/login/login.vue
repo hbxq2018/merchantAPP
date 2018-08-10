@@ -351,7 +351,7 @@ export default {
                     // _this.$axios.get("/api/app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
-                        _this.$GLOBAL.API+"app/user/findByOpIdAndUnId/?openId=" +
+                        "/api/app/user/findByOpIdAndUnId/?openId=" +
                           _this.openId +
                           "&unionId=" +
                           _this.unionId,
@@ -414,7 +414,7 @@ export default {
                     // _this.$axios.get("/api/"app/user/findByOpenId/" + _this.openId, {})
                     _this.$axios
                       .get(
-                        _this.$GLOBAL.API+"app/user/findByOpIdAndUnId/?openId=" +
+                        "/api/app/user/findByOpIdAndUnId/?openId=" +
                           _this.openId +
                           "&unionId=" +
                           _this.unionId,
