@@ -1,5 +1,5 @@
 <template>
-  <div class="dataRecode">
+  <div class="dataRecode" :class="isSelected ? '' : 'active'">
     <div class="daily_header">
       <mt-header fixed title="数据记录" class="header_inner">
           <router-link to="/income" slot="left">
@@ -126,7 +126,7 @@ export default {
           "&endTime=" +
           this.endTime;
       this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
-        if (res.data.code == 0 && res.data.data) {
+        if (res.data.code == 0) {
           _this.money = res.data.data ? res.data.data : 0;
         }
       });
@@ -404,7 +404,12 @@ export default {
         "&endTime=" +
         this.endTime;
       this.$axios.get("/api/app/so/soDetailExport?" + _value).then(res => {
-        
+        var img = document.querySelector("canvas");
+        var a = document.createElement("a");
+        var event = new MouseEvent("click");
+        a.download = name || name;
+        a.href = '/api/app/so/soDetailExport?' + _value;
+        a.dispatchEvent(event);
       });
     },
     //yyyy-MM-dd
@@ -440,7 +445,9 @@ export default {
   background-color: #ebebeb;
   box-sizing: border-box;
   height: 100%;
-  overflow: scroll;
+  &.active {
+    overflow: scroll;
+  }
   .daily_header {
     position: fixed;
     top: 0;

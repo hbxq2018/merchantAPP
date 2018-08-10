@@ -21,7 +21,7 @@
         </div>
       </div>
       <div class="content_list">
-        <div class="list_num">分店(4)</div>
+        <div class="list_num">分店({{subList.length}})</div>
         <div class="list_item" v-for="(item,index) in subList" :key="index">
           <div class="item_top">
             <span class="item_top_l">{{item.shopName}}</span>

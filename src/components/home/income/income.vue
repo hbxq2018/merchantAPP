@@ -107,17 +107,17 @@ export default {
           "&endTime=" +
           this.today;
       this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
-        if (res.data.code == 0 && res.data.data) {
+        if (res.data.code == 0) {
           _this.income[0].money = res.data.data ? res.data.data : 0;
+          _this.$axios.get("/api/app/so/totalAmount?" + _param).then(res => {
+            if (res.data.code == 0) {
+              _this.income[1].money = res.data.data ? res.data.data : 0;
+              let today = +_this.income[0].money, yester = +_this.income[1].money;
+              _this.income[0].rate = ((today - yester) / (yester == 0 ? 1 : yester) * 100).toFixed(2);
+            }
+          });
         }
       });
-      this.$axios.get("/api/app/so/totalAmount?" + _param).then(res => {
-        if (res.data.code == 0 && res.data.data) {
-          _this.income[1].money = res.data.data ? res.data.data : 0;
-        }
-      });
-      let today = +_this.income[0].money, yester = +_this.income[1].money;
-      _this.income[0].rate = ((today - yester) / (yester == 0 ? 1 : yester) * 100).toFixed(2);
     },
     //订单数
     orderNum() {

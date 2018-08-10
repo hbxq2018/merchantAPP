@@ -1,5 +1,5 @@
 <template>
-  <div class="DailyRevenue">
+  <div class="DailyRevenue" :class="isSelected ? '' : 'active'">
     <div id="daily_header" class="daily_header">
       <mt-header fixed title="详情" class="header_inner">
           <router-link to="/income" slot="left">
@@ -315,7 +315,9 @@ export default {
   background-color: #ebebeb;
   box-sizing: border-box;
   height: 100%;
-  overflow: scroll;
+  &.active {
+    overflow: scroll;
+  }
   .daily_header {
     position: fixed;
     top: 0;
