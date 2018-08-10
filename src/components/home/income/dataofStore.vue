@@ -172,9 +172,9 @@ export default {
       let money = "", orderNum = "", qrcodeNum = "";
       for(let i = 0; i < this.subList.length; i++) {
         if(this.subList[i].id == id) {
-          money = this.subList[i].soAmount;
-          orderNum = this.subList[i].solist;
-          qrcodeNum = this.subList[i].soWriteoffList;
+          money = dateName == '今日' ? this.subList[i].soAmount : this.subList[i].preSoAmount;
+          orderNum = dateName == '今日' ? this.subList[i].solist : this.subList[i].preSolist;
+          qrcodeNum = dateName == '今日' ? this.subList[i].soWriteoffList : this.subList[i].preSoWriteoffList;
         }
       }
       this.$router.push({
