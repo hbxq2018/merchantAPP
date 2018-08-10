@@ -403,13 +403,62 @@ export default {
         this.startDate +
         "&endTime=" +
         this.endTime;
-      this.$axios.get("/api/app/so/soDetailExport?" + _value).then(res => {
-        var img = document.querySelector("canvas");
-        var a = document.createElement("a");
-        var event = new MouseEvent("click");
-        a.download = name || name;
-        a.href = '/api/app/so/soDetailExport?' + _value;
-        a.dispatchEvent(event);
+
+      // "/api/app/so/soDetailExport?" + _value
+
+      // var img = document.querySelector("canvas");
+      // var a = document.createElement("a");
+      // var event = new MouseEvent("click");
+      // a.download = name || name;
+      // a.href = '/api/app/so/soDetailExport?' + _value;
+      // a.dispatchEvent(event);
+      mui.plusReady(function() {
+        let relativePath = "营业数据Excel" + (Math.random() + "").substr(10);
+        var dtask = plus.downloader.createDownload(
+          "/api/app/so/soDetailExport?" + _value,
+          { filename: relativePath },
+          function(d, status) {
+            // 下载完成
+            //alert("执行")
+            if (status == 200) {
+              var index = d.filename.lastIndexOf("/");
+              var name = d.filename.substring(index + 1, d.filename.length);
+              /*localStorage.removeItem("fileList");
+                    return;*/
+              console.log(loadUrl);
+              var myDate = new Date();
+              console.log(myDate);
+              var file =
+                '{"date":"' +
+                myDate.toLocaleString() +
+                '","id":"' +
+                d.filename +
+                '","name":"' +
+                name +
+                '"}';
+              console.log(file);
+              var file1 = localStorage.getItem("fileList");
+              console.log("size=========" + file1);
+              //  return;
+              console.log(file1);
+              if (file1 != null) {
+                //不是第一次下载文件
+                //判断是否已经存在
+                console.log("jinru");
+                file = file + "," + file1;
+                console.log(file);
+                localStorage.setItem("fileList", file);
+                console.log("filealist=" + localStorage.getItem("fileList"));
+              } else {
+                var jsonList = [];
+                var jsonarray = eval(jsonList); //定义追加格式
+                jsonarray.push(file);
+                var files = JSON.stringify(jsonarray);
+                localStorage.setItem("fileList", file); //第一次下载文件存储字符串
+              }
+            }
+          }
+        );
       });
     },
     //yyyy-MM-dd
