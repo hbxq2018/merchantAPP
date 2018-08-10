@@ -99,8 +99,6 @@ export default {
     }
   },
   created: function() {
-    // this.getflag();
-    console.log('isflag123:',isflag)
     this.isflags = isflag;
     quit = true;
     if (this.$route.query.ind == 2) {

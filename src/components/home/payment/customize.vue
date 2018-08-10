@@ -244,7 +244,7 @@ export default {
     margin-top: 580px;
     .empty{
       width: 50%;
-      margin-top: 40%;
+      margin-top: 20%;
     }
     .item {
       width: 674px;

@@ -13,7 +13,7 @@ import axios from 'axios';
 import GLOBAL from '../untils/config/config';
 import UTILS from '../untils/util';
 
-require('./assets/util/vconsole.js');
+ require('./assets/util/vconsole.js');
 
 
 Vue.prototype.$axios = axios;

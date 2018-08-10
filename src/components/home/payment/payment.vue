@@ -159,7 +159,7 @@ export default {
         _this._endTime +
         "&page=" +
         this.page +
-        "&rows=10";
+        "&rows=10&isBill=0";
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let data = res.data;
         if (data.code == 0) {

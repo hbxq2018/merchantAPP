@@ -161,7 +161,6 @@ export default {
       });
     },
     getversion: function() {
-        console.log('getversion')
       mui.plusReady(function() {
         plus.runtime.getProperty(plus.runtime.appid, function(inf) {
           this.data.versionNumber = inf.version;
@@ -174,7 +173,6 @@ export default {
     }
   },
   created: function() {
-       console.log('isflag1231312:',isflag)
     if(version){
         this.data.versionNumber=version;
     }
