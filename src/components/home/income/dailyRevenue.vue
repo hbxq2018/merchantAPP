@@ -56,7 +56,7 @@
 import Vue from "vue";
 import orderItem from "./orderItem";
 import ticketItem from "./ticketItem";
-import { Loadmore } from "mint-ui";
+import { Loadmore , Indicator } from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 export default {
   name: "DailyRevenue",
@@ -106,6 +106,7 @@ export default {
   methods: {
     //核销券数
     codeList() {
+      Indicator.open('数据加载中...');
       let _this = this,
         _value =
           "shopId=" +
@@ -121,6 +122,7 @@ export default {
         _value += "&skuId=" + this.skuId;
       }
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        Indicator.close();
         if (_this.skuId == "") {
           _this.totalCodeNum = _this.subCodeNum = res.data.data.total
             ? res.data.data.total
@@ -158,9 +160,11 @@ export default {
           this.endTime;
       //商家订单列表
       if (!this.shopListLoad) {
+        Indicator.open('数据加载中...');
         this.$axios
           .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
           .then(res => {
+            Indicator.close();
             if (res.data.code == 0 && res.data.data.list != null) {
               let list = res.data.data.list;
               for (let i = 0; i < list.length; i++) {
@@ -208,8 +212,11 @@ export default {
     },
     //下拉
     loadTop() {
+      this.allLoaded = false;
       if (this.switchFlag) {
         this.orderPage = 1;
+        this.shopListLoad = false;
+        this.listLoad = false;
         this.orderObj = [];
         this.orderList();
       } else {

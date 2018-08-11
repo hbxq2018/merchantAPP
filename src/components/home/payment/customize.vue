@@ -7,8 +7,8 @@
         </mt-header>
         <div class="legend">目前仅支持查询最多31天数据</div>
         <div class="seldate">
-             <mt-field label="开始时间" placeholder="选择开始时间" type="date" v-model="beginTime"></mt-field>
-            <mt-field label="结束时间" placeholder="选择结束时间" type="date" v-model="endTime"></mt-field>
+          <div class="iqudate" @click="openPicker(1)"><div class="iquleft">开始时间</div>{{beginTime}}</div>
+          <div class="iqudate" @click="openPicker(2)"><div class="iquleft">结束时间</div>{{endTime}}</div>
         </div>
        
         <div class="inquiry" @click="inquiry">查询</div>
@@ -32,26 +32,42 @@
             <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
           </mt-loadmore>
         </div>
+        
+        <mt-datetime-picker
+          type="date"
+          ref="custpicker"
+          year-format="{value} 年"
+          month-format="{value} 月"
+          date-format="{value} 日"
+          :startDate = 'mindata'
+          @confirm="handleConfirm"
+          >
+        </mt-datetime-picker>
     </div>
 </template>
 
 <script>
-import { Toast } from "mint-ui";
+import { Toast , DatetimePicker , Indicator } from "mint-ui";
 import store from "@/vuex/store";
+import Vue from "vue";
+Vue.component(DatetimePicker.name, DatetimePicker);
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "customize",
   data() {
     return {
-      beginTime: "",
-      endTime: "",
+      beginTime: "请选择开始时间",
+      endTime: "请选择结束时间",
       _beginTime: "",
       _endTime: "",
+      mindata:"",
       money: 0,
       total: 0,
       isShow: false,
       allLoaded: false,
+      pickerVisible:true,
       page: 1,
+      actId:1,
       lists: []
     };
   },
@@ -90,36 +106,43 @@ export default {
       let d1 = this.beginTime,
         d2 = this.endTime,
         diff = 0;
+      d2 = new Date(this.endTime);
+      d2.setTime(d2.getTime() + 24 * 60 * 60 * 1000);
+      d2 =this.formatDate(d2);
       if (new Date(d1.replace(/-/g, "/")) < new Date(d2.replace(/-/g, "/"))) {
         diff = new Date(d2.replace(/-/g, "/"))-new Date(d1.replace(/-/g, "/"));
         if(diff < 2678410000){
           this.lists = [];
+          this.page = 1;
           this.amount();
           this.amountList();
           this.isShow = true;
         }else{
-          this.beginTime = "";
-          this.endTime = "";
+          this.beginTime = "请选择开始时间";
+          this.endTime = "请选择结束时间";
           Toast("最多查询31天的数据");
         }
       } else {
-        this.beginTime = "";
-        this.endTime = "";
+        this.beginTime = "请选择开始时间";
+        this.endTime = "请选择结束时间";
         Toast("开始时间不得比结束时间晚");
       }
     },
     //获取已核销总额与总数量
     amount() {
-      let _this = this,
-        _value =
-          "shopId=" +
-          this.userInfo.id +
-          "&begainTime=" +
-          _this.beginTime +
-          "&endTime=" +
-          _this.endTime;
-          _this._beginTime = _this.beginTime;
-          _this._endTime = _this.endTime;
+      let _this = this,_tomorrow='', _value ='';
+      _tomorrow = new Date(this.endTime);
+      _tomorrow.setTime(_tomorrow.getTime() + 24 * 60 * 60 * 1000);
+      _tomorrow =this.formatDate(_tomorrow);
+      _value =
+        "shopId=" +
+        this.userInfo.id +
+        "&begainTime=" +
+        _this.beginTime +
+        "&endTime=" +
+        _tomorrow;
+        _this._beginTime = _this.beginTime;
+      _this._endTime = _this.endTime;
       _this.$axios.get("/api/app/hx/amount?" + _value).then(res => {
         if (res.data.code == 0) {
           let service = res.data.data[1].totalService;
@@ -129,19 +152,24 @@ export default {
     },
     //获取核销列表数据
     amountList() {
-      let _this = this;
-      let _value =
+      Indicator.open("数据加载中...");
+      let _this = this,_tomorrow='',_value='';
+      _tomorrow = new Date(this.endTime);
+      _tomorrow.setTime(_tomorrow.getTime() + 24 * 60 * 60 * 1000);
+      _tomorrow =this.formatDate(_tomorrow);
+      _value =
         "shopId=" +
         this.userInfo.id +
         "&begainTime=" +
         _this.beginTime +
         "&endTime=" +
-        _this.endTime +
+        _tomorrow +
         "&page=" +
         this.page +
         "&rows=10";
       _this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let data = res.data;
+        Indicator.close();
         if (data.code == 0) {
           _this.total = data.data.total;
           let _list = data.data.list;
@@ -149,6 +177,7 @@ export default {
             for (let i = 0; i < _list.length; i++) {
               if(_list[i].shopName && _list[i].skuName){
                 _this.lists.push(_list[i]);
+                
               }
             }
           }else {
@@ -170,7 +199,56 @@ export default {
       this.page += 1;
       this.amountList();
       this.$refs.custom.onBottomLoaded();
+    },
+    openPicker(id) {
+      this.$refs.custpicker.open();
+      this.actId = id;
+    },
+    //判断时间大小
+    handleConfirm(data) {
+      if (this.actId == 1) {
+        if (this.endTime) {
+          if (
+            new Date(this.formatDate(data)).getTime() >
+            new Date(this.endTime).getTime()
+          ) {
+            Toast("开始时间不能大于结束时间");
+            return false;
+          }
+        }
+        this.beginTime = this.formatDate(data);
+      } else if (this.actId == 2) {
+
+        console.log('dataa;',data)
+        if (this.beginTime) {
+          if (
+            new Date(this.beginTime).getTime() >
+            new Date(this.formatDate(data)).getTime()
+          ) {
+            Toast("结束时间不能小于开始时间");
+            return false;
+          }
+        }
+        this.endTime = this.formatDate(data);
+      }
+    },
+    //yyyy-MM-dd
+    formatDate(data) {
+      var month = data.getMonth() + 1;
+      var strDate = data.getDate();
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+      }
+      var currentdate = data.getFullYear() + "-" + month + "-" + strDate;
+      return currentdate;
     }
+  },
+  created:function(){
+    let _mindata = new Date(new Date().getTime() -86400000 * 365*2);
+    this.mindata = new Date(_mindata);
   }
 };
 </script>
@@ -199,7 +277,21 @@ export default {
     position: fixed;
     top: 140px;
     width: 100%;
+    height: 200px;
     z-index: 100;
+    background: #fff;
+    .iqudate{
+      width: 100%;
+      height:49%;
+      text-align: center;
+      line-height: 100px;
+      border-bottom: 2px solid #ebebeb;
+      .iquleft{
+        width: 30%;
+        height: 100%;
+        float: left;
+      }
+    }
   }
   .inquiry {
     position: fixed;

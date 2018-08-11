@@ -173,7 +173,7 @@ export default {
       // this.today =_date;
       let _mindata =
         new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() -
-        86400000 * 365;
+        86400000 * 365*2;
       this.mindata = new Date(_mindata);
       let _maxdata =
         new Date(_this.$UTILS.dateConv(new Date(_date))).getTime() +

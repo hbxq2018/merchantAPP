@@ -99,6 +99,7 @@ export default {
     ...mapMutations(["setuserInfo"]),
     // 查询今日分店数据
     subbranch() {
+      Indicator.open('数据加载中...');
       let _val =
         "id=" +
         this.userInfo.id +
@@ -107,6 +108,7 @@ export default {
         "&endTime=" +
         this.tomorrow;
       this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
+        Indicator.close();
         if (res.data.code == 0) {
           let data = res.data.data;
           this.totalMoney = this.changemoney(data[0].allsoAmount);

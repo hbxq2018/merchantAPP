@@ -68,8 +68,6 @@ export default {
   methods: {
      ...mapMutations(['setuserInfo']),
     onValuesChange(picker, values) {
-      console.log('picker:',picker)
-      console.log('values:',values[0])
       this.jianAmount = values[0];
       if (values[0] > values[1]) {
         picker.setSlotValue(1, values[0]);
@@ -143,7 +141,6 @@ export default {
               data[i].full = arr[0];
             }
             this.ticketlist = data;
-            // console.log("ticketlist:",this.ticketlist)
           }
         });
     },

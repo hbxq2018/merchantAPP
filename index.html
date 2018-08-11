@@ -176,7 +176,6 @@
 							contentType: "application/x-www-form-urlencoded;charset=UTF-8",
 							success: function (data) {
 								newVer = data.version * 1;
-								version = data.version * 1;
 								apkUrl = data.apkUrl;
 								console.log('index-data:',data)
 								if(data.flag == 0){
@@ -187,6 +186,7 @@
 								console.log('isflag:',isflag)
 								console.log('data-txt:',data);
 								if (newVer > ver) {
+									version = data.version * 1;
 									//mui.toast("发现新版本:V" + data.Data);//获取远程数据库中上新andriod版本号
 									var _msg = "发现新版本:V" + newVer;
 									mui.confirm(_msg, "升级确认", btn, function (e) {
@@ -207,7 +207,6 @@
 										}
 									});
 								} else {
-									console.log("当前版本号已是最新");
 									mui.toast("当前版本号已是最新");
 									return;
 								}

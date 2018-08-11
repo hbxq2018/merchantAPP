@@ -93,7 +93,7 @@ export default {
     }
   },
   created: function() {
-    // Indicator.open("数据加载中...");
+    Indicator.open("数据加载中...");
     let _this = this;
     let _date = new Date();
     let _start =_this.$UTILS.dateConv(_date);
@@ -115,6 +115,7 @@ export default {
     }
     value = value.substring(0, value.length-1);
     this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
+      Indicator.close();
       if (res.data.code == 0) {
         let _data =[];
          for(key in res.data.data){

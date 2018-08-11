@@ -21,21 +21,25 @@
     </div>
     <div class="detasbj" id="detasbj"></div>
     <div class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
-      <ul v-if="writedata.length>0" id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-        <li class="order_history" v-for="(item,index) in writedata" :key="index">
-            <div class="order_h_sublevel">
-                <div class="roder_left">
-                    <!-- <b>{{item.couponAmount}}<span>元代金券</span></b> -->
-                    <b>{{item.skuName}}</b>
-                    <p>{{item.updateTime}}</p>
-                </div>
-                <div class="roder-right">
-                    <span>&yen;{{item.servicePrice | changemoney}}</span>
-                </div>
-            </div>
-        </li>
-      </ul>
-      <img v-else class="emtpy" :src="url" alt="什么都没有">
+      <!-- <ul v-if="writedata.length>0" id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"> -->
+         <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="sonmore">
+             <ul v-if="writedata.length>0">
+	        <li class="order_history" v-for="(item,index) in writedata" :key="index">
+	            <div class="order_h_sublevel">
+	                <div class="roder_left">
+	                    <!-- <b>{{item.couponAmount}}<span>元代金券</span></b> -->
+	                    <b>{{item.skuName}}</b>
+	                    <p>{{item.updateTime}}</p>
+	                </div>
+	                <div class="roder-right">
+	                    <span>&yen;{{item.servicePrice | changemoney}}</span>
+	                </div>
+	            </div>
+	        </li>
+      	     </ul>
+      	     <img v-else class="emtpy" :src="url" alt="什么都没有">
+         </mt-loadmore>
+      
     </div>
   </div>
 </template>
@@ -60,14 +64,9 @@ export default {
       service:0,
       totalNoService:0,
       isbill:0,
-      allLoaded: true,
+      allLoaded: false,
       oDvheight:'0px',
-      scrollMode: "auto",
-      touchStartY: 0,
-      distance: 0,
-      topFlag: false, //是否到顶部
-      bottomFlag: false, //是否到底部
-      flag: true //节流阀
+      scrollMode: "auto"
     };
   },
   store,
@@ -100,7 +99,7 @@ export default {
   methods: {
     //獲取核銷數據
     getdata: function( type) {
-      // Indicator.open('数据加载中...');
+      Indicator.open('数据加载中...');
       if (this.page == 1) {
         this.writedata = [];
       }
@@ -129,6 +128,7 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        Indicator.close();
         if (res.data.code == 0) {
           this.total = res.data.data.total;
           if (res.data.data.list) {
@@ -139,148 +139,33 @@ export default {
               for (let i = 0; i < _data.length; i++) {
                 this.writedata.push(_data[i]);
               }
-              // Indicator.close();
               if (_data.length < 9) {
                 this.allLoaded = false;
               }
             } else {
               Toast("没有更多数据了");
-              // Indicator.close();
-              this.allLoaded = false;
+              this.allLoaded = true;
             }
           } else {
-            // Indicator.close();
-            this.allLoaded = false;
+            this.allLoaded = true;
           }
-        }else{
-          // Indicator.close();
         }
       });
     },
-
-
-     //获取顶部卷去高度
-    getScrollTop() {
-      var scrollTop = 0,
-        bodyScrollTop = 0,
-        documentScrollTop = 0;
-      if (document.body) {
-        bodyScrollTop = document.body.scrollTop;
-      }
-      if (document.documentElement) {
-        documentScrollTop = document.documentElement.scrollTop;
-      }
-      scrollTop =
-        bodyScrollTop - documentScrollTop > 0
-          ? bodyScrollTop
-          : documentScrollTop;
-      return scrollTop;
+    //下拉
+    loadTop() {
+      this.page = 1;
+      this.allLoaded = false;
+      this.list = [];
+      this.getdata();
+      this.$refs.sonmore.onTopLoaded();
     },
-    //盒子总高度
-    getScrollHeight() {
-      var scrollHeight = 0,
-        bodyScrollHeight = 0,
-        documentScrollHeight = 0;
-      if (document.body) {
-        bodyScrollHeight = document.body.scrollHeight;
-      }
-      if (document.documentElement) {
-        documentScrollHeight = document.documentElement.scrollHeight;
-      }
-      scrollHeight =
-        bodyScrollHeight - documentScrollHeight > 0
-          ? bodyScrollHeight
-          : documentScrollHeight;
-      return scrollHeight;
-    },
-    //屏幕可视高度
-    getWindowHeight() {
-      var windowHeight = 0;
-      if (document.compatMode == "CSS1Compat") {
-        windowHeight = document.documentElement.clientHeight;
-      } else {
-        windowHeight = document.body.clientHeight;
-      }
-      return windowHeight;
-    },
-    touchStart(e) {
-      let dishesUl = document.getElementById("detasonul");
-      let bottomH =
-        document.getElementById("detasbj").clientHeight;
-      this.touchStartY = e.targetTouches[0].pageY;
-      if (this.getScrollTop() == 0 && this.flag) {
-        this.topFlag = true;
-      } else {
-        this.topFlag = false;
-      }
-      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
-        this.allLoaded = false;
-        this.bottomFlag = false;
-      }
-      
-      if (
-        Math.abs(
-          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
-        ) < 5 &&
-        this.allLoaded
-      ) {
-        this.bottomFlag = true;
-      } else {
-        this.bottomFlag = false;
-      }
-    },
-    touchMove(e) {
-      let dishesUl = document.getElementById("detasonul");
-      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        if (this.distance > 100) {
-          this.distance = 100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        if (this.distance < -100) {
-          this.distance = -100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-    },
-    touchEnd() {
-      let dishesUl = document.getElementById("detasonul"),
-        _this = this;
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        this.flag = false;
-        let index = 100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-            _this.flag = true;
-            _this.distance = 0;
-          }
-          index--;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        this.page = 1;
-        this.allLoaded = true;
-        this.getdata();
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        let index = -100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-          }
-          index++;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        ++this.page;
-        this.getdata();
-      }
+    //上拉
+    loadBottom() {
+      this.page += 1;
+      this.getdata();
+      this.$refs.sonmore.onBottomLoaded();
     }
-
-
   },
   created: function() {
     const ua = navigator.userAgent.toLowerCase();
@@ -303,6 +188,7 @@ export default {
   width: 100%;
   height: 100%;
   background: #ebebeb;
+  overflow: scroll;
   .nodata {
     width: 100%;
     height: 224px;

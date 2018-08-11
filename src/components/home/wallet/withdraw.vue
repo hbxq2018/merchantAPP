@@ -267,6 +267,7 @@ export default {
               _endTime = "";
             if (res.data.data && res.data.data.endTime) {
               begtime = res.data.data.endTime;
+              begtime = begtime.replace(/\-/g, '/');
             } else {
               begtime = 1514736000 * 1000; //首次提现以2018-01-01 0：00：00为开始时间
             }
@@ -274,21 +275,10 @@ export default {
             begtime = new Date(begtime);
 
             let _beginTime = this.formatDate(begtime);
-              // begtime.getFullYear() +
-              // "-" +
-              // (begtime.getMonth() + 1) +
-              // "-" +
-              // begtime.getDate();
 
             let yesterday = new Date();
-            yesterday.setTime(yesterday.getTime() - 24 * 60 * 60 * 1000);
+            yesterday.setTime(yesterday.getTime());
             _endTime =this.formatDate(yesterday);
-            console.log('287-_endTime:',_endTime)
-              // day1.getFullYear() +
-              // "-" +
-              // (day1.getMonth() + 1) +
-              // "-" +
-              // day1.getDate();
             
             let _parms = {
                 userId: this.shopInfo.id,
@@ -363,6 +353,7 @@ export default {
               _endTime = "";
             if (res.data.data && res.data.data.endTime) {
               begtime = res.data.data.endTime;
+              begtime = begtime.replace(/\-/g, '/');
             } else {
               begtime = 1514736000 * 1000; //首次提现以2018-01-01 0：00：00为开始时间
             }

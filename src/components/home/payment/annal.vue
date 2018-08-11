@@ -27,6 +27,7 @@
 <script>
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
+import { Indicator } from "mint-ui";
 export default {
   name: "annal",
   data() {
@@ -69,11 +70,13 @@ export default {
     ...mapMutations(["setuserInfo"]),
     //获取缴费记录列表数据
     amountList() {
+      Indicator.open('数据加载中...');
       let _this = this;
       this.$axios
       // .get("/api/app/serviceAmount/allByShopId?shopId="+this.userInfo.id+"&&page="+this.page+"&rows=10")
         .get("/api/app/serviceAmount/allByShopId?shopId="+this.shopInfo.shopId+"&page="+this.page+"&rows=10")
         .then(res => {
+          Indicator.close();
           if (res.data.code == 0) {
             if (res.data.data && res.data.data.length > 0) {
               let _list = res.data.data;

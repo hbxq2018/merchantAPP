@@ -31,7 +31,7 @@
 
 <script>
 import Vue from "vue";
-import { Loadmore } from "mint-ui";
+import { Loadmore , Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Loadmore.name, Loadmore);
@@ -106,10 +106,12 @@ export default {
     },
     //获取列表数据
     getDatelist: function() {
+      Indicator.open('数据加载中...');
       let _parms = {
           userId: this.shopInfo.id,
           operateType: this.operateType,
           page: this.page,
+          type:1,
           row: 10
         },
         _value = "";
@@ -119,6 +121,7 @@ export default {
       _value = _value.substring(0, _value.length - 1);
       if(this.page == 1){this.list = [];}
       this.$axios.get("/api/app/account/listTrading?" + _value).then(res => {
+        Indicator.close();
         if (res.data.code == 0) {
           if (res.data.data.list && res.data.data.list.length > 0) {
             let _list = res.data.data.list;
@@ -138,11 +141,7 @@ export default {
       this.page = 1;
       this.allLoaded = false;
       this.acttop = !this.acttop;
-      if (this.acttop) {
-        this.operateType == 1;
-      } else {
-        this.operateType == 2;
-      }
+      this.operateType = this.acttop?'1':'2';
       this.getDatelist();
     }
   },

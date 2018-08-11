@@ -4,7 +4,7 @@
         <mt-button icon="back"></mt-button></router-link></mt-header>
         <div class="weWrap">
             <img :src="data.src" alt="享7Logo">
-            <p>{{data.name}}<span>{{data.versionNumber}}</span></p>
+            <p>{{data.name}}<span>{{versions}}</span></p>
         </div>
         <div class="Our_information" v-for="(item,index) in data1" :key='index' :id="item.id" @click="handlist">
             <div class="Information_details">
@@ -31,8 +31,9 @@ export default {
         //   src: "../../../../static/images/xiang7Logo.png",
         src: require("../../../../static/images/xiang7Logo.png"),
         name: "版本号:",
-        versionNumber: "V1.0"
+        versionNumber: ""
       },
+      versions:'',
       data1: [
         {
           name: "微信公众号",
@@ -61,7 +62,6 @@ export default {
     handlist: function(e) {
       let id = e.currentTarget.id;
       if (id == 4) {
-        console.log("id:", id);
         this.appUpdate();
       }
     },
@@ -74,10 +74,10 @@ export default {
             ver = ver.replace("v", "");
           }
           ver *= 1;
-          if(version == ver){
-              mui.toast("当前版本号已是最新");
-              return false
-          }
+          // if(version == ver){
+          //     mui.toast("当前版本号已是最新");
+          //     return false
+          // }
           var btn = ["确定升级"];
           var ua = navigator.userAgent.toLowerCase();
           if (/iphone|ipad|ipod/.test(ua)) {
@@ -161,21 +161,18 @@ export default {
       });
     },
     getversion: function() {
+      let _this = this;
       mui.plusReady(function() {
         plus.runtime.getProperty(plus.runtime.appid, function(inf) {
-          this.data.versionNumber = inf.version;
-          if (this.data.versionNumber.indexOf("v") == -1) {
-            this.data.versionNumber = "v" + this.data.versionNumber;
-            console.log('versionNumber11111111:',this.data.versionNumber)
+          _this.versions = inf.version;
+          if (_this.versions.indexOf("v") == -1) {
+            _this.versions = "v" + _this.versions;
           }
         });
       });
     }
   },
   created: function() {
-    if(version){
-        this.data.versionNumber=version;
-    }
     this.getversion();
   }
 };

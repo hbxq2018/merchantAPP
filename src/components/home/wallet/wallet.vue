@@ -102,6 +102,7 @@ export default {
                     _endTime = "";
                     if (res.data.data && res.data.data.endTime) {
                         begtime = res.data.data.endTime;
+                        begtime = begtime.replace(/\-/g, '/');
                     } else {
                         begtime = 1514736000 * 1000; //首次提现以2018-01-01 0：00：00为开始时间
                     }
@@ -130,16 +131,16 @@ export default {
             }
         },
         //yyyy-mm-dd
-        formatDate(data) {
-            let month = data.getMonth() + 1;
-            let strDate = data.getDate();
+        formatDate(date) {
+            let month = date.getMonth() + 1;
+            let strDate = date.getDate();
             if (month >= 1 && month <= 9) {
                 month = "0" + month;
             }
             if (strDate >= 0 && strDate <= 9) {
                 strDate = "0" + strDate;
             }
-            let currentdate = data.getFullYear() + "-" + month + "-" + strDate;
+            let currentdate = date.getFullYear() + "/" + month + "/" + strDate;
             return currentdate;
         }
     },

@@ -45,7 +45,7 @@
 
 <script>
 import store from "@/vuex/store";
-import { Toast } from "mint-ui";
+import { Toast , Indicator} from "mint-ui";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "payment",
@@ -53,7 +53,7 @@ export default {
     return {
       money: 0,
       total: 0,
-      beginTime: "2018-01-01",
+      beginTime: "2018/01/01 00:00:00",
       endTime: "",
       _startTime: "",
       _endTime: "",
@@ -109,13 +109,14 @@ export default {
             //使用查询到的结束时间做为入参的开始时间，入参结束时间则今天（当前日期_endTime），但显示结束时间使用昨天（当前日期的前一天）
             if (res.data.data) {
               let newstart = res.data.data.endTime; 
+              newstart = newstart.replace(/\-/g, '/');
               newstart = ((new Date(newstart)).getTime()- 24 * 60 * 60 * 1000); 
               newstart = new Date(newstart);
               _this.beginTime =  _this.formatDate(newstart);
               _this._startTime = res.data.data.endTime;
             }else{
-              _this.beginTime = "2018-01-01"; 
-              _this._startTime = "2018-01-01";
+              _this.beginTime = "2018/01/01 00:00:00"; 
+              _this._startTime = "2018/01/01 00:00:00";
             }
           }
           let yesterday = new Date();
@@ -149,6 +150,7 @@ export default {
     },
     //获取列表数据
     amountList() {
+      Indicator.open('数据加载中...');
       let _this = this;
       let _value =
         "shopId=" +
@@ -162,6 +164,7 @@ export default {
         "&rows=10&isBill=0";
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let data = res.data;
+        Indicator.close();
         if (data.code == 0) {
           _this.total = data.data.total;
           if (data.data.list && data.data.list.length > 0) {

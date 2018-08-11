@@ -60,6 +60,7 @@
       year-format="{value} 年"
       month-format="{value} 月"
       date-format="{value} 日"
+      :startDate = 'mindata'
       @confirm="handleConfirm"
       >
     </mt-datetime-picker>
@@ -70,7 +71,7 @@
 import Vue from "vue";
 import orderItem from "./orderItem";
 import ticketItem from "./ticketItem";
-import { DatetimePicker, Toast, Loadmore } from "mint-ui";
+import { DatetimePicker, Toast, Loadmore , Indicator } from "mint-ui";
 Vue.component(DatetimePicker.name, DatetimePicker, Loadmore.name, Loadmore);
 export default {
   name: "DataRecode",
@@ -81,6 +82,7 @@ export default {
       shopId: 0,
       startDate: "开始时间",
       endTime: "结束时间",
+      mindata:"",
       money: 0,
       order: 0,
       totalCodeNum: 0,
@@ -101,6 +103,8 @@ export default {
     };
   },
   created: function() {
+    let _mindata = new Date(new Date().getTime() -86400000 * 365*2);
+    this.mindata = new Date(_mindata);
     this.shopId = this.$route.params.shopId;
     this.money = this.$route.params.money;
     this.order = this.$route.params.orderNum;
@@ -154,6 +158,7 @@ export default {
     },
     //核销券数
     codeList() {
+      Indicator.open('数据加载中...');
       let _this = this,
         _value =
           "shopId=" +
@@ -169,6 +174,7 @@ export default {
         _value += "&skuId=" + this.skuId;
       }
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        Indicator.close();
         if (_this.skuId == "") {
           _this.totalCodeNum = _this.subCodeNum = res.data.data.total
             ? res.data.data.total
@@ -206,9 +212,11 @@ export default {
           this.endTime;
       //商家订单列表
       if (!this.shopListLoad) {
+        Indicator.open('数据加载中...');
         this.$axios
           .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
           .then(res => {
+            Indicator.close();
             if (res.data.code == 0 && res.data.data.list != null) {
               let list = res.data.data.list;
               for (let i = 0; i < list.length; i++) {
@@ -224,6 +232,7 @@ export default {
               _this.shopListLoad = list.length < 5 ? true : false;
             } else {
               _this.shopListLoad = true;
+              // _this.allLoaded = true;
             }
           });
       }
@@ -256,8 +265,11 @@ export default {
     },
     //下拉
     loadTop() {
+      this.allLoaded = false;
       if (this.switchFlag) {
         this.orderPage = 1;
+        this.shopListLoad = false;
+        this.listLoad = false;
         this.orderObj = [];
         this.orderList();
       } else {

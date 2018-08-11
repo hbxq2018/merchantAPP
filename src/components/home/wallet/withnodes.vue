@@ -6,7 +6,7 @@
         </mt-header>
 
         <div class="conten" v-show="list.length>0">
-            <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="loadmore">
+            <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="widthloadmore">
                 <ul v-if="list">
                    <li class="item" v-for="(item,index) in list" :key="index" :id="item.id" @click="handlist">
                         <p class="item-one">
@@ -65,7 +65,7 @@
 
 <script>
 import Vue from "vue";
-import { Loadmore,Popup } from "mint-ui";
+import { Loadmore,Popup,Indicator } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Loadmore.name, Loadmore);
@@ -127,6 +127,11 @@ export default {
     },
     //时间格式化
     rendDate: function(val) {
+      if(val){//兼容IOS
+        val = val.replace(/\-/g, '/');
+      }else{
+        return false
+      }
       val = new Date(val);
       
       let month = val.getMonth() + 1;
@@ -148,22 +153,23 @@ export default {
     //点击某条数据，查看该数据详情
     handlist: function(e) {
       let id = e.currentTarget.id;
-      this.carrying = true;
       for (let i in this.list) {
         if (id == this.list[i].id) {
           this.actdata = this.list[i];
+          this.carrying = true;
         }
-        this.title = "提现详情";
       }
     },
     //点击左上角返回图标
     goback: function() {
       if (this.carrying) {
-        this.title = "提现记录";
         this.carrying = false;
       } else {
         this.$router.push("/withdraw");
       }
+    },
+    closemodal:function(){
+      this.carrying = !this.carrying;
     },
      //下拉
     loadTop() {
@@ -171,16 +177,17 @@ export default {
       this.allLoaded = false;
       this.list = [];
       this.gettxlist();
-      this.$refs.loadmore.onTopLoaded();
+      this.$refs.widthloadmore.onTopLoaded();
     },
     //上拉
     loadBottom() {
       this.page += 1;
       this.gettxlist();
-      this.$refs.loadmore.onBottomLoaded();
+      this.$refs.widthloadmore.onBottomLoaded();
     },
      //查询提现记录数据
     gettxlist() {
+      Indicator.open('数据加载中...');
       let _parms = {
           userId: this.shopInfo.id,
           page: this.page,
@@ -192,13 +199,16 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       this.$axios.get("/api/app/tx/list?" + _value).then(res => {
+        Indicator.close();
         if (res.data.code == 0) {
           if (res.data.data.list && res.data.data.list.length > 0) {
             let _list = res.data.data.list;
             for (let i in _list) {
               let _createTime= _list[i].createTime;
+              _createTime = _createTime.replace(/\-/g, '/');
               _createTime=new Date(_createTime);
               _createTime.setTime(_createTime.getTime() + 86400 * 2 * 1000);
+              _createTime =this.formatDate(_createTime);
               _list[i].arrivalTime = _createTime;
               _list[i].accountName = _list[i].accountName.substr(
                 _list[i].accountName.length - 4,
@@ -213,10 +223,6 @@ export default {
           this.allLoaded = true; // 若数据已全部获取完毕
         }
       });
-    },
-    //关闭弹框
-    closemodal:function(){
-      this.carrying = !this.carrying;
     },
     // yyyy-mm-dd hh:MM:ss
     formatDate:function(date){

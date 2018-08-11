@@ -19,8 +19,10 @@
 
 
         <div class="loadBottom mocontent" :style="{'-webkit-overflow-scrolling': scrollMode}">
-            <div v-if="listData.length>0" id="moving"  class="movingBox" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-                <div class="contentList" v-for="(item,index) in listData" :key="index">
+            <!-- <div v-if="listData.length>0" id="moving"  class="movingBox" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"> -->
+            <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="movmore">
+              <ul v-if="listData.length>0">
+                <li class="contentList" v-for="(item,index) in listData" :key="index">
                     <div class="listTop">
                         <img class="userHead" :src="item.iconUrl" alt="用户头像">
                         <p class="userName">{{!item.nickName || item.nickName ==null || item.nickName =='null'?item.userName:item.nickName}}</p>
@@ -36,9 +38,11 @@
                       </div>
                       <div class="listText">{{item.summary | uncodeUtf16}}</div>
                     </div>
-                </div>
-            </div>
-            <img v-else class="empty" src="../../../static/images/zhanweitu.png" alt="空空如也">
+                </li>
+                <div class="ulbottom"></div>
+              </ul>
+               <img v-else class="empty" src="../../../static/images/zhanweitu.png" alt="空空如也">
+            </mt-loadmore>
         </div> 
     </div>
 </template>
@@ -55,12 +59,9 @@ export default {
     return {
       isheader: 1,
       page: 1,
-      allLoaded: true,
       scrollMode: "auto",
-      touchStartY: 0,
       distance: 0,
-      topFlag: false, //是否到顶部
-      bottomFlag: false, //是否到底部
+      allLoaded: false,
       flag: true, //节流阀
       topicType: "",
       delImg: require("../../../static/images/more.png"),
@@ -71,7 +72,7 @@ export default {
     };
   },
   store,
-   filters: {
+  filters: {
     uncodeUtf16:function(str) {  //反解开EMOJI编码后的字符串   与上对应使用
       var reg = /\&#.*?;/g;
       var result = str.replace(reg, function (char) {
@@ -89,7 +90,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["shopInfo"])
+    ...mapState(["shopInfo","userInfo"])
   },
   methods: {
     //点击头部按钮
@@ -106,6 +107,7 @@ export default {
       }
       this.isheader = val;
       this.page = 1;
+      this.allLoaded = false;
       this.getlist();
     },
     //点击加号+
@@ -114,7 +116,6 @@ export default {
     },
     //点击视频开始播放
     handplay: function(val, type) {
-      console.log("handplay", val, type);
       if (type == 1) {
         this.$router.push({ name: "Article", params: { id: val } });
       }else if(type == 2){
@@ -142,10 +143,11 @@ export default {
     },
     //获取列表数据
     getlist: function() {
+      Indicator.open('数据加载中...');
       let _parms = {
-          userId: this.shopInfo.id,
+          shopId: this.userInfo.id,
           page: this.page,
-          rows: 5
+          rows: 10
         },
         _value = "",
         oldData = [];
@@ -157,8 +159,8 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       this.$axios.get("/api/app/topic/myList?" + _value).then(res => {
+        Indicator.close();
         if (res.data.code == 0) {
-
           if (this.page == 1) {
             this.listData = [];
           }
@@ -186,11 +188,8 @@ export default {
               oldData.push(_listData[i]);
             }
             this.listData = oldData;
-            if (res.data.data.list.length < 5) {
-              this.allLoaded = false;
-            }
           } else {
-            this.allLoaded = false;
+             this.allLoaded = true; // 若数据已全部获取完毕
           }
         }
       });
@@ -226,130 +225,19 @@ export default {
       }
       return str;
     },
-    //获取顶部卷去高度
-    getScrollTop() {
-      var scrollTop = 0,
-        bodyScrollTop = 0,
-        documentScrollTop = 0;
-      if (document.body) {
-        bodyScrollTop = document.body.scrollTop;
-      }
-      if (document.documentElement) {
-        documentScrollTop = document.documentElement.scrollTop;
-      }
-      scrollTop =
-        bodyScrollTop - documentScrollTop > 0
-          ? bodyScrollTop
-          : documentScrollTop;
-      return scrollTop;
+     //下拉
+    loadTop() {
+      this.page = 1;
+      this.allLoaded = false;
+      this.listData = [];
+      this.getlist();
+      this.$refs.movmore.onTopLoaded();
     },
-    //盒子总高度
-    getScrollHeight() {
-      var scrollHeight = 0,
-        bodyScrollHeight = 0,
-        documentScrollHeight = 0;
-      if (document.body) {
-        bodyScrollHeight = document.body.scrollHeight;
-      }
-      if (document.documentElement) {
-        documentScrollHeight = document.documentElement.scrollHeight;
-      }
-      scrollHeight =
-        bodyScrollHeight - documentScrollHeight > 0
-          ? bodyScrollHeight
-          : documentScrollHeight;
-      return scrollHeight;
-    },
-    //屏幕可视高度
-    getWindowHeight() {
-      var windowHeight = 0;
-      if (document.compatMode == "CSS1Compat") {
-        windowHeight = document.documentElement.clientHeight;
-      } else {
-        windowHeight = document.body.clientHeight;
-      }
-      return windowHeight;
-    },
-    touchStart(e) {
-      let dishesUl = document.getElementById("moving");
-      let bottomH = document.getElementById("mofillimg")
-        ? document.getElementById("mofillimg").clientHeight
-        : 0;
-      this.touchStartY = e.targetTouches[0].pageY;
-      if (this.getScrollTop() == 0 && this.flag) {
-        this.topFlag = true;
-      } else {
-        this.topFlag = false;
-      }
-
-      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH) {
-        this.allLoaded = false;
-        this.bottomFlag = false;
-      } else {
-        this.allLoaded = true;
-        this.bottomFlag = true;
-      }
-
-      if (
-        Math.abs(
-          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
-        ) < 55 &&
-        this.allLoaded
-      ) {
-        this.bottomFlag = true;
-      } else {
-        this.bottomFlag = false;
-      }
-    },
-    touchMove(e) {
-      let dishesUl = document.getElementById("moving");
-      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        if (this.distance > 100) {
-          this.distance = 100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        if (this.distance < -100) {
-          this.distance = -100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-    },
-    touchEnd() {
-      let dishesUl = document.getElementById("moving"),
-        _this = this;
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        this.flag = false;
-        let index = 100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-            _this.flag = true;
-            _this.distance = 0;
-          }
-          index--;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        this.page = 1;
-        this.allLoaded = true;
-        this.getlist();
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        let index = -100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-          }
-          index++;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        ++this.page;
-        this.getlist();
-      }
+    //上拉
+    loadBottom() {
+      this.page += 1;
+      this.getlist();
+      this.$refs.movmore.onBottomLoaded();
     }
   },
   created: function() {
@@ -547,6 +435,11 @@ export default {
         -webkit-line-clamp: 2;
         overflow: hidden;
       }
+    }
+    .ulbottom{
+      width: 100%;
+      height: 110px;
+      background:none;
     }
   }
 }
