@@ -2,7 +2,7 @@
   <div class="DailyRevenue" :class="isSelected ? '' : 'active'">
     <div id="daily_header" class="daily_header">
       <mt-header fixed title="详情" class="header_inner">
-          <router-link to="/income" slot="left">
+          <router-link :to="toBackup" slot="left">
               <mt-button icon="back"></mt-button>
           </router-link>
       </mt-header>
@@ -62,6 +62,7 @@ export default {
   name: "DailyRevenue",
   data() {
     return {
+      toBackup: "/income",
       shopId: 0,
       beginTime: "",
       endTime: "",
@@ -98,6 +99,9 @@ export default {
     this.totalCodeNum = this.subCodeNum = this.$route.params.qrcodeNum;
     this.name = this.$route.params.name.substring(0, 2);
     this.orderList();
+    if(this.$route.params.sub == 1) {
+      this.toBackup = "/dataofStore";
+    }
   },
   methods: {
     //核销券数

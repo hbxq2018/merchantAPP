@@ -2,7 +2,7 @@
   <div class="dataRecode" :class="isSelected ? '' : 'active'">
     <div class="daily_header">
       <mt-header fixed title="数据记录" class="header_inner">
-          <router-link to="/income" slot="left">
+          <router-link :to="toBackup" slot="left">
               <mt-button icon="back"></mt-button>
           </router-link>
           <mt-button slot="right" @click="ExcelDown">导出Excel</mt-button>
@@ -76,6 +76,7 @@ export default {
   name: "DataRecode",
   data() {
     return {
+      toBackup: "/income",
       id: 1,
       shopId: 0,
       startDate: "开始时间",
@@ -109,6 +110,9 @@ export default {
       new Date(new Date().setDate(new Date().getDate() + 1))
     );
     this.orderList();
+    if(this.$route.params.sub == 1) {
+      this.toBackup = "/dataofStore";
+    }
   },
   components: {
     orderItem,

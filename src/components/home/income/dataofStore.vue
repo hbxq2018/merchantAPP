@@ -163,7 +163,8 @@ export default {
           shopId: id,
           money: money,
           orderNum: orderNum,
-          qrcodeNum: qrcodeNum
+          qrcodeNum: qrcodeNum,
+          sub: 1
         }
       });
     },
@@ -186,7 +187,8 @@ export default {
           money: money,
           orderNum: orderNum,
           qrcodeNum: qrcodeNum,
-          name: dateName
+          name: dateName,
+          sub: 1
         }
       });
     },
