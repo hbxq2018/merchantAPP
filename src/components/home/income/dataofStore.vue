@@ -97,34 +97,26 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
-    // 查询分店数据
+    // 查询今日分店数据
     subbranch() {
-      let _this = this,
-        _val =
-          "id=" +
-          _this.userInfo.id +
-          "&beginTime=" +
-          _this.today +
-          "&endTime=" +
-          _this.tomorrow,
-        _param =
-          "id=" +
-          this.userInfo.id +
-          "&beginTime=" +
-          this.yesterday +
-          "&endTime=" +
-          this.today;
+      let _val =
+        "id=" +
+        this.userInfo.id +
+        "&beginTime=" +
+        this.today +
+        "&endTime=" +
+        this.tomorrow;
       this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
         if (res.data.code == 0) {
           let data = res.data.data;
-          _this.totalMoney = _this.changemoney(data[0].allsoAmount);
-          _this.totalOrder = data[0].allsolist;
-          _this.totalCode = data[0].allsoWritelist;
-           for (let i = 0; i < data.length; i++) {
-            _this.subList.push({
+          this.totalMoney = this.changemoney(data[0].allsoAmount);
+          this.totalOrder = data[0].allsolist;
+          this.totalCode = data[0].allsoWritelist;
+          for (let i = 0; i < data.length; i++) {
+            this.subList.push({
               id: data[i].id,
               shopName: data[i].shopName,
-              soAmount: _this.changemoney(data[i].soAmount),
+              soAmount: this.changemoney(data[i].soAmount),
               solist: data[i].solist,
               soWriteoffList: data[i].soWriteoffList,
               preSoAmount: "",
@@ -132,26 +124,44 @@ export default {
               preSoWriteoffList: ""
             });
           }
-          _this.$axios.get("/api/app/shop/getByShopId?" + _param).then(res => {
-            if (res.data.code == 0) {
-              let list = res.data.data;
-              for (let i = 0; i < list.length; i++) {
-                _this.subList[i].preSoAmount = _this.changemoney(list[i].soAmount);
-                _this.subList[i].preSolist = list[i].solist;
-                _this.subList[i].preSoWriteoffList = list[i].soWriteoffList;
-                let today = +_this.subList[i].soAmount, yester = +_this.subList[i].preSoAmount;
-                _this.subList[i].rate = ((today - yester) / (yester == 0 ? 1 : yester) * 100).toFixed(2);
-              }
-            }
-          });
+          this.preSubbranch();
+        }
+      });
+    },
+    //查询昨日分店数据
+    preSubbranch() {
+      let _param =
+        "id=" +
+        this.userInfo.id +
+        "&beginTime=" +
+        this.yesterday +
+        "&endTime=" +
+        this.today;
+      this.$axios.get("/api/app/shop/getByShopId?" + _param).then(res => {
+        if (res.data.code == 0) {
+          let list = res.data.data;
+          for (let i = 0; i < list.length; i++) {
+            this.subList[i].preSoAmount = this.changemoney(list[i].soAmount);
+            this.subList[i].preSolist = list[i].solist;
+            this.subList[i].preSoWriteoffList = list[i].soWriteoffList;
+            let today = +this.subList[i].soAmount,
+              yester = +this.subList[i].preSoAmount;
+            this.subList[i].rate = (
+              (today - yester) /
+              (yester == 0 ? 1 : yester) *
+              100
+            ).toFixed(2);
+          }
         }
       });
     },
     //查看历史数据
     historyData(id) {
-      let money = "", orderNum = "", qrcodeNum = "";
-      for(let i = 0; i < this.subList.length; i++) {
-        if(this.subList[i].id == id) {
+      let money = "",
+        orderNum = "",
+        qrcodeNum = "";
+      for (let i = 0; i < this.subList.length; i++) {
+        if (this.subList[i].id == id) {
           money = this.subList[i].soAmount;
           orderNum = this.subList[i].solist;
           qrcodeNum = this.subList[i].soWriteoffList;
@@ -159,7 +169,7 @@ export default {
       }
       this.$router.push({
         name: "DataRecode",
-        params: { 
+        params: {
           shopId: id,
           money: money,
           orderNum: orderNum,
@@ -170,12 +180,23 @@ export default {
     },
     // 查看今日/昨日数据
     incomeDetail(time, id, dateName) {
-      let money = "", orderNum = "", qrcodeNum = "";
-      for(let i = 0; i < this.subList.length; i++) {
-        if(this.subList[i].id == id) {
-          money = dateName == '今日' ? this.subList[i].soAmount : this.subList[i].preSoAmount;
-          orderNum = dateName == '今日' ? this.subList[i].solist : this.subList[i].preSolist;
-          qrcodeNum = dateName == '今日' ? this.subList[i].soWriteoffList : this.subList[i].preSoWriteoffList;
+      let money = "",
+        orderNum = "",
+        qrcodeNum = "";
+      for (let i = 0; i < this.subList.length; i++) {
+        if (this.subList[i].id == id) {
+          money =
+            dateName == "今日"
+              ? this.subList[i].soAmount
+              : this.subList[i].preSoAmount;
+          orderNum =
+            dateName == "今日"
+              ? this.subList[i].solist
+              : this.subList[i].preSolist;
+          qrcodeNum =
+            dateName == "今日"
+              ? this.subList[i].soWriteoffList
+              : this.subList[i].preSoWriteoffList;
         }
       }
       this.$router.push({
