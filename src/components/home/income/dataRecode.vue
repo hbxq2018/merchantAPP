@@ -335,6 +335,8 @@ export default {
         this.listLoad = false;
         this.orderList();
       } else {
+        this.skuId = "";
+        this.selectedName = "全部";
         this.codePage = 1;
         this.ticketObj = [];
         this.tickType();
@@ -396,69 +398,42 @@ export default {
     },
     //导出Excel
     ExcelDown() {
-      let _value =
-        "shopId=" +
-        this.shopId +
-        "&soStatus=2&beginTime=" +
-        this.startDate +
-        "&endTime=" +
-        this.endTime;
-
-      // "/api/app/so/soDetailExport?" + _value
-
-      // var img = document.querySelector("canvas");
-      // var a = document.createElement("a");
-      // var event = new MouseEvent("click");
-      // a.download = name || name;
-      // a.href = '/api/app/so/soDetailExport?' + _value;
-      // a.dispatchEvent(event);
+      let _this = this,
+        _Url =
+          "/api/app/so/soDetailExport?&shopId=" +
+          this.shopId +
+          "&soStatus=2&beginTime=" +
+          this.startDate +
+          "&endTime=" +
+          this.endTime;
       mui.plusReady(function() {
-        let relativePath = "营业数据Excel" + (Math.random() + "").substr(10);
         var dtask = plus.downloader.createDownload(
-          "/api/app/so/soDetailExport?" + _value,
-          { filename: relativePath },
+          _Url,
+          { filename: "_downloads/" },
           function(d, status) {
             // 下载完成
-            //alert("执行")
             if (status == 200) {
-              var index = d.filename.lastIndexOf("/");
-              var name = d.filename.substring(index + 1, d.filename.length);
-              /*localStorage.removeItem("fileList");
-                    return;*/
-              console.log(loadUrl);
-              var myDate = new Date();
-              console.log(myDate);
-              var file =
-                '{"date":"' +
-                myDate.toLocaleString() +
-                '","id":"' +
-                d.filename +
-                '","name":"' +
-                name +
-                '"}';
-              console.log(file);
-              var file1 = localStorage.getItem("fileList");
-              console.log("size=========" + file1);
-              //  return;
-              console.log(file1);
-              if (file1 != null) {
-                //不是第一次下载文件
-                //判断是否已经存在
-                console.log("jinru");
-                file = file + "," + file1;
-                console.log(file);
-                localStorage.setItem("fileList", file);
-                console.log("filealist=" + localStorage.getItem("fileList"));
-              } else {
-                var jsonList = [];
-                var jsonarray = eval(jsonList); //定义追加格式
-                jsonarray.push(file);
-                var files = JSON.stringify(jsonarray);
-                localStorage.setItem("fileList", file); //第一次下载文件存储字符串
-              }
+              mui.toast("下载成功");
+              var btnArray = ["否", "是"]; //弹框消息确认是否打开附件
+              mui.confirm("是否打开附件查看？", "下载成功", btnArray, function(
+                e
+              ) {
+                if (e.index == 1) {
+                  //打开附件
+                  plus.runtime.openFile(d.filename, {}, function(e) {
+                    plus.nativeUI.alert("无法打开此文件：" + e.emssage);
+                  });
+                } else {
+                  //不打开
+                }
+              });
+            } else {
+              mui.toast("下载失败，请检查网络是否连接");
             }
           }
         );
+        dtask.start();
+        mui.toast("正在下载中...");
       });
     },
     //yyyy-MM-dd
