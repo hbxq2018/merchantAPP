@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
-    //营业额
+    //今日营业额
     moneyNum() {
       let _this = this,
         _value =
@@ -98,24 +98,32 @@ export default {
           "&beginTime=" +
           this.today +
           "&endTime=" +
-          this.tomorrow,
-        _param =
-          "shopId=" +
-          this.userInfo.id +
-          "&beginTime=" +
-          this.yesterday +
-          "&endTime=" +
-          this.today;
+          this.tomorrow;
       this.$axios.get("/api/app/so/totalAmount?" + _value).then(res => {
         if (res.data.code == 0) {
           _this.income[0].money = res.data.data ? res.data.data : 0;
-          _this.$axios.get("/api/app/so/totalAmount?" + _param).then(res => {
-            if (res.data.code == 0) {
-              _this.income[1].money = res.data.data ? res.data.data : 0;
-              let today = +_this.income[0].money, yester = +_this.income[1].money;
-              _this.income[0].rate = ((today - yester) / (yester == 0 ? 1 : yester) * 100).toFixed(2);
-            }
-          });
+          _this.preMoneyNum(_this.income[0].money);
+        }
+      });
+    },
+    //昨日营业额
+    preMoneyNum(now) {
+      let _param =
+        "shopId=" +
+        this.userInfo.id +
+        "&beginTime=" +
+        this.yesterday +
+        "&endTime=" +
+        this.today;
+      this.$axios.get("/api/app/so/totalAmount?" + _param).then(res => {
+        if (res.data.code == 0) {
+          this.income[1].money = res.data.data ? res.data.data : 0;
+          let yester = +this.income[1].money;
+          this.income[0].rate = (
+            (+now - yester) /
+            (yester == 0 ? 1 : yester) *
+            100
+          ).toFixed(2);
         }
       });
     },
@@ -182,11 +190,12 @@ export default {
       });
     },
     toDetail(idx) {
-      let beginTime = '', endTime = '';
-      if(idx == 0) {
+      let beginTime = "",
+        endTime = "";
+      if (idx == 0) {
         beginTime = this.today;
         endTime = this.tomorrow;
-      } else if(idx == 1) {
+      } else if (idx == 1) {
         beginTime = this.yesterday;
         endTime = this.today;
       }
@@ -206,7 +215,7 @@ export default {
     toDataRecode() {
       this.$router.push({
         name: "DataRecode",
-        params: { 
+        params: {
           shopId: this.userInfo.id,
           money: this.income[0].money,
           orderNum: this.income[0].orderNum,
