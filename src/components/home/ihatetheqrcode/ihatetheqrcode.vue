@@ -9,12 +9,12 @@
                 <div>长按保存二维码</div>
             </div>
         </div>
-        <div class="Standing eventual">
-            <div class="homepage">
+        <div class="Standing eventual" >
+            <!-- <div class="homepage">
                 <div><span>支付二维码</span></div>
                 <img v-if='imgs.商家买单无背景图' @touchstart="savepage(2)" :src="imgs.商家买单无背景图" alt="支付二维码图片">
                 <div>长按保存二维码</div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -92,10 +92,10 @@ export default {
 </script>
 <style lang="less">
 .ihatetheqrcode {
-  width: 100%;
-  height: auto;
-  padding-top: 100px;
-  background-color: #fc5e2d;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #fc5e2d;
   .Standing {
     height: 540px;
     display: flex;
@@ -105,11 +105,9 @@ export default {
     .homepage {
       width: 514px;
       height: 514px;
-      background-color: #fff;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
+      padding-top: 80px;
+      background: #fff;
+      border-radius: 10px;
       span {
         font-size: 30px;
         margin-top: 40px;

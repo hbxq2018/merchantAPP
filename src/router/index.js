@@ -33,6 +33,9 @@ import Other from '@/components/home/manage/other'
 import PhotoList from '@/components/home/manage/photoList'
 import Ticket from '@/components/home/ticket/ticket'
 import Promotion from '@/components/home/ticket/promotion'
+import Cutdish from '@/components/home/ticket/cutdish'
+import Cutedit from '@/components/home/ticket/cutedit'
+import EditList from '@/components/home/ticket/editList'
 import SetMeal from '@/components/home/ticket/setMeal'
 import ToSetMeal from '@/components/home/ticket/toSetMeal'
 import Dishes from '@/components/home/manage/dishes'
@@ -243,6 +246,21 @@ export default new Router({
       path:'/promotion',
       name:'Promotion',
       component:Promotion
+    },
+    {
+      path:'/cutdish',
+      name:'Cutdish',
+      component:Cutdish
+    },
+    {
+      path:'/cutedit',
+      name:'Cutedit',
+      component:Cutedit
+    },
+    {
+      path:'/editList',
+      name:'EditList',
+      component:EditList
     },
     {
       path:'/setMeal',

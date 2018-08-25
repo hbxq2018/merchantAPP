@@ -1,6 +1,6 @@
 <template>
   <div class="photo">
-      <mt-header :title="name">
+      <mt-header fixed :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         <mt-button slot="right" @click="edit">{{isEdit ? '取消' : '编辑'}}</mt-button>
       </mt-header>
@@ -124,14 +124,13 @@ export default {
 </script>
 <style lang="less">
 .photo {
-  .mint-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
+  position: fixed;
+  width: 100%;
+  height: 100%;;
+  overflow: scroll;
   .photoBox {
-    padding: 106px 28px 0 28px;
+    margin-top: 106px;
+    padding: 0 28px 0 28px;
     box-sizing: border-box;
     .uploadBtn {
       width: 100%;

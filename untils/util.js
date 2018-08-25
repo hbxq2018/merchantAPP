@@ -2,6 +2,35 @@ var config = require('./config/config.js');
 import { myStore } from './tools/store';
 import { tools } from './tools/tools';
 
+function imgSrcToBase64(img) { //将图片转为base64格式
+  var canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  var ctx = canvas.getContext("2d");
+  ctx.drawImage(img,0,0,img.width,img.height);
+
+  return canvas.toDataURL();
+}
+
+function base64ToBlob(urlData) { //将base64格式转为图片
+  var arr = urlData.split(',');
+  var mime = arr[0].match(/:(.*?);/)[1] || 'image/png';
+  // 去掉url的头，并转化为byte
+  var bytes = window.atob(arr[1]);
+  // 处理异常,将ascii码小于0的转换为大于0
+  var ab = new ArrayBuffer(bytes.length);
+  // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
+  var ia = new Uint8Array(ab);
+  
+  for (var i = 0; i < bytes.length; i++) {
+      ia[i] = bytes.charCodeAt(i);
+  }
+
+  return new Blob([ab], {
+      type: mime
+  });
+}
+
 function getNowFormatDate() {  //yyyy-MM-dd HH:MM:SS”
   var date = new Date();
   var seperator1 = "/";

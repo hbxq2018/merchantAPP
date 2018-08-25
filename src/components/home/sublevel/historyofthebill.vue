@@ -31,7 +31,7 @@
 
 <script>
 import { formatDate } from "../../../../untils/util";
-import { InfiniteScroll, Indicator } from "mint-ui";
+import { InfiniteScroll, Indicator,Toast } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
@@ -94,8 +94,7 @@ export default {
   },
   created: function() {
     Indicator.open("数据加载中...");
-    let _this = this;
-    let _date = new Date();
+    let _this = this,_date = new Date(),isSuccess = false;
     let _start =_this.$UTILS.dateConv(_date);
     let arr = _start.split("/");
     arr[1]= '01';
@@ -114,8 +113,16 @@ export default {
       value += key + '=' + obj[key] + '&';
     }
     value = value.substring(0, value.length-1);
+    setTimeout(() => {
+      if (!isSuccess) {
+        isSuccess = false;
+        Indicator.close();
+        Toast("网络异常，请检查网络连接");
+      }
+    }, Delay);
     this.$axios.get("/api/app/hx/listAmount?" + value).then(res => {
       Indicator.close();
+      isSuccess = true;
       if (res.data.code == 0) {
         let _data =[];
          for(key in res.data.data){

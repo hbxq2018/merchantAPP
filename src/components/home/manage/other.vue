@@ -1,10 +1,10 @@
 <template>
   <div class="other" @click="allFlag">
-      <mt-header :title="name">
+      <mt-header fixed :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         <!-- <mt-button slot="right"  @click="save">保存</mt-button> -->
       </mt-header>
-      <div>
+      <div class="ocontent">
           <div class="otherInfo clearfix" @click="isWeek">
               <div class="otherInfo_l">营业日</div>
               <div class="otherInfo_r">
@@ -188,9 +188,14 @@ export default {
 </script>
 <style lang="less">
 .other {
+  position: fixed;
   width: 100%;
   height: 100%;
-  background-color: #EBEBEB;
+  background: #EBEBEB;
+  overflow: scroll;
+  .ocontent{
+    padding-top: 80px;
+  }
   .otherInfo {
     background-color: #fff;
     width: 100%;

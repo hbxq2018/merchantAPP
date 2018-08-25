@@ -7,11 +7,11 @@
 			</div>
 			<form class="login_form">
 				<div class="login_form_tele">
-					<input type="number" class="login_form_inp" max="11" placeholder="请输入手机号" v-model="telephone">
+					<input type="number" class="login_form_inp" maxlength="11" oninput="if(value.length>11)value=value.slice(0,11)" placeholder="请输入手机号" v-model="telephone">
 					<span id="securityCode" class="securityCode" :class="timeFlag ? '' : 'active'" @click="securityCode">{{veridyBtn}}</span>
 				</div>
 				<div class="login_form_code">
-					<input type="number" class="login_form_inp" max="4" placeholder="请输入验证码" v-model="password" @keyup.enter="verification">
+					<input type="number" class="login_form_inp" maxlength="4" oninput="if(value.length>4)value=value.slice(0,4)" placeholder="请输入验证码" v-model="password" @keyup.enter="verification">
 				</div>
 				<div class="login_form_btn">
           <img src="../../../static/images/enter.png" alt="登录" @click="verification">
@@ -56,10 +56,26 @@ export default {
       iconUrl: "", //头像
       isSignWX: false, //是否登陆微信
       wxType: 0, //微信返回信息的格式
-      isinme: false
+      isinme: false,
+      timer: null
     };
   },
   store,
+  watch: {
+    telephone: function() {
+      if (this.telephone) {
+        let RegExp = /^(1[3456789]\d{9})$/;
+        if (RegExp.test(this.telephone)) {
+        } else {
+          this.timeFlag = true;
+          this.veridyBtn = "获取验证码";
+          if (this.timer) {
+            clearInterval(this.timer);
+          }
+        }
+      }
+    }
+  },
   computed: {
     ...mapState(["userInfo", "shopInfo"])
   },
@@ -78,8 +94,8 @@ export default {
       }
       return flag;
     },
+    //获取验证码
     securityCode() {
-      //获取验证码
       let _this = this;
       if (!this.timeFlag) {
         return false;
@@ -99,11 +115,11 @@ export default {
                 senconds = "",
                 countdown = 60;
               _this.verifyCode = data.data.verifyId;
-              let timer = setInterval(() => {
+              this.timer = setInterval(() => {
                 countdown--;
                 if (countdown == 0) {
                   _this.veridyBtn = "获取验证码";
-                  clearInterval(timer);
+                  clearInterval(this.timer);
                   _this.timeFlag = true;
                   return false;
                 }
@@ -128,11 +144,16 @@ export default {
         Toast("请填写正确的手机号");
       }
     },
+    //判断输入验证码是否正确
     verification() {
-      //判断输入验证码是否正确
       let _parms = {},
         _this = this,
         value = "";
+      if (this.verifyCode) {
+        if (this.verifyCode != this.password) {
+          Toast("验证码输入错误");
+        }
+      }
       if (!this.telephone) {
         Toast("请输入电话号码");
       } else if (!this.password) {
@@ -166,8 +187,8 @@ export default {
           });
       }
     },
+    //商家注册
     signIn(val) {
-      //商家注册
       let _this = this;
       let mobile = val ? val : this.telephone;
       this.$axios
@@ -245,9 +266,9 @@ export default {
           console.log(err);
         });
     },
+    //获取到微信用户信息后，先用openId去查询是否有信息，如果没有就调添加用户接口addAppUser
+    //添加商户
     addShop() {
-      //获取到微信用户信息后，先用openId去查询是否有信息，如果没有就调添加用户接口addAppUser
-      //添加商户
       let _this = this;
       let _parms = { mobile: this.telephone, sourceType: this._type };
       this.$axios
@@ -264,8 +285,8 @@ export default {
           console.log(err);
         });
     },
+    //获取商家信息
     getshopinfo: function(id) {
-      //获取商家信息
       let _this = this;
       this.$axios.get("/api/shop/get/" + id).then(res => {
         if (res.data.code == "0") {
@@ -275,8 +296,8 @@ export default {
         }
       });
     },
+    //判断商家是否在审核中
     searchByUserId(id) {
-      //判断商家是否在审核中
       let _this = this;
       this.$axios
         .get("/api/app/shopEnter/searchByUserId?userId=" + id)
@@ -308,6 +329,7 @@ export default {
           }
         });
     },
+    //微信
     weixinLogin() {
       if (window.plus) {
         this.plusFunc();
@@ -315,8 +337,8 @@ export default {
         document.addEventListener("plusready", this.plusFunc(), false);
       }
     },
+    //微信获取用户信息
     plusFunc() {
-      //微信获取用户信息
       let _this = this;
       let auths = [];
       plus.oauth.getServices(
@@ -462,6 +484,7 @@ export default {
         }
       );
     },
+    //判断设备类型 android/ios/other
     setScroll() {
       const ua = navigator.userAgent.toLowerCase();
       if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {

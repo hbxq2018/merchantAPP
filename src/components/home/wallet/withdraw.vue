@@ -46,6 +46,7 @@
                 <div class="modal-cont-right" @click="handchange">更改</div>
             </div>
         </div>
+        
 
         
 
@@ -136,7 +137,7 @@ export default {
     //3.将加法和加上校验位能被 10 整除。
 
     //bankno为银行卡号
-    luhnCheck: function(bankno) {
+    luhnCheck: function(bankno,isyz) {
       //校验银行卡是否正确
       var lastNum = bankno.substr(bankno.length - 1, 1); //取出最后一位（与luhn进行比较）
 
@@ -196,11 +197,21 @@ export default {
 
       if (lastNum == luhn) {
         console.log("验证通过");
-        this.isbankno = true;
+        if(isyz == 1){
+          return bankno;
+        }else{
+          this.isbankno = true;
+        }
+        
         // return true;
       } else {
         console.log("银行卡号必须符合luhn校验");
         this.isbankno = false;
+        if(isyz == 1){
+          return '';
+        }else{
+          this.isbankno = false;
+        }
         // return false;
       }
     },
@@ -330,7 +341,7 @@ export default {
       this.sheetVisible = false;
       this.iseditbank = true;
     },
-     //点击左上角返回图标
+    //点击左上角返回图标
     goback: function() {
       if (this.iseditbank) {
         this.iseditbank = false;
@@ -374,11 +385,12 @@ export default {
     },
     //根据用户id查询账户信息
     getaccountInfo: function() {
-      let _value = "userId=" + this.shopInfo.id;
+      let _value = "userId=" + this.shopInfo.id,_this = this;
       this.$axios.get("/api/app/account/getByUserId?" + _value).then(res => {
         if (res.data.code == 0) {
           let _data = res.data.data;
-          this.cardnumber = _data.accountName;
+          this.cardnumber =  _this.luhnCheck(_data.accountName,1);
+
           this.username = _data.accountCardholder;
           this.checkBanks(_data.accountName);
           this.Lastfour = _data.accountName.substr(

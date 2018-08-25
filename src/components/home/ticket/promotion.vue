@@ -1,6 +1,6 @@
 <template>
   <div class="promotion">
-    <mt-header :title="name">
+    <mt-header fixed title="商品上传">
         <router-link to="/home" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -28,13 +28,18 @@ export default {
   name: "Ticket",
   data() {
     return {
-      name: "优化推广",
       list: [
           {
               url: require('../../../../static/images/ticket.png'),
               name: '享7券',
               info: '选择享7券，设置满减门槛',
               href: '/ticket'
+          },
+          {
+              url: require('../../../../static/images/ticket.png'),
+              name: '砍价拼菜',
+              info: '上传爆款菜品，引导趣味消费',
+              href: '/cutdish'
           },
           {
               url: require('../../../../static/images/setMeal.png'),
@@ -61,17 +66,17 @@ export default {
 <style lang="less">
 @import url(../../../common/css/common.css);
 .promotion {
+    position: fixed;
+    width: 100%;
     height: 100%;
+    background: #EBEBEB;
+    overflow: scroll;
     .promotionBox {
-        height: 100%;
-        margin-top: -80px;
-        padding-top: 80px;
-        box-sizing: border-box;
-        background-color: #EBEBEB;
+        margin-top: 80px;
         .promotion_list {
             height: 140px;
             width: 100%;
-            background-color: #fff;
+            background: #fff;
             padding: 30px 28px;
             box-sizing: border-box;
             margin-bottom: 20px;

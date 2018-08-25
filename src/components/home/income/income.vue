@@ -1,12 +1,10 @@
 <template>
   <div class="income">
-    <div class="income_header">
-      <mt-header fixed title="营业数据" class="header_inner">
-          <router-link to="/home" slot="left">
-              <mt-button icon="back"></mt-button>
-          </router-link>
-      </mt-header>
-    </div>
+    <mt-header fixed title="营业数据" class="header_inner">
+        <router-link to="/home" slot="left">
+            <mt-button icon="back"></mt-button>
+        </router-link>
+    </mt-header>
     <div class="income_content">
       <div class="content_top">
         <div class="content_top_item" v-for="(item,index) in income" :key="index">
@@ -261,22 +259,22 @@ export default {
 <style lang="less">
 .income {
   background-color: #ebebeb;
-  padding: 100px 32px 0 30px;
-  box-sizing: border-box;
-  .income_header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background-color: #fc5e2d;
-    .header_inner {
-      height: 80px;
-    }
+  // padding: 80px 32px 0 30px;
+  // box-sizing: border-box;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  // background: #ebebeb;
+  overflow: scroll;
+  .header_inner {
+    height: 80px;
   }
   .income_content {
+    margin-top: 100px;
+     width: 688px;
+      margin-left: 30px;
     .content_top {
-      width: 100%;
+     width: 100%;
       height: 382px;
       border-radius: 8px;
       background-color: #fff;

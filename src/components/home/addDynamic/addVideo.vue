@@ -40,7 +40,6 @@
 </template>
 
 <script>
-
 import Vue from "vue";
 import { MessageBox, Indicator, Toast } from "mint-ui";
 import store from "@/vuex/store";
@@ -51,47 +50,47 @@ export default {
   data() {
     return {
       motype: 2,
-      duration:0,
-      schedule:0,
-      finish:100,
+      duration: 0,
+      schedule: 0,
+      finish: 100,
       title: "",
       content: "",
       moTitle: "",
       coverImg: "",
       coverUrl: "",
       isplay: false,
-      ispro:false,
+      ispro: false,
       playIcon: "https://xq-1256079679.file.myqcloud.com/test_play_0.8.jpg"
     };
   },
   store,
-  mounted:function(){
-    this.videoId = $('#videoId');
-    let article = $('#article-body');
-		if(article){
-		  var artEditor = new Eleditor({
-        el: '#article-body',
+  mounted: function() {
+    this.videoId = $("#videoId");
+    let article = $("#article-body");
+    if (article) {
+      var artEditor = new Eleditor({
+        el: "#article-body",
         toolbars: [
-          'insertText',
-          'editText',
-          'insertImage',
-          'insertHr',
-          'delete',
-          'undo',
-          'cancel'
+          "insertText",
+          "editText",
+          "insertImage",
+          "insertHr",
+          "delete",
+          "undo",
+          "cancel"
         ],
-        upload:{
-          server: "/api/app/img/upload",
+        upload: {
+          server:"/api/app/img/upload",
           fileSizeLimit: 10,
-          formName: 'file',
-          options :{formData:{userName:this.shopInfo.userName}},
-          fromData:{'userName':this.shopInfo.userName}
+          formName: "file",
+          options: { formData: { userName: this.shopInfo.userName } },
+          fromData: { userName: this.shopInfo.userName }
         },
-        changer: function(){
-          this.content=$('#article-body').html();
+        changer: function() {
+          this.content = $("#article-body").html();
         }
       });
-		}
+    }
   },
   computed: {
     ...mapState(["shopInfo"])
@@ -99,56 +98,58 @@ export default {
 
   methods: {
     //返回
-    handback:function(){
-      if(this.moTitle || this.content || this.coverImg){
-        MessageBox.confirm("有正在编辑的文稿示未发送保存，现在退出将清空文稿，是否确认退出？").then(
-          action=>{
-            if(action == 'confirm'){
-              this.$router.push({ path: "/home", query: { ind: 3 } });
-            }
+    handback: function() {
+      if (this.moTitle || this.content || this.coverImg) {
+        MessageBox.confirm(
+          "有正在编辑的文稿示未发送保存，现在退出将清空文稿，是否确认退出？"
+        ).then(action => {
+          if (action == "confirm") {
+            this.$router.push({ path: "/home", query: { ind: 3 } });
           }
-        )
-      }else{
+        });
+      } else {
         this.$router.push({ path: "/home", query: { ind: 3 } });
       }
     },
     //清空数据
-    EmptyData:function(){
-      if($('#article-body').html()){
-        $('#article-body').html('<p class="Eleditor-placeholder">点击此处编辑内容</p>');
+    EmptyData: function() {
+      if ($("#article-body").html()) {
+        $("#article-body").html(
+          '<p class="Eleditor-placeholder">点击此处编辑内容</p>'
+        );
       }
-      this.duration=0,
-      this.title= "",
-      this.content= "",
-      this.moTitle= "",
-      this.coverImg= "",
-      this.coverUrl= "",
-      this.isplay= false
+      (this.duration = 0),
+        (this.title = ""),
+        (this.content = ""),
+        (this.moTitle = ""),
+        (this.coverImg = ""),
+        (this.coverUrl = ""),
+        (this.isplay = false);
     },
     //点击发送，保存编辑
     handsend: function() {
       let _this = this;
-      if($('#article-body').html()){
-        this.content=$('#article-body').html();
-        this.content=this.utf16toEntities(this.content);
+      if ($("#article-body").html()) {
+        this.content = $("#article-body").html();
+        this.content = this.utf16toEntities(this.content);
       }
-      if(this.content.length>4800){
+      if (this.content.length > 4800) {
         Toast("文字内容过长，可用图片代替");
-      }else if (!this.moTitle) {
+      } else if (!this.moTitle) {
         Toast("请输入标题");
       } else if (!this.coverImg) {
         Toast("请上传封面图片或视频");
-      } else if(this.duration>30 && this.motype==2){
+      } else if (this.duration > 30 && this.motype == 2) {
         Toast("视频播放时长不超过30秒");
-          this.coverImg='';
-          this.content='';
-          this.coverUrl='';
-      } else if(!this.content && this.motype==1){
+        this.coverImg = "";
+        this.content = "";
+        this.coverUrl = "";
+      } else if (!this.content && this.motype == 1) {
         Toast("请输入文章内容");
-        this.content='';
-      }else{
-       this.moTitle=this.utf16toEntities(this.moTitle);
-       
+        this.content = "";
+      } else {
+        this.moTitle = this.utf16toEntities(this.moTitle);
+
         MessageBox.confirm("确定保存?").then(
           action => {
             if (action == "confirm") {
@@ -161,13 +162,13 @@ export default {
                 homePic: this.coverImg,
                 userName: this.shopInfo.userName,
                 nickName: this.shopInfo.nickName
-              }
-              $.post("/api/app/topic/add",_parms,function(res){
+              };
+              $.post("/api/app/topic/add", _parms, function(res) {
                 if (res.code == 0) {
                   _this.EmptyData();
                   MessageBox("提示", "保存成功");
                 }
-              })
+              });
             }
           },
           () => {}
@@ -194,8 +195,12 @@ export default {
     },
     // 获取文件
     getFile: function(e) {
-      let _text = "",_Url = "",reg= /\.(jpg|bmp|gif)$/,_this = this,inputDOM = {};
-        // 1-文章  2-视频
+      let _text = "",
+        _Url = "",
+        reg = /\.(jpg|bmp|gif|jpeg|svg|)$/,
+        _this = this,
+        inputDOM = {};
+      // 1-文章  2-视频
       if (this.motype == 1) {
         _text = "图片上传中...";
       } else if (this.motype == 2) {
@@ -210,20 +215,21 @@ export default {
         return false;
       }
 
-      if(this.file.size*1>10485760){
+      if (this.file.size * 1 > 10485760) {
         Toast("文件过大，请重新10M以内的文件上传");
         return false;
       }
-      
+      console.log('file:',this.file);
+      console.log('file.name:',this.file.name);
       if (!reg.test(this.file.name) && this.motype == 1) {
         Indicator.close();
         Toast("请上传一张图片");
-        return false
+        return false;
       }
       if (reg.test(this.file.name) && this.motype == 2) {
         Indicator.close();
         Toast("请上传一个视频");
-        return false
+        return false;
       }
       Indicator.open({
         text: _text,
@@ -232,38 +238,42 @@ export default {
       // 触发这个组件对象的input事件
       this.$emit("input", this.file);
       // 这里就可以获取到文件的名字了
-      
+
       if (reg.test(this.file.name)) {
-       this.uploadFile();
-      }else{
-       this.getFileURL(this.file);
+        this.uploadFile();
+      } else {
+        this.getFileURL(this.file);
       }
     },
-    uploadFile:function(){ //上传图片视频
-      let _this= this, _text = "",_Url = "",timer=null;
+    uploadFile: function() {
+      //上传图片视频
+      let _this = this,
+        _text = "",
+        _Url = "",
+        timer = null;
       this.ispro = true;
       this.schedule = 0;
-      timer = setInterval(getTotelNumber,200)
+      timer = setInterval(getTotelNumber, 200);
       function getTotelNumber() {
-        _this.schedule+=1; 
-        if(_this.coverImg){
-          _this.schedule=100;
+        _this.schedule += 1;
+        if (_this.coverImg) {
+          _this.schedule = 100;
           clearInterval(timer);
           _this.ispro = false;
-        }else if(_this.schedule<99){
-          _this.schedule+=1; 
-        } else if(_this.schedule==99){
-         clearInterval(timer);
+        } else if (_this.schedule < 99) {
+          _this.schedule += 1;
+        } else if (_this.schedule == 99) {
+          clearInterval(timer);
         }
       }
       getTotelNumber();
-        // 1-文章  2-视频
+      // 1-文章  2-视频
       if (this.motype == 1) {
-        _Url = "/api/app/img/upload";
+        _Url ="/api/app/img/upload";
       } else if (this.motype == 2) {
-        _Url = "/api/app/img/uploadMp4";
+        _Url ="/api/app/img/uploadMp4";
       }
-      
+
       this.fileName = this.file.name;
       // 这里加个回调也是可以的
       this.onChange && this.onChange(this.file, inputDOM.value);
@@ -272,67 +282,76 @@ export default {
       form.append("file", this.file, this.file.name);
       form.append("userName", this.shopInfo.userName);
       this.$axios.post(_Url, form).then(res => {
-          Indicator.close();
-           _this.ispro = false;
-          if (res.data.code != 0) {
-            Toast("系统繁忙请稍后再试");
-            return false;
-          }
-          if (this.motype == 1) {
-            //文章
-            _this.coverImg = res.data.data.picUrl;
-          } else if (this.motype == 2) {
-            //视频
-            _this.coverImg = res.data.data.smallPicUrl;
-            _this.coverUrl = res.data.data.picUrl;
-            let _obj = {
-              type:'video',
-              value:res.data.data.picUrl,
-              txt:''
-            },arr=[],value='';
-            arr.push(_obj);
-            value = JSON.stringify(arr);
-            _this.content = value;
-          }
-      })
+        Indicator.close();
+        _this.ispro = false;
+        if (res.data.code != 0) {
+          Toast("系统繁忙请稍后再试");
+          return false;
+        }
+        if (this.motype == 1) {
+          //文章
+          _this.coverImg = res.data.data.picUrl;
+        } else if (this.motype == 2) {
+          //视频
+          _this.coverImg = res.data.data.smallPicUrl;
+          _this.coverUrl = res.data.data.picUrl;
+          let _obj = {
+              type: "video",
+              value: res.data.data.picUrl,
+              txt: ""
+            },
+            arr = [],
+            value = "";
+          arr.push(_obj);
+          value = JSON.stringify(arr);
+          _this.content = value;
+        }
+      });
     },
     //获取视频时长
     getFileURL(file) {
       //获取视频本地地址
       var getUrl = null;
-      if (window.createObjectURL != undefined) { // basic
+      if (window.createObjectURL != undefined) {
+        // basic
         getUrl = window.createObjectURL(file);
-      } else if (window.URL != undefined) { // mozilla(firefox)
+      } else if (window.URL != undefined) {
+        // mozilla(firefox)
         getUrl = window.URL.createObjectURL(file);
-      } else if (window.webkitURL != undefined) { // webkit or chrome
+      } else if (window.webkitURL != undefined) {
+        // webkit or chrome
         getUrl = window.webkitURL.createObjectURL(file);
       }
-     
+
       if (getUrl) {
         let that = this;
         videoId.src = getUrl;
-          setTimeout(function(){
-           //获取视频时长
-           if(videoId.duration){
+        setTimeout(function() {
+          //获取视频时长
+          if (videoId.duration) {
             that.duration = videoId.duration;
-            that.uploadFile();
-           }else{
-             Indicator.close();
-             Toast("请上传一个视频");
-             return 0;
-           }
-          },1000)
+            if(that.duration>15){
+              Toast("视频时长不应超过15秒");
+            }else{
+              that.uploadFile();
+            }
+          } else {
+            Indicator.close();
+            Toast("请上传一个视频");
+            return 0;
+          }
+        }, 1000);
       }
     },
-    //将emoji表情转为字符进行存储 
-    utf16toEntities:function(str) {  
-      var patt = /[\ud800-\udbff][\udc00-\udfff]/g; // 检测utf16字符正则 
-      str = str.replace(patt, function (char) {
+    //将emoji表情转为字符进行存储
+    utf16toEntities: function(str) {
+      var patt = /[\ud800-\udbff][\udc00-\udfff]/g; // 检测utf16字符正则
+      str = str.replace(patt, function(char) {
         var H, L, code;
         if (char.length === 2) {
-          H = char.charCodeAt(0); // 取出高位 
-          L = char.charCodeAt(1); // 取出低位 
-          code = (H - 0xD800) * 0x400 + 0x10000 + L - 0xDC00; // 转换算法 
+          H = char.charCodeAt(0); // 取出高位
+          L = char.charCodeAt(1); // 取出低位
+          code = (H - 0xd800) * 0x400 + 0x10000 + L - 0xdc00; // 转换算法
           return "&#" + code + ";";
         } else {
           return char;
@@ -350,17 +369,16 @@ export default {
       this.motype = 2;
       this.title = "编辑视频";
     }
-    
   }
 };
 </script>
 
 <style lang="less">
 .addVideo {
-  #article-body{
+  #article-body {
     width: 100%;
-    padding:  5px;
-    overflow:scroll;
+    padding: 5px;
+    overflow: scroll;
     border: 1px solid #7e6e6e;
     padding-bottom: 500px;
   }
@@ -368,15 +386,15 @@ export default {
     width: 694px;
     padding: 28px;
     padding-top: 100px;
-    word-break:break-all;
-    overflow:scroll;
+    word-break: break-all;
+    overflow: scroll;
     .cover {
       width: 694px;
       height: 390px;
       border-radius: 8px;
       border-style: dotted;
       position: relative;
-      .mt-progress{
+      .mt-progress {
         position: relative;
         top: 200px;
       }
@@ -454,12 +472,13 @@ export default {
       font-size: 36px;
     }
   }
-  .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button{
-    width:40px!important;
-    height:40px!important;
+  .ql-snow.ql-toolbar button,
+  .ql-snow .ql-toolbar button {
+    width: 40px !important;
+    height: 40px !important;
   }
-  .ql-toolbar.ql-snow + .ql-container.ql-snow{
-    font-size: 40px!important;
+  .ql-toolbar.ql-snow + .ql-container.ql-snow {
+    font-size: 40px !important;
   }
 }
 </style>

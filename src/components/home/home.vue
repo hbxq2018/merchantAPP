@@ -71,7 +71,7 @@ export default {
             console.log('home-isflag:',this.isflag)
           },
           error: function (xhr, type, errerThrown) {
-            mui.toast("网络异常,请稍候再试");
+            // mui.toast("网络异常,请稍候再试");
           }
         });
     },

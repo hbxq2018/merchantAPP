@@ -146,7 +146,7 @@ export default {
     },
     //订单列表
     orderList() {
-      let _this = this,
+      let _this = this,isSuccess = false,
         _value =
           "shopId=" +
           this.shopId +
@@ -159,11 +159,19 @@ export default {
           "&endTime=" +
           this.endTime;
       //商家订单列表
+       Indicator.open('数据加载中...');
+       setTimeout(() => {
+          if(!isSuccess){
+            isSuccess = false;
+            Indicator.close();
+            Toast("网络异常，请检查网络连接")
+          }
+        }, Delay);
       if (!this.shopListLoad) {
-        Indicator.open('数据加载中...');
         this.$axios
           .get("/api/app/so/myorderForShop?" + _value + "&soStatus=2")
           .then(res => {
+            isSuccess = true;
             Indicator.close();
             if (res.data.code == 0 && res.data.data.list != null) {
               let list = res.data.data.list;
@@ -188,6 +196,8 @@ export default {
         this.$axios
           .get("/api/app/so/myorder?" + _value + "&soStatus=3")
           .then(res => {
+            isSuccess = true;
+            Indicator.close();
             if (res.data.code == 0 && res.data.data) {
               let list = res.data.data;
               for (let i = 0; i < list.length; i++) {

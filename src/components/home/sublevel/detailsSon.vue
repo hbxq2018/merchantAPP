@@ -103,7 +103,7 @@ export default {
       if (this.page == 1) {
         this.writedata = [];
       }
-      let _start = "2018/" + this.ind + "/01";
+      let _start = "2018/" + this.ind + "/01",isSuccess = false;
       let _end = "";
       let _ind = this.ind * 1 + 1;
       if (_ind < 13) {
@@ -127,7 +127,15 @@ export default {
         _value += key + "=" + obj[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
+      setTimeout(() => {
+      if (!isSuccess) {
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接");
+        }
+      }, Delay);
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
+        isSuccess= true;
         Indicator.close();
         if (res.data.code == 0) {
           this.total = res.data.data.total;

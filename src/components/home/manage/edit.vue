@@ -1,20 +1,16 @@
 <template>
   <div class="edit">
-      <mt-header :title="name">
+      <mt-header fixed :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         <!-- <mt-button slot="right"  @click="save">保存</mt-button> -->
       </mt-header> 
       <div class="edit_content">
-        <mt-field class="indleft" v-show="ind == '0'" v-model="data.mobile" label="手机电话" placeholder="请输入手机号码" ref="phone" type="tel" ></mt-field>
-        <mt-field class="indleft" v-show="ind == '0'" v-model="data.phone" label="座机电话" placeholder="请输入座机号码" ref="phone" type="tel" ></mt-field>
-        <div v-show="ind == '0'" class="legend">座机号码和手机号码，请正确输入至少一个联系方式</div>
-        <!-- <mt-checklist  
-            v-if="ind == '1' || ind == '2'" 
-            :max="_max"
-            align="right"
-            v-model="value"   
-            :options="options">  
-        </mt-checklist>  -->
+        <div class="cont_top" v-if="ind == '0'">
+          <mt-field class="indleft" v-model="data.mobile" label="手机电话" placeholder="请输入手机号码" ref="mobile" type="tel" ></mt-field>
+          <mt-field class="indleft" v-model="data.phone" label="座机电话" placeholder="请输入座机号码" ref="phone" type="tel" ></mt-field>
+          <div class="legend">座机号码和手机号码，请正确输入至少一个联系方式</div>
+        </div>
+  
         <div class="category">
           <ul>
             <li v-for="(item,index) in options" :key="index" :id="item.id" class="category_item clearfix">
@@ -23,6 +19,7 @@
             </li>
           </ul>
         </div>
+
         <mt-field class="indright" v-show="ind == 4" v-model="data.Introduction" placeholder="商家简介" type="textarea" rows="8"></mt-field>
       </div> 
   </div>
@@ -124,40 +121,46 @@ export default {
   methods: {
     ...mapMutations(["setuserInfo"]),
     clickback: function() {
-      this.$router.push({ name: "Manage", params: {} });
       const ind = this.ind;
       if (ind == 0) {
         if(this.data.mobile || this.data.phone){
-          const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
+          let ismobile = true,isphone=true;
+          const reg = /^1[3|4|5|6|7|8|9][0-9]\d{4,8}$/;
           const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
           
-          if (reg.test(this.data.mobile)) {
-            let mobile = this.data.mobile + "/" + "mobile";
-            this.setuserInfo(mobile);
-            this.$router.push({ name: "Manage", params: {} });
-          } else {
-            this.data.mobile = "";
-            let mobile = this.data.mobile + "/" + "mobile";
-            this.setuserInfo(mobile);
-            this.$router.push({ name: "Manage", params: {} });
-            if(this.data.mobile){
+          if(this.data.mobile){
+            ismobile= false;
+            if (reg.test(this.data.mobile)) {
+              ismobile=true;
+              let mobile = this.data.mobile + "/" + "mobile";
+              this.setuserInfo(mobile);
+            } else {
+              this.data.mobile = "";
               Toast("手机号码输入有误，请重新输入");
+              let mobile = this.data.mobile + "/" + "mobile";
+              this.setuserInfo(mobile);
             }
           }
-        
-          if (reg2.test(this.data.phone)) {
-            let phone = this.data.phone + "/" + "phone";
-            this.setuserInfo(phone);
-            this.$router.push({ name: "Manage", params: {} });
-          } else {
-            this.data.phone = "";
-            let phone = this.data.phone + "/" + "phone";
-            this.setuserInfo(phone);
-            this.$router.push({ name: "Manage", params: {} });
-            if(this.data.phone){
-              Toast("座机号码输入有误，请重新输入");
+          
+          if(this.data.phone){
+            isphone=false;
+            if (reg2.test(this.data.phone)) {
+              isphone=true;
+              let phone = this.data.phone + "/" + "phone";
+              this.setuserInfo(phone);
+            } else {
+              this.data.phone = "";
+               Toast("座机号码输入有误，请重新输入");
+              let phone = this.data.phone + "/" + "phone";
+              this.setuserInfo(phone);
             }
           }
+          
+          setTimeout(() => {
+              if(ismobile && isphone){
+                this.$router.push({ name: "Manage", params: {} });
+              }
+          }, 1000);
           
         }else{
           Toast("请正确输入至少一个联系电话");
@@ -311,7 +314,9 @@ export default {
     this.name = this.$route.query.name;
     this.ind = this.$route.query.ind;
     this.content = this.$route.query.value;
-    if (this.ind == "0") {
+    this.data.mobile = this.userInfo.mobile;
+    this.data.phone = this.userInfo.phone;
+    if (this.ind == 0) {
         const reg = /^1[3|4|5|8][0-9]\d{4,8}$/;
         const reg2 = /^0(([1-9]\d)|([3-9]\d{2}))\d{8}$/;
         if (reg.test(this.content)) {
@@ -322,7 +327,7 @@ export default {
         }
       
     }
-    if (this.ind == "1") {
+    if (this.ind == 1) {
       this.options = this.option1;
       this.ismin = false;
       this.content = this.content.split(",");
@@ -335,7 +340,7 @@ export default {
         }
       }
       this.value = this.content;
-    } else if (this.ind == "2") {
+    } else if (this.ind == 2) {
       this.ismin = true;
       for (let i = 0; i < this.option2.length; i++) {
         if (this.option2[i].label == this.content) {
@@ -345,7 +350,7 @@ export default {
       }
       this.options = this.option2;
       this.value = this.content;
-    } else if (this.ind == "3") {
+    } else if (this.ind == 3) {
       this.$router.push({ path: "/shopMap", query: { ind: "2" } });
     } else {
       this.data.Introduction = this.content;
@@ -355,14 +360,16 @@ export default {
 </script>
 <style lang="less">
 .edit {
-  .mint-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  overflow: scroll;
   .edit_content {
-    padding-top: 80px;
+    .cont_top{
+      margin-top: 80px;
+    }
+    
     .legend{
       margin-top: 50px;
     }
@@ -378,6 +385,8 @@ export default {
     }
     .category {
       ul {
+        margin: 0;
+        padding: 0;
         .category_item {
           height: 100px;
           line-height: 100px;

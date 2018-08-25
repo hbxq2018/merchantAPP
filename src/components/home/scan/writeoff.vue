@@ -1,6 +1,6 @@
 <template>
   <div class="write">
-    <mt-header title="核销" >
+    <mt-header fixed title="核销" >
         <router-link to="/scan" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -12,7 +12,7 @@
         <div class="code money"><span slot="left">实际需付款（元）</span>  <span v-if="diffs>0">{{diffs}}</span></div> -->
 
 
-        <div class="code money"><span slot="left">顾客信息</span><span slot="right">{{setnum(ticket.userName)}}</span></div>
+        <div class="code money"><span slot="left">顾客信息</span><span slot="right">{{ticket.userName | setnum}}</span></div>
         <div class="code money"><span slot="left">券信息</span><span slot="right">{{ticket.skuName}}</span></div>
         <button :class="isdiff?'actbutton subbutton':'subbutton'" type="submit" @click="submit">确认核销</button>
     </div>
@@ -62,6 +62,14 @@ export default {
       } else {
         this.isdiff = false;
       }
+    }
+  },
+  filters:{
+    setnum:function(val){
+      if(val){
+          val = val.substr(0, 3) + "****" + val.substr(7);
+      }
+      return val
     }
   },
   methods: {
@@ -130,7 +138,7 @@ export default {
             if (data.data.skuName.indexOf(Dis) > 0) {
               this.label1 = "输入折后金额";
               this.plac = "折后金额(元)";
-              this.searchShopId();
+              // this.searchShopId();
             }
             this.isdiff = true;
             this.ticket = data.data
@@ -141,12 +149,6 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    },
-    setnum:function(val){
-      if(val){
-          val = val.substr(0, 3) + "****" + val.substr(7);
-      }
-      return val
     },
     searchShopId: function() {//查询商家是否参加某一活动
       let _this = this;
@@ -187,7 +189,6 @@ export default {
   height: 100%;
   margin-top: 11%;
   z-index: 1;
-  padding-top: 20px;
   .code {
     width: 90%;
     margin-left: 5%;

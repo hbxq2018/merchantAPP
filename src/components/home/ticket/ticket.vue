@@ -1,6 +1,6 @@
 <template>
   <div class="ticket">
-    <mt-header :title="name">
+    <mt-header fixed :title="name">
         <router-link to="/promotion" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { Picker,Toast } from "mint-ui";
+import { Picker,Toast,Indicator,MessageBox } from "mint-ui";
 import store from '@/vuex/store'
 import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
@@ -123,17 +123,32 @@ export default {
     },
     delticket: function(e) {
       const ind = e.currentTarget.id;
-      this.$axios.get("/api/app/pnr/delete/" + ind).then(res => {
-        if (res.data.code == "0") {
-          Toast("删除成功");
-          this.getticketlist();
-        }
-      });
+      MessageBox.confirm("确定要删除吗?").then(
+      action => {
+        this.$axios.get("/api/app/pnr/delete/" + ind).then(res => {
+          if (res.data.code == "0") {
+            Toast("删除成功");
+            this.getticketlist();
+          }
+        });
+      })
+      
     },
     getticketlist: function() {
+      let isSuccess = false;
+      Indicator.open('数据加载中...');
+      setTimeout(() => {
+        if(!isSuccess){
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接")
+        }
+      }, Delay);
       this.$axios.get("/api/app/pnr/selectByShopId?shopId=" + this.shopId)
         .then(res => {
-          if (res.data.code == "0") {
+           isSuccess = true;
+            Indicator.close();
+          if (res.data.code == 0) {
             let data = res.data.data;
             for (let i in data) {
               data[i].ruleDesc = data[i].ruleDesc.substr(1);
@@ -166,9 +181,14 @@ export default {
 </script>
 <style lang="less">
 .ticket {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background:#fff;
+  overflow: scroll;
   ul {
     margin: 0;
-    padding: 0;
+    padding-top: 80px;
     width: 100%;
     .tic {
       width: 663px;
@@ -186,8 +206,8 @@ export default {
       text-align: center;
       font-size: 36px;
       overflow: hidden;  
-          text-overflow: ellipsis; 
-          white-space: nowrap; 
+      text-overflow: ellipsis; 
+      white-space: nowrap; 
     }
     .text {
       font-size: 30px;

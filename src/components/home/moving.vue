@@ -150,7 +150,8 @@ export default {
           rows: 10
         },
         _value = "",
-        oldData = [];
+        oldData = [],
+        isSuccess = false;
       if (this.topicType) {
         _parms.topicType = this.topicType;
       }
@@ -158,8 +159,16 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
+      setTimeout(() => {
+        if(!isSuccess){
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接")
+        }
+      }, Delay);
       this.$axios.get("/api/app/topic/myList?" + _value).then(res => {
         Indicator.close();
+        isSuccess = true;
         if (res.data.code == 0) {
           if (this.page == 1) {
             this.listData = [];
@@ -167,7 +176,7 @@ export default {
           oldData = this.listData;
           if (res.data.data.list && res.data.data.list.length > 0) {
             let _listData = res.data.data.list,
-              reg = /^1[34578][0-9]{9}$/;
+              reg = /^1[345678][0-9]{9}$/;
             for (let i in _listData) {
               _listData[i].interval = this.timeDiffrence(
                 _listData[i].createTime,

@@ -75,7 +75,7 @@ export default {
           // src:'../../../static/images/voucher.png',
           src: require("../../../static/images/voucher.png"),
           id: "4",
-          name: "优化推广",
+          name: "商品上传",
           con: "自定义满减额度",
           href: "#"
         }
@@ -127,12 +127,13 @@ export default {
 
 <style lang="less">
 .menu {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
   .menu_top {
     width: 100%;
     height: 310px;
-    position: fixed;
-    left: 0;
-    top: 0;
     background: #fc5e2d;
     & > .eaves {
       position: absolute;
@@ -187,7 +188,7 @@ export default {
 
   .menu_content {
     overflow: hidden;
-    padding: 300px 0 230px 0;
+    padding-top: 0px;
     & > .conul {
       padding: 0;
       margin: 0;

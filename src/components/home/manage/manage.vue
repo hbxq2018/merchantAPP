@@ -120,7 +120,7 @@ export default {
       this.$axios
         .get("/api/app/shopCashier/adminByShopId?" + _value)
         .then(res => {
-          if (res.data.code == "0") {
+          if (res.data.code == 0) {
             if (res.data.data && res.data.data.id) {
               if (res.data.data.cashierId == this.shopInfo.id) {
                 this.ismain = true;
@@ -225,11 +225,23 @@ export default {
       }
     },
     clickadd: function() {
-      MessageBox.prompt("输入要添加核销员的注册电话").then(
+      MessageBox.prompt("输入要添加核销员的注册电话",{
+        inputType:'number',
+        inputPlaceholder:'请输入要添加核销员的注册电话',
+        inputValidator: (val) => {
+          const reg = /^[1][3456789][0-9]{9}$/;
+          if(val.length >= 11){
+            if (!reg.test(val)) {
+              return false;
+            }
+          }
+        },
+        inputErrorMessage: '手机号输入有误'
+      }).then(
         ({ value, action }) => {
           if (action == "confirm") {
             if (value) {
-              const reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              const reg = /^[1][3456789][0-9]{9}$/;
               if (!reg.test(value)) {
                 MessageBox("提示", "手机号输入错误");
               } else {
@@ -253,21 +265,26 @@ export default {
       }
       _value1 = _value1.substring(0, _value1.length - 1);
       this.$axios.get("/api/app/user/findUserByMobile?" + _value1).then(res => {
-        if (res.data.code == "0") {
+        if (res.data.code == 0) {
           hxdata = res.data.data;
-          if (hxdata.userType == 2 && hxdata.shopId) {
-            if (type == "del") {
-              this.deleteHxUser(value);
-              this.shopCashier(hxdata, 2);
+          if(!hxdata || hxdata == null){
+            Toast("添加失败,该用户不存在")
+          }else{
+            if (hxdata.userType == 2 && hxdata.shopId) {
+              if (type == "del") {
+                this.deleteHxUser(value);
+                this.shopCashier(hxdata, 2);
+              } else {
+                MessageBox("提示", "该用户已是核销员，请勿重复添加");
+              }
             } else {
-              MessageBox("提示", "该用户已是核销员，请勿重复添加");
-            }
-          } else {
-            if (type == "add") {
-              this.addHxUser(value);
-              this.shopCashier(hxdata, 1);
+              if (type == "add") {
+                this.addHxUser(value);
+                this.shopCashier(hxdata, 1);
+              }
             }
           }
+          
         } else {
           MessageBox("提示", res.data.message);
         }

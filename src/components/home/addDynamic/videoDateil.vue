@@ -100,7 +100,7 @@ export default {
                 zanSourceType: 1
                 },
                 _value = "",
-                reg = /^1[34578][0-9]{9}$/;
+                reg = /^1[345678][0-9]{9}$/;
             for (var key in _parms) {
                 _value += key + "=" + _parms[key] + "&";
             }
@@ -135,7 +135,7 @@ export default {
                 cmtType: '2',
                 },
                 _value = "",
-                reg = /^1[34578][0-9]{9}$/;
+                reg = /^1[345678][0-9]{9}$/;
             for (var key in _parms) {
                 _value += key + "=" + _parms[key] + "&";
             }

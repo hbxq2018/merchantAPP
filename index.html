@@ -23,24 +23,37 @@
 	<div id="app"></div>
 	<!-- built files will be auto injected -->
 	<script>
+		
 		appUpdate();
-		var quit = false, ispush = false, pushinfo = {}, pushmsg = {}, wgtVer = null, isBack = false , isflag = true;
+		var quit = false,
+		ispush = false, 
+		pushinfo = {}, 
+		pushmsg = {}, 
+		wgtVer = null, 
+		isBack = false, 
+		isflag = true,
+		backPath = true,
+		Delay = 1000*15,
+		Herf = 'file:///storage/emulated/0/Android/data/io.dcloud.HBuilder/apps/HBuilder/www/'
+		;
 
 
-		// if(window.plus){
-		// 	plusReady();
-		// }else{
-		// 	document.addEventListener('plusready',plusReady,false);
-		// }
+		var path = location.href;
+		console.log('path:',path);
+
+	
 
 
 		document.addEventListener("plusready", function () {
-
 			message = document.getElementById("message");
-			console.log('index_message:')
+			console.log('index_message:',message)
 			// 监听点击消息事件
 			plus.push.addEventListener("click", function (msg) {
-				console.log('index_click_msg')
+				console.log('监听在线消息事件_click')
+				console.log("msg:",msg)
+				// new Audio(
+				// 	'http://tts.baidu.com/text2audio?cuid=baiduid&lan=zh&ctp=1&pdt=311&tex='+msg.content
+				// ).play();
 				// 判断是从本地创建还是离线推送的消息
 				switch (msg.payload) {
 					case "LocalMSG":
@@ -51,14 +64,25 @@
 						break;
 				}
 				// 提示点击的内容
+				
 				plus.ui.alert(msg.content);
+				
 				// 处理其它数据
-				logoutPushMsg(msg);
+				// logoutPushMsg(msg);
 			}, false);
 			// 监听在线消息事件
 			plus.push.addEventListener("receive", function (msg) {
-				console.log('index_receive_msg')
+				console.log('监听在线消息事件_receive')
 				console.log('msg:', msg)
+
+				// getPushInfo(msg);
+				// let _newMsg = '享七收款'+msg.content+'元';
+				new Audio(
+					'http://tts.baidu.com/text2audio?cuid=baiduid&lan=zh&ctp=1&pdt=311&tex='+msg.content
+				).play();
+
+
+				
 				if (msg.aps) {  // Apple APNS message
 					console.log("接收到在线APNS消息：");
 				} else {
@@ -66,7 +90,7 @@
 				}
 
 				// window.open(window.location.origin + '/income')
-				getPushInfo(msg);
+				
 				// opepage();
 
 			}, false);
@@ -74,10 +98,8 @@
 		function getPushInfo(msg) {
 			pushmsg = msg;
 			pushinfo = plus.push.getClientInfo();
+			AllMessage = plus.push.getAllMessage();
 			ispush = true;
-			console.log('pushmsg:', pushmsg)
-			console.log('pushinfo:', pushinfo)
-			console.log('ispush:', ispush)
 			//  window.location.reload();
 			// logoutPushMsg(msg);
 			// outSet( "获取客户端推送标识信息：" );
@@ -96,6 +118,7 @@
 		// //首页返回键处理
 		// //处理逻辑：1秒内，连续两次按返回键，则退出应用；
 		var first = null;
+
 		mui.back = function () {
 			if (isBack) {    //如果在审核页面点击物理返回键就退出程序
 				plus.runtime.quit();//那么就退出app
@@ -103,8 +126,8 @@
 				//首次按键，提示‘再按一次退出应用’
 				if (!first) {
 					first = new Date().getTime();//记录第一次按下回退键的时间
-					// mui.toast('再按一次退出应用');//给出提示
-					history.go(-1)//回退到上一页面
+				    //mui.toast('再按一次退出应用');//给出提示
+					history.go(-1);//回退到上一页面
 					setTimeout(function () {//1s中后清除
 						first = null;
 					}, 1000);

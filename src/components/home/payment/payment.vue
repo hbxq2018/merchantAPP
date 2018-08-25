@@ -45,7 +45,7 @@
 
 <script>
 import store from "@/vuex/store";
-import { Toast , Indicator} from "mint-ui";
+import { Toast, Indicator } from "mint-ui";
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "payment",
@@ -98,32 +98,28 @@ export default {
     //通过shopId查询商家的缴费记录(通过此接口来判断发起缴纳服务费的开始时间和结束时间)
     getBeginTime() {
       let _this = this;
-      _this.lists=[];
+      _this.lists = [];
       this.$axios
-        .get(
-          "/api/app/serviceAmount/selectByShopId?shopId=" +
-            this.userInfo.id
-        )
+        .get("/api/app/serviceAmount/selectByShopId?shopId=" + this.userInfo.id)
         .then(res => {
           if (res.data.code == 0) {
             //使用查询到的结束时间做为入参的开始时间，入参结束时间则今天（当前日期_endTime），但显示结束时间使用昨天（当前日期的前一天）
             if (res.data.data) {
-              let newstart = res.data.data.endTime; 
-              newstart = newstart.replace(/\-/g, '/');
-              newstart = ((new Date(newstart)).getTime()- 24 * 60 * 60 * 1000); 
+              let newstart = res.data.data.endTime;
+              newstart = newstart.replace(/\-/g, "/");
+              newstart = new Date(newstart).getTime() - 24 * 60 * 60 * 1000;
               newstart = new Date(newstart);
-              _this.beginTime =  _this.formatDate(newstart);
+              _this.beginTime = _this.formatDate(newstart);
               _this._startTime = res.data.data.endTime;
-            }else{
-              _this.beginTime = "2018/01/01 00:00:00"; 
+            } else {
+              _this.beginTime = "2018/01/01 00:00:00";
               _this._startTime = "2018/01/01 00:00:00";
             }
           }
           let yesterday = new Date();
           _this._endTime = _this.formatDate(new Date());
           yesterday.setTime(yesterday.getTime() - 24 * 60 * 60 * 1000);
-          this.endTime =  _this.formatDate(yesterday);
-
+          this.endTime = _this.formatDate(yesterday);
 
           _this.amount();
           _this.amountList();
@@ -139,19 +135,18 @@ export default {
           _this.beginTime +
           "&endTime=" +
           _this._endTime;
-      _this.$axios
-        .get("/api/app/hx/amount?" + _value)
-        .then(res => {
-          if (res.data.code == 0) {
-            let service = res.data.data[1].totalNoService;
-            _this.money = service ? service : 0;
-          }
-        });
+      _this.$axios.get("/api/app/hx/amount?" + _value).then(res => {
+        if (res.data.code == 0) {
+          let service = res.data.data[1].totalNoService;
+          _this.money = service ? service : 0;
+        }
+      });
     },
     //获取列表数据
     amountList() {
-      Indicator.open('数据加载中...');
-      let _this = this;
+      Indicator.open("数据加载中...");
+      let _this = this,
+        isSuccess = false;
       let _value =
         "shopId=" +
         this.userInfo.id +
@@ -162,8 +157,16 @@ export default {
         "&page=" +
         this.page +
         "&rows=10&isBill=0";
+      setTimeout(() => {
+        if (!isSuccess) {
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接");
+        }
+      }, Delay);
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         let data = res.data;
+        isSuccess = true;
         Indicator.close();
         if (data.code == 0) {
           _this.total = data.data.total;
@@ -190,7 +193,7 @@ export default {
       if (this.money <= 0) {
         Toast("暂不需要缴纳服务费");
       } else {
-        let id = "wxpay";// 微信支付
+        let id = "wxpay"; // 微信支付
         this.pay(id);
       }
     },
@@ -199,9 +202,10 @@ export default {
       // 从服务器请求支付订单
       let _this = this;
       var WXPAYSERVER =
-        "/api/app/wxpay/payForShopApp?shopId=" +
+       "/api/app/wxpay/payForShopApp?shopId=" +
         this.userInfo.id +
-        "&servicePrice="+this.money+
+        "&servicePrice=" +
+        this.money +
         "&beginTime=" +
         this._startTime +
         "&endTime=" +
@@ -222,9 +226,10 @@ export default {
                 wxChannel = channels[i];
                 channel = wxChannel;
                 var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {//3
+                xhr.onreadystatechange = function() {
+                  //3
                   switch (xhr.readyState) {
-                      // 1\2\3\4
+                    // 1\2\3\4
                     case 4:
                       if (xhr.status == 200) {
                         let obj = JSON.parse(xhr.responseText);
@@ -240,19 +245,20 @@ export default {
                           },
                           function(error) {
                             console.log("error:", error);
-                            let str = error.message,msg='';
-                            if(str.indexOf("-1") != -1){
-                              msg = '一般错误，请联系客服';
-                            }else if(str.indexOf("-2") != -1){
-                              msg = '支付取消，请重新支付';
-                            }else if(str.indexOf("-3") != -1){
-                              msg = '发送失败，请稍后再试';
-                            }else if(str.indexOf("-4") != -1){
-                              msg = '认证被否决';
-                            }else if(str.indexOf("-5") != -1){
-                              msg = '不支持错误';
+                            let str = error.message,
+                              msg = "";
+                            if (str.indexOf("-1") != -1) {
+                              msg = "一般错误，请联系客服";
+                            } else if (str.indexOf("-2") != -1) {
+                              msg = "支付取消，请重新支付";
+                            } else if (str.indexOf("-3") != -1) {
+                              msg = "发送失败，请稍后再试";
+                            } else if (str.indexOf("-4") != -1) {
+                              msg = "认证被否决";
+                            } else if (str.indexOf("-5") != -1) {
+                              msg = "不支持错误";
                             }
-                            if(msg){
+                            if (msg) {
                               _this.getBeginTime();
                               plus.nativeUI.alert(msg);
                             }
@@ -262,12 +268,12 @@ export default {
                         alert("获取订单信息失败！");
                       }
                       break;
-                      default:
+                    default:
                       break;
                   }
                 };
-                xhr.open("POST", PAYSERVER);//1
-                xhr.send();//2
+                xhr.open("POST", PAYSERVER); //1
+                xhr.send(); //2
               } else {
                 aliChannel = channels[i];
               }
@@ -427,7 +433,7 @@ export default {
     top: 637px;
     z-index: 50;
     background: #fff;
-    .empty{
+    .empty {
       width: 50%;
       margin-top: 20%;
     }
@@ -469,7 +475,7 @@ export default {
       }
     }
   }
-  .actpay-cont{
+  .actpay-cont {
     background: none;
   }
 }

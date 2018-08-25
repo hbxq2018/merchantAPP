@@ -111,7 +111,7 @@ export default {
       d2 =this.formatDate(d2);
       if (new Date(d1.replace(/-/g, "/")) < new Date(d2.replace(/-/g, "/"))) {
         diff = new Date(d2.replace(/-/g, "/"))-new Date(d1.replace(/-/g, "/"));
-        if(diff < 2678410000){
+        if(diff < 2678410000){//2678410000=60*60*24*1000+
           this.lists = [];
           this.page = 1;
           this.amount();

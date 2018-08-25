@@ -65,10 +65,15 @@
 
 <script>
 import Vue from "vue";
-import { Loadmore,Popup,Indicator } from "mint-ui";
+import { Loadmore, Popup, Indicator, Toast } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Loadmore.name, Loadmore);
+
+// mui.back = function() {
+//   let newPath = Herf+'index.html#/withdraw';
+//   location.href = newPath;
+// };
 export default {
   name: "notes",
   data() {
@@ -108,7 +113,7 @@ export default {
       }
       return result;
     },
-     //翻译状态
+    //翻译状态
     rendStatus: function(val) {
       /**
        * 审批状态 1 待审批 2 审批通过 3 审批不通过 4 取消 5 终止
@@ -127,13 +132,14 @@ export default {
     },
     //时间格式化
     rendDate: function(val) {
-      if(val){//兼容IOS
-        val = val.replace(/\-/g, '/');
-      }else{
-        return false
+      if (val) {
+        //兼容IOS
+        val = val.replace(/\-/g, "/");
+      } else {
+        return false;
       }
       val = new Date(val);
-      
+
       let month = val.getMonth() + 1;
       let strDate = val.getDate();
       if (month >= 1 && month <= 9) {
@@ -143,8 +149,18 @@ export default {
         strDate = "0" + strDate;
       }
 
-      val =val.getFullYear() + "-" + month+ "-" + strDate +
-      " " + val.getHours() +":" + val.getMinutes()+":" + val.getSeconds();
+      val =
+        val.getFullYear() +
+        "-" +
+        month +
+        "-" +
+        strDate +
+        " " +
+        val.getHours() +
+        ":" +
+        val.getMinutes() +
+        ":" +
+        val.getSeconds();
 
       return val;
     }
@@ -162,16 +178,12 @@ export default {
     },
     //点击左上角返回图标
     goback: function() {
-      if (this.carrying) {
-        this.carrying = false;
-      } else {
-        this.$router.push("/withdraw");
-      }
+      this.$router.push("/withdraw");
     },
-    closemodal:function(){
+    closemodal: function() {
       this.carrying = !this.carrying;
     },
-     //下拉
+    //下拉
     loadTop() {
       this.page = 1;
       this.allLoaded = false;
@@ -185,30 +197,40 @@ export default {
       this.gettxlist();
       this.$refs.widthloadmore.onBottomLoaded();
     },
-     //查询提现记录数据
+    //查询提现记录数据
     gettxlist() {
-      Indicator.open('数据加载中...');
+      Indicator.open("数据加载中...");
       let _parms = {
           userId: this.shopInfo.id,
           page: this.page,
           row: 10
         },
-        _value = "",_this = this;
+        _value = "",
+        _this = this,
+        isSuccess = false;
       for (var key in _parms) {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
+      setTimeout(() => {
+        if (!isSuccess) {
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接");
+        }
+      }, Delay);
       this.$axios.get("/api/app/tx/list?" + _value).then(res => {
+        isSuccess = true;
         Indicator.close();
         if (res.data.code == 0) {
           if (res.data.data.list && res.data.data.list.length > 0) {
             let _list = res.data.data.list;
             for (let i in _list) {
-              let _createTime= _list[i].createTime;
-              _createTime = _createTime.replace(/\-/g, '/');
-              _createTime=new Date(_createTime);
+              let _createTime = _list[i].createTime;
+              _createTime = _createTime.replace(/\-/g, "/");
+              _createTime = new Date(_createTime);
               _createTime.setTime(_createTime.getTime() + 86400 * 2 * 1000);
-              _createTime =this.formatDate(_createTime);
+              _createTime = this.formatDate(_createTime);
               _list[i].arrivalTime = _createTime;
               _list[i].accountName = _list[i].accountName.substr(
                 _list[i].accountName.length - 4,
@@ -225,7 +247,7 @@ export default {
       });
     },
     // yyyy-mm-dd hh:MM:ss
-    formatDate:function(date){
+    formatDate: function(date) {
       let month = date.getMonth() + 1;
       let strDate = date.getDate();
       if (month >= 1 && month <= 9) {
@@ -237,7 +259,18 @@ export default {
       let Hours = date.getHours();
       let Minutes = date.getMinutes();
       let Seconds = date.getSeconds();
-      let currentdate = date.getFullYear() + "-" + month + "-" + strDate+" "+Hours+":"+Minutes+":"+Seconds;
+      let currentdate =
+        date.getFullYear() +
+        "-" +
+        month +
+        "-" +
+        strDate +
+        " " +
+        Hours +
+        ":" +
+        Minutes +
+        ":" +
+        Seconds;
       return currentdate;
     }
   },
@@ -254,11 +287,11 @@ export default {
   height: 100%;
   background: #ebebeb;
   overflow: scroll;
-  .empty{
+  .empty {
     width: 50%;
     margin-top: 40%;
   }
-  
+
   .conten {
     width: 100%;
     padding-top: 80px;
@@ -290,7 +323,7 @@ export default {
       }
     }
   }
-  .mint-popup{
+  .mint-popup {
     border-radius: 30px;
   }
   .carrying {
@@ -367,7 +400,7 @@ export default {
         margin-top: 20px;
       }
     }
-    .carrtwo{
+    .carrtwo {
       margin-top: 90px;
     }
   }

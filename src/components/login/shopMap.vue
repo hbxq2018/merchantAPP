@@ -132,7 +132,7 @@
             zoomToAccuracy: true  //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
           })
           map.addControl(geolocation)
-          geolocation.getCurrentPosition()
+          // geolocation.getCurrentPosition()
           AMap.event.addListener(geolocation, 'complete', (result) => {
             // result.position.getLng();//定位成功返回的经度
             // result.position.getLat();//定位成功返回的纬度

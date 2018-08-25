@@ -12,10 +12,13 @@ import 'lib-flexible';
 import axios from 'axios';
 import GLOBAL from '../untils/config/config';
 import UTILS from '../untils/util';
+import clipper from '../static/Eleditor/clipper';
+//import './assets/util/vconsole.js';
 
- //require('./assets/util/vconsole.js');
+ Vue.config.productionTip = false
 
-
+ Vue.use(clipper);
+ 
 Vue.prototype.$axios = axios;
 Vue.prototype.$GLOBAL = GLOBAL;
 Vue.prototype.$UTILS = UTILS;

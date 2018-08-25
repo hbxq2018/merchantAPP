@@ -223,8 +223,16 @@ export default {
 .addDishes {
   background-color: #ebebeb;
   height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  .mint-header{
+    z-index: 9999;
+    position: relative;
+  }
   .addDishesBox {
-    padding-top: 80px;
+    // padding-top: 80px;
     .addPicBox {
       height: 420px;
       box-sizing: border-box;
@@ -251,7 +259,7 @@ export default {
         opacity: 0;
         position: absolute;
         left: 0;
-        top: 0;
+        top: 80px;
         z-index: 1;
       }
       .uploadPic {

@@ -27,7 +27,7 @@
 <script>
 import store from "@/vuex/store";
 import { mapState, mapMutations, mapGetters } from "vuex";
-import { Indicator } from "mint-ui";
+import { Indicator,Toast } from "mint-ui";
 export default {
   name: "annal",
   data() {
@@ -71,11 +71,19 @@ export default {
     //获取缴费记录列表数据
     amountList() {
       Indicator.open('数据加载中...');
-      let _this = this;
+      let _this = this,isSuccess = false;
+      setTimeout(() => {
+        if (!isSuccess) {
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接");
+        }
+      }, Delay);
       this.$axios
       // .get("/api/app/serviceAmount/allByShopId?shopId="+this.userInfo.id+"&&page="+this.page+"&rows=10")
         .get("/api/app/serviceAmount/allByShopId?shopId="+this.shopInfo.shopId+"&page="+this.page+"&rows=10")
         .then(res => {
+          isSuccess = true;
           Indicator.close();
           if (res.data.code == 0) {
             if (res.data.data && res.data.data.length > 0) {
@@ -84,7 +92,6 @@ export default {
                 this.list.push(_list[i]);
               }
             } else {
-              console.log('23')
               this.allLoaded = true; // 若数据已全部获取完毕
             }
           } else {

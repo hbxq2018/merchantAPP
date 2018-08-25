@@ -107,8 +107,17 @@ export default {
         this.today +
         "&endTime=" +
         this.tomorrow;
+      let isSuccess = false;
+      setTimeout(() => {
+        if(!isSuccess){
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接")
+        }
+      }, Delay);
       this.$axios.get("/api/app/shop/getByShopId?" + _val).then(res => {
         Indicator.close();
+        isSuccess = true;
         if (res.data.code == 0) {
           let data = res.data.data;
           this.totalMoney = this.changemoney(data[0].allsoAmount);

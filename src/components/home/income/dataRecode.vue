@@ -159,7 +159,7 @@ export default {
     //核销券数
     codeList() {
       Indicator.open('数据加载中...');
-      let _this = this,
+      let _this = this, isSuccess = false,
         _value =
           "shopId=" +
           this.shopId +
@@ -173,8 +173,16 @@ export default {
       if (this.skuId) {
         _value += "&skuId=" + this.skuId;
       }
+      setTimeout(() => {
+        if(!isSuccess){
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接")
+        }
+      }, Delay);
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
         Indicator.close();
+        isSuccess = true;
         if (_this.skuId == "") {
           _this.totalCodeNum = _this.subCodeNum = res.data.data.total
             ? res.data.data.total
@@ -416,7 +424,7 @@ export default {
     ExcelDown() {
       let _this = this,
         _Url =
-          "/api/app/so/soDetailExport?&shopId=" +
+         "/api/app/so/soDetailExport?&shopId=" +
           this.shopId +
           "&soStatus=2&beginTime=" +
           this.startDate +

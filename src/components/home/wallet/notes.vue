@@ -31,7 +31,7 @@
 
 <script>
 import Vue from "vue";
-import { Loadmore , Indicator } from "mint-ui";
+import { Loadmore , Indicator,Toast } from "mint-ui";
 import store from "@/vuex/store";
 import { mapState, mapMutations } from "vuex";
 Vue.component(Loadmore.name, Loadmore);
@@ -42,6 +42,7 @@ export default {
       acttop: true,
       allLoaded: false,
       page: 1,
+      mainId:'',
       operateType: 1,
       list: []
     };
@@ -108,19 +109,28 @@ export default {
     getDatelist: function() {
       Indicator.open('数据加载中...');
       let _parms = {
-          userId: this.shopInfo.id,
+          userId: this.mainId,
           operateType: this.operateType,
           page: this.page,
           type:1,
           row: 10
         },
-        _value = "";
+        _value = "",
+        isSuccess = false;
       for (var key in _parms) {
         _value += key + "=" + _parms[key] + "&";
       };
       _value = _value.substring(0, _value.length - 1);
       if(this.page == 1){this.list = [];}
+      setTimeout(() => {
+        if(!isSuccess){
+          isSuccess = false;
+          Indicator.close();
+          Toast("网络异常，请检查网络连接")
+        }
+      }, Delay);
       this.$axios.get("/api/app/account/listTrading?" + _value).then(res => {
+        isSuccess = true;
         Indicator.close();
         if (res.data.code == 0) {
           if (res.data.data.list && res.data.data.list.length > 0) {
@@ -146,7 +156,11 @@ export default {
     }
   },
   created: function() {
-    this.getDatelist();
+    if (this.$route.params.mainId) {
+      this.mainId = this.$route.params.mainId;
+      this.getDatelist();
+    }
+   
   }
 };
 </script>

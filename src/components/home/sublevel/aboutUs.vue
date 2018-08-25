@@ -121,7 +121,7 @@ export default {
             mui.ajax({
               type: "get",
               dataType: "json",
-              url: "https://www.hbxq001.cn/version.txt",
+              url:"https://www.hbxq001.cn/version.txt",
               data: {},
               contentType: "application/x-www-form-urlencoded;charset=UTF-8",
               success: function(data) {

@@ -1,26 +1,28 @@
 <template>
   <div class="dishes">
-    <mt-header :title="title">
+    <mt-header fixed :title="title">
         <router-link :to="backpath" slot="left">
             <mt-button icon="back"></mt-button>
         </router-link>
     </mt-header>
     <div class="dishesBox" :style="{'-webkit-overflow-scrolling': scrollMode}">
-			<ul v-if="list.length>0" id="dishesUl" class="dishesUl" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-				<li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(index,item.skuName,item.id,item.isSign)">
-					<img class="icon fl" :src="item.picUrl" alt="">
-					<div class="text fl">
-						<p>{{item.skuName}}</p>
-						<p>{{item.skuInfo}}</p>
-					</div>
-          <span class="issign" v-if="type == 2 && item.isSign">已报名</span>
-          <div v-if="type == 2 && !item.isSign" :class="index == ind?'dishsel actdishsel':'dishsel'">
-                    <span></span>
-                </div>
-					<div v-if="type == 1" class="arrow fr"></div>
-				</li>
-			</ul>
-      <img v-else class="empty" :src="url" alt="什么都没有">
+      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="dishmore">
+        <ul v-if="list.length>0" id="dishesUl" class="dishesUl">
+          <li class="dishes_list clearfix" v-for="(item,index) in list" :key="index" @click="toAddDishes(index,item.skuName,item.id,item.isSign)">
+            <img class="icon fl" :src="item.picUrl" alt="">
+            <div class="text fl">
+              <p>{{item.skuName}}</p>
+              <p>{{item.skuInfo}}</p>
+            </div>
+            <span class="issign" v-if="type == 2 && item.isSign">已报名</span>
+            <div v-if="type == 2 && !item.isSign" :class="index == ind?'dishsel actdishsel':'dishsel'">
+                      <span></span>
+                  </div>
+            <div v-if="type == 1" class="arrow fr"></div>
+          </li>
+        </ul>
+        <img v-else class="empty" :src="url" alt="什么都没有">
+      </mt-loadmore>
     </div>
     <div v-show="type == 1 || !type" id="dishesBottom" class="dishesBottom" @click="toAddDishes()">
         <span>+</span>
@@ -45,7 +47,7 @@ export default {
       backpath: "/manage",
       page: 1,
       ind: -1,
-      allLoaded: true,
+      allLoaded: false,
       scrollMode: "auto",
       touchStartY: 0,
       distance: 0,
@@ -81,15 +83,15 @@ export default {
             }
             Indicator.close();
             if (lists.length < 8) {
-              _this.allLoaded = false;
+              _this.allLoaded = true;
             }
           } else {
             Indicator.close();
-            _this.allLoaded = false;
+            _this.allLoaded = true;
             Toast("暂无数据");
           }
         } else {
-          _this.allLoaded = false;
+          _this.allLoaded = true;
         }
       });
     },
@@ -104,126 +106,19 @@ export default {
       }
     },
 
-
-    //获取顶部卷去高度
-    getScrollTop() {
-      var scrollTop = 0,
-        bodyScrollTop = 0,
-        documentScrollTop = 0;
-      if (document.body) {
-        bodyScrollTop = document.body.scrollTop;
-      }
-      if (document.documentElement) {
-        documentScrollTop = document.documentElement.scrollTop;
-      }
-      scrollTop =
-        bodyScrollTop - documentScrollTop > 0
-          ? bodyScrollTop
-          : documentScrollTop;
-      return scrollTop;
+    //下拉
+    loadTop() {
+      this.page = 1;
+      this.allLoaded = false;
+      this.dataList = [];
+      this.getDishList();
+      this.$refs.dishmore.onTopLoaded();
     },
-    //盒子总高度
-    getScrollHeight() {
-      var scrollHeight = 0,
-        bodyScrollHeight = 0,
-        documentScrollHeight = 0;
-      if (document.body) {
-        bodyScrollHeight = document.body.scrollHeight;
-      }
-      if (document.documentElement) {
-        documentScrollHeight = document.documentElement.scrollHeight;
-      }
-      scrollHeight =
-        bodyScrollHeight - documentScrollHeight > 0
-          ? bodyScrollHeight
-          : documentScrollHeight;
-      return scrollHeight;
-    },
-    //屏幕可视高度
-    getWindowHeight() {
-      var windowHeight = 0;
-      if (document.compatMode == "CSS1Compat") {
-        windowHeight = document.documentElement.clientHeight;
-      } else {
-        windowHeight = document.body.clientHeight;
-      }
-      return windowHeight;
-    },
-    touchStart(e) {
-      let dishesUl = document.getElementById("dishesUl");
-      let bottomH =
-        document.getElementById("dishesBottom").clientHeight * 1.727;
-      this.touchStartY = e.targetTouches[0].pageY;
-      if (this.getScrollTop() == 0 && this.flag) {
-        this.topFlag = true;
-      } else {
-        this.topFlag = false;
-      }
-      if (dishesUl.clientHeight < this.getWindowHeight() - bottomH - 5) {
-        this.allLoaded = false;
-        this.bottomFlag = false;
-      }
-      
-      if (
-        Math.abs(
-          this.getScrollHeight() - this.getScrollTop() - this.getWindowHeight()
-        ) < 5 &&
-        this.allLoaded
-      ) {
-        this.bottomFlag = true;
-      } else {
-        this.bottomFlag = false;
-      }
-    },
-    touchMove(e) {
-      let dishesUl = document.getElementById("dishesUl");
-      this.distance = Math.ceil(+e.targetTouches[0].pageY - this.touchStartY);
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        if (this.distance > 100) {
-          this.distance = 100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        if (this.distance < -100) {
-          this.distance = -100;
-        }
-        dishesUl.style.transform =
-          "translate3d(0px, " + this.distance + "px, 0px)";
-      }
-    },
-    touchEnd() {
-      let dishesUl = document.getElementById("dishesUl"),
-        _this = this;
-      if (this.distance > 0 && this.topFlag == true && this.flag) {
-        this.flag = false;
-        let index = 100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-            _this.flag = true;
-            _this.distance = 0;
-          }
-          index--;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        this.page = 1;
-        this.allLoaded = true;
-        this.getDishList();
-      }
-      if (this.distance < 0 && this.bottomFlag == true) {
-        let index = -100;
-        let timer = setInterval(function() {
-          if (index == 0) {
-            clearInterval(timer);
-          }
-          index++;
-          dishesUl.style.transform = "translate3d(0px, " + index + "px, 0px)";
-        }, 5);
-        ++this.page;
-        this.getDishList();
-      }
+    //上拉
+    loadBottom() {
+      this.page += 1;
+      this.getDishList();
+      this.$refs.dishmore.onBottomLoaded();
     }
   },
   created: function() {
@@ -246,17 +141,15 @@ export default {
 <style lang="less">
 @import url(../../../common/css/common.css);
 .dishes {
+  position: fixed;
+  width: 100%;
   height: 100%;
-  background-color: #ebebeb;
-  .mint-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-  }
+  background: #ebebeb;
+  overflow: scroll;
   .dishesBox {
+    margin-top: 80px;
     width: 100%;
-    padding: 81px 0 110px 0;
+    padding: 0 0 110px 0;
     box-sizing: border-box;
     .dishesUl {
       width: 100%;

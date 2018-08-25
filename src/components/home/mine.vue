@@ -66,10 +66,10 @@ export default {
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
             },{
                 src: require("../../../static/images/yueseaef.png"),
-                name:'店铺/收款码',
+                name:'店铺二维码',
                 id:4,
                 arrowDiagrams:require("../../../static/images/home_arrow.png"),
-            },
+            }
           ]
       }
   },
@@ -119,9 +119,11 @@ export default {
 </script>
 <style lang="less">
     .mine{
+        position: fixed;
         width: 100%;
         height: 100%;
-        background: #EBEBEB;
+        background: #ebebeb;
+        overflow: scroll;
         .mine_top{
             width: 100%;
             height: 288px;

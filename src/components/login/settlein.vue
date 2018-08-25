@@ -381,11 +381,14 @@ export default {
         Toast("请输入姓名");
         return false;
       }
-      let RegExp = /^((0\d{2,3}\d{7,8})|(1[3584]\d{9}))$/;
+      let RegExp = /^((0\d{2,3}\d{7,8})|(1[345678]\d{9}))$/;
       let Reg1 = /^(0\d{2,3}\d{7,8})$/;
-      let Reg2 = /^(1[3584]\d{9})$/;
+      let Reg2 = /^(1[345678]\d{9})$/;
       if (Reg1.test(this.phone)) {
         this.ismobile = false;
+        this.phone = '';
+        Toast('请输入一个手机号码');
+        return false;
       } else if (Reg2.test(this.phone)) {
         this.ismobile = true;
       } else {
@@ -455,13 +458,14 @@ export default {
         city: this.city,
         userId: this.id ? this.id : this.shopInfo.id,
         shopHours: shopHours,
-        otherService: otherService
+        otherService: otherService,
+        mobile: this.phone
       };
-      if (this.ismobile) {
-        _parms.mobile = this.phone;
-      } else {
-        _parms.phone = this.phone;
-      }
+      // if (this.ismobile) {
+      //   _parms.mobile = this.phone;
+      // } else {
+      //   _parms.phone = this.phone;
+      // }
       if(!this.isNull(this.LogoUrl) && this.LogoUrl != this.defaultPic) {
         _parms.logoPic = this.LogoUrl;
       }
