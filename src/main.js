@@ -13,7 +13,7 @@ import axios from 'axios';
 import GLOBAL from '../untils/config/config';
 import UTILS from '../untils/util';
 import clipper from '../static/Eleditor/clipper';
-//import './assets/util/vconsole.js';
+import './assets/util/vconsole.js';
 
  Vue.config.productionTip = false
 
