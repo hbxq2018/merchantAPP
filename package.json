@@ -5,12 +5,13 @@
   "author": "luyong <13971489895@163.com>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --host 192.168.1.109 --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "build": "node build/build.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "babel-plugin-transform-remove-strict-mode": "0.0.2",
     "babel-runtime": "^6.26.0",
     "cropperjs": "^1.4.1",
     "exif-js": "^2.3.0",

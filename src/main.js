@@ -15,9 +15,9 @@ import UTILS from '../untils/util';
 import clipper from '../static/Eleditor/clipper';
 import './assets/util/vconsole.js';
 
- Vue.config.productionTip = false
+Vue.config.productionTip = false
 
- Vue.use(clipper);
+Vue.use(clipper);
  
 Vue.prototype.$axios = axios;
 Vue.prototype.$GLOBAL = GLOBAL;

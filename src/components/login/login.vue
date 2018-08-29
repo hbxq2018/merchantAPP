@@ -103,7 +103,7 @@ export default {
       _this.timeFlag = false;
       let RegExp = /^(1[3456789]\d{9})$/;
       if (RegExp.test(this.telephone)) {
-        // this.$GLOBAL.API  <==> /api/    上线时所有替换
+        // this.$GLOBAL.API  <==> /api/    打包所有替换
         this.$axios
           .post(
             "/api/app/sms/sendForShopAppRegister?shopMobile=" + this.telephone

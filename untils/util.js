@@ -128,7 +128,7 @@ function uncodeUtf16(str) {  //反解开EMOJI编码后的字符串   与上对�
 }
 
 function timeDiffrence(current, updateTime, createTime) {      //文章发布时间  updateTime
-  let createT = '', timestamp = 0, str = '暂无';
+  var createT = '', timestamp = 0, str = '暂无';
   updateTime = updateTime ? updateTime.replace(/-/g, "/") : '';
   updateTime = updateTime ? updateTime : createTime;
   if (updateTime != null && updateTime != '') {
@@ -164,7 +164,7 @@ function isNull(value) {
 
 //时间间隔
 function dateConv(dateStr) {
-  let year = dateStr.getFullYear(),
+  var year = dateStr.getFullYear(),
     month = dateStr.getMonth() + 1,
     today = dateStr.getDate();
   month = month > 9 ? month : "0" + month;
@@ -174,7 +174,7 @@ function dateConv(dateStr) {
 
 
 
-const methods = {
+var methods = {
   calcDistance: calcDistance,
   transformLength: transformLength,
   utf16toEntities: utf16toEntities,
@@ -192,16 +192,16 @@ export function formatDate(date, fmt) {
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
-  let o = {
+  var o = {
     'M+': date.getMonth() + 1,
     'd+': date.getDate(),
     'h+': date.getHours(),
     'm+': date.getMinutes(),
     's+': date.getSeconds()
   };
-  for (let k in o) {
-    if (new RegExp(`(${k})`).test(fmt)) {
-      let str = o[k] + '';
+  for (var k in o) {
+    if (new RegExp(k).test(fmt)) {
+      var str = o[k] + '';
       fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str));
     }
   }

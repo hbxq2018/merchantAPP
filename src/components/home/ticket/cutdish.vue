@@ -213,10 +213,8 @@ export default {
     //查询在售中是否显示编辑按钮
     getisEdif(){ 
        this.$axios.get("/api/version.txt").then(res => {
-         console.log('res:',res)
         // isAppEdit   为1不显示  为0显示
         this.isEdit = res.data.isAppEdit == 0?true:false;
-        console.log('this.isEdit:',this.isEdit)
        })
     }
   },

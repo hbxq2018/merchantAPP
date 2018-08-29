@@ -227,7 +227,7 @@ export default {
       let self = this;
 
       let formdata = new FormData();
-      let _Url ="/api/app/img/uploadMp4";
+      let _Url =this.$GLOBAL.API+"app/img/uploadMp4";
       let _file = self.base64ToBlob(imageData);
       formdata.append("file", _file, loadfileName);
       formdata.append("userName", this.shopInfo.userName);

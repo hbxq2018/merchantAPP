@@ -366,7 +366,7 @@ export default {
               }
               _data.list = _data.list.slice(1, _data.list.length);
               for (let j = 0; j < _data.list.length; j++) {
-                if (/^1[345678]\d{9}$/.test(_data.list[j].userName)) {
+                if (/^1[3456789]\d{9}$/.test(_data.list[j].userName)) {
                   _data.list[j].userName =
                     _data.list[j].userName.substring(0, 3) +
                     "******" +

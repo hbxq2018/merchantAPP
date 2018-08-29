@@ -132,7 +132,8 @@
 						first = null;
 					}, 1000);
 				} else {
-					if (new Date().getTime() - first < 1000) {//如果两次按下的时间小于1s，
+					// 这里的时间兼容 要处理一下 
+					if (new Date().getTime()*1 - first*1 < 1000) {//如果两次按下的时间小于1s，
 						if (quit) {
 							plus.runtime.quit();//那么就退出app
 						}
@@ -145,7 +146,7 @@
 		function appUpdate() {//判斷是否需要更新
 			mui.plusReady(function () {
 				plus.runtime.getProperty(plus.runtime.appid, function (inf) {
-					let ver = inf.version,
+					var ver = inf.version,
 						newVer = "",apkUrl="";
 					if (ver.indexOf("v") != -1) {
 						ver = ver.replace("v", "");
