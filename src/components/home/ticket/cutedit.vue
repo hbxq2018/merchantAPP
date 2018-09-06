@@ -18,6 +18,7 @@
             <div class="form_name form_item clearfix">
                 <span class="fl">商品名称</span>
                 <input class="fr" type="text" placeholder="例:宫保鸡丁" v-model="singleData.skuName" maxlength="13">
+              <!-- <mt-field  v-model="singleData.skuName" :attr="{ maxlength: 13 }" placeholder="例:宫保鸡丁" type="text"></mt-field> -->
             </div>
             <div class="form_price">
                 <div class="form_item clearfix" @click="editDateil">
@@ -29,11 +30,13 @@
                 <div class="form_item clearfix">
                     <span class="fl">原价（元）</span>
                     <input class="fr" type="number" id="sell" placeholder="请输入原价" v-model="sellPrice" v-on:blur="sellblur()" maxlength="6">
+                    <!-- <mt-field  v-model="sellPrice" :attr="{ maxlength: 6 }" placeholder="请输入原价" type="number" id="sell" @blur.native.capture="sellblur()"></mt-field> -->
                     <p class="form_line"></p>
                 </div>
                 <div class="form_item clearfix">
                     <span class="fl">底价（元）</span>
                     <input class="fr" type="number" id="agio" placeholder="请输入底价" v-model="agioPrice" v-on:blur="agioblur()" maxlength='6'>
+                    <!-- <mt-field  v-model="agioPrice" :attr="{ maxlength: 6 }" placeholder="请输入底价" type="number" id="agio" @blur.native.capture="agioblur()"></mt-field> -->
                     <p class="form_line"></p>
                 </div>
                 <div class="form_item clearfix">
@@ -556,14 +559,18 @@ export default {
   height: 100%;
   background: #ebebeb;
   overflow: scroll;
+  .mint-field-core{
+    text-align: right!important;
+  }
   .mint-header{
     z-index: 99999;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
   }
   .editcontent {
     z-index: 100;
+    
     .addPicBox {
       height: 420px;
       box-sizing: border-box;
@@ -648,14 +655,15 @@ export default {
       span {
         color: #191919;
       }
-      input {
-        width: 60%;
-        border: 0;
-        height: 100%;
-        color: #b1b1b1;
-        text-align: right;
-        font-size: 28px;
-      }
+    
+      input{
+          width: 40%;
+          border: 0;
+          height: 100%;
+          color: #b1b1b1;
+          text-align: right;
+          font-size: 28px;
+        }
     }
     .reveal {
       color: #808080;

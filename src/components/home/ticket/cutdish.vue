@@ -237,16 +237,13 @@ export default {
 
 <style lang="less">
 .cutdish {
-  position: fixed;
+  // position: fixed;
   width: 100%;
   height: 100%;
   background: #ebebeb;
   overflow: scroll;
-  .mint-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 9999;
+  .mint-header{
+    z-index: 11;
   }
   .cutTop {
     width: 100%;

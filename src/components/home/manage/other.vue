@@ -17,6 +17,10 @@
               <div class="otherInfo_r">
                 <div class="timeTxt fl" @click="isTime(1)">{{startTime}}</div>
                 <div class="timeLine fl">~</div>
+                <div class="timeLine fl fli">
+                  <i :class='isNextDay?"":"acti"' @click="NextDay">今日</i>
+                  <i :class='isNextDay?"acti":""' @click="NextDay">次日</i>
+                </div>
                 <div class="timeTxt fl" @click="isTime(2)">{{endTime}}</div>
               </div>
           </div>
@@ -48,6 +52,7 @@ export default {
   data() {
     return {
       name: '其他信息',
+      isNextDay:false,
       slots: [
         {
           flex: 1,
@@ -111,12 +116,20 @@ export default {
   },
   methods: {
     ...mapMutations(["setuserInfo"]),
+    //点击返回
     clickback() {
-      let startArr = [], endArr = [];
+      let startArr = [], endArr = [],_start = '',_end='',_endTime='';
+      _endTime = this.endTime;
       startArr = this.startTime.split(':');
       endArr = this.endTime.split(':');
-      if(parseInt(startArr[0]) * 60 + parseInt(startArr[1]) >= parseInt(endArr[0]) * 60 + parseInt(endArr[1])){
-        Toast('开始时间不得大于结束时间');
+      _start = parseInt(startArr[0]) * 60 + parseInt(startArr[1]);
+      _end = parseInt(endArr[0]) * 60 + parseInt(endArr[1]);
+      if(this.isNextDay){
+        _end += 60*24;
+        _endTime = '次日'+_endTime;
+      }
+      if(_start >= _end){
+        Toast('开始时间不得晚于结束时间');
         return false;
       }
       let otherService = '', shopHours = '';
@@ -125,8 +138,10 @@ export default {
           otherService += this.otherArr[i].name + ',';
         }
       }
+
+      
       otherService = otherService + "/otherService";
-      shopHours = this.startWeek + '至' + this.endWeek + ',' + this.startTime + '至' + this.endTime + "/shopHours";
+      shopHours = this.startWeek + '至' + this.endWeek + ',' + this.startTime + '至' + _endTime + "/shopHours";
       this.setuserInfo(otherService);
       this.setuserInfo(shopHours);
       this.$router.push({ name: "Manage", params: {} });
@@ -138,6 +153,10 @@ export default {
     isTime(id) {
       this.selectTime = id;
       this.$refs.picker.open();
+    },
+    //是否选中次日
+    NextDay(){
+      this.isNextDay = !this.isNextDay;
     },
     //营业日的弹窗是否显示
     isWeek(e) {
@@ -180,6 +199,11 @@ export default {
       this.endWeek = shopHours[0].substring(shopHours[0].indexOf('至')+1, shopHours[0].length);
       this.startTime = shopHours[1].substring(0, shopHours[1].indexOf('至'));
       this.endTime = shopHours[1].substring(shopHours[1].indexOf('至')+1, shopHours[1].length);
+
+      if(this.endTime.indexOf('次日') !=-1){
+        this.isNextDay = true;
+        this.endTime=this.endTime.replace("次日","");
+      }
   },
   created: function() {
       
@@ -230,7 +254,7 @@ export default {
         color: #b1b1b1;
       }
       .timeTxt {
-        width: 45%;
+        width: 40%;
         height: 100%;
         line-height: 100px;
         font-size: 30px;
@@ -241,6 +265,26 @@ export default {
           line-height: 100px;
           width: 5%;
           padding-top: -50px;
+      }
+      .fli {
+          height: 100px;
+          line-height: 100px;
+          width: 15%;
+          padding-top: -50px;
+          font-size: 18px;
+          position: relative;
+          i{position: relative;}
+          i:nth-child(1){
+            top: -20px;
+            left: 30px;
+          }
+          i:nth-child(2){
+            top: 20px;
+            left: -10px;
+          }
+          .acti{
+            color: #fc5e2d;
+          }
       }
       .otherInfo_arrow {
         width: 40px;

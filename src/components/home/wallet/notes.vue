@@ -6,26 +6,27 @@
                 <mt-button icon="back"></mt-button>
             </router-link>
         </mt-header>
-        <div style="height:80px;"></div>
+
         <div class="notestop" @click="handTop">
-            <div :class="acttop?'actdiv':''">转出</div>
-            <div :class="acttop?'':'actdiv'">转入</div>
+          <div :class="acttop?'actdiv':''">转出</div>
+          <div :class="acttop?'':'actdiv'">转入</div>
         </div>
-        <!-- <div style="height:90px;"></div> -->
+
         <div :class="list.length?'conten':'conten actconten'">
-             <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="notesmore">
-                <ul v-if="list.length>0">
-                    <li class="item" v-for="(item,index) in list" :key="index" :id="index">
-                        <div class="item-one">
-                            <p class="item-p"> {{acttop?'转出':'转入'}}</p>
-                            <p class="item-t">{{item.createTime}}</p>
-                        </div>
-                        <div class="item-two">{{item.operateAmount | changemoney}}</div>
-                    </li>
-                </ul>
-                <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
-            </mt-loadmore>
+          <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="notesmore">
+            <ul v-if="list.length>0">
+                <li class="item" v-for="(item,index) in list" :key="index" :id="index">
+                  <div class="item-one">
+                      <p class="item-p"> {{acttop?'转出':'转入'}}</p>
+                      <p class="item-t">{{item.createTime}}</p>
+                  </div>
+                  <div class="item-two">{{item.operateAmount | changemoney}}</div>
+                </li>
+            </ul>
+            <img v-else class="empty" src="../../../../static/images/zhanweitu.png" alt="空空如也">
+          </mt-loadmore>
         </div>
+
     </div>
 </template>
 
@@ -167,7 +168,7 @@ export default {
 
 <style lang="less">
 .notes {
-  position: fixed;
+  // position: fixed;
   width: 100%;
   height: 100%;
   background: #ebebeb;
@@ -195,7 +196,7 @@ export default {
 
   .conten {
     width: 100%;
-    margin-top: 20px;
+    margin-top: 160px;
     background: #fff;
     .empty{
       width: 50%;

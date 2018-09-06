@@ -21,25 +21,23 @@
     </div>
     <div class="detasbj" id="detasbj"></div>
     <div class="detabox" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
-      <!-- <ul v-if="writedata.length>0" id="detasonul" class="detasonul" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"> -->
-         <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="sonmore">
-             <ul v-if="writedata.length>0">
-	        <li class="order_history" v-for="(item,index) in writedata" :key="index">
-	            <div class="order_h_sublevel">
-	                <div class="roder_left">
-	                    <!-- <b>{{item.couponAmount}}<span>元代金券</span></b> -->
-	                    <b>{{item.skuName}}</b>
-	                    <p>{{item.updateTime}}</p>
-	                </div>
-	                <div class="roder-right">
-	                    <span>&yen;{{item.servicePrice | changemoney}}</span>
-	                </div>
-	            </div>
-	        </li>
-      	     </ul>
-      	     <img v-else class="emtpy" :src="url" alt="什么都没有">
-         </mt-loadmore>
-      
+      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="sonmore">
+          <ul v-if="writedata.length>0">
+          <li class="order_history" v-for="(item,index) in writedata" :key="index">
+              <div class="order_h_sublevel">
+                  <div class="roder_left">
+                      <!-- <b>{{item.couponAmount}}<span>元代金券</span></b> -->
+                      <b>{{item.skuName}}</b>
+                      <p>{{item.updateTime}}</p>
+                  </div>
+                  <div class="roder-right">
+                      <span>&yen;{{item.servicePrice | changemoney}}</span>
+                  </div>
+              </div>
+          </li>
+          </ul>
+          <img v-else class="emtpy" :src="url" alt="什么都没有">
+      </mt-loadmore>
     </div>
   </div>
 </template>
@@ -47,43 +45,46 @@
 <script>
 import store from "@/vuex/store";
 import Vue from "vue";
-import { Loadmore ,Indicator ,Toast} from "mint-ui";
+import { Loadmore, Indicator, Toast } from "mint-ui";
 Vue.component(Loadmore.name, Loadmore);
 import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   data() {
     return {
       payment: "",
-      diff:'',
+      diff: "",
       total: "",
       first: {},
       writedata: [],
-      url: require('../../../../static/images/zhanweitu.png'),
+      url: require("../../../../static/images/zhanweitu.png"),
       ind: 1,
       page: 1,
-      service:0,
-      totalNoService:0,
-      isbill:0,
+      service: 0,
+      totalNoService: 0,
+      isbill: 0,
       allLoaded: false,
-      oDvheight:'0px',
+      oDvheight: "0px",
       scrollMode: "auto"
     };
   },
   store,
   filters: {
-    changemoney:function(val){
-      val = val*1;
-      val=val.toFixed(2);
-      let result=addCommas(val),x='', x1=0,x2=0;
-      function addCommas(nStr){
-        nStr += '';
-        x = nStr.split('.');
+    changemoney: function(val) {
+      val = val * 1;
+      val = val.toFixed(2);
+      let result = addCommas(val),
+        x = "",
+        x1 = 0,
+        x2 = 0;
+      function addCommas(nStr) {
+        nStr += "";
+        x = nStr.split(".");
         x1 = x[0];
-        x2 = x.length > 1 ? '.' + x[1] : '';
+        x2 = x.length > 1 ? "." + x[1] : "";
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        } 
+          x1 = x1.replace(rgx, "$1" + "," + "$2");
+        }
         val = x1 + x2;
         return val;
       }
@@ -98,12 +99,13 @@ export default {
   },
   methods: {
     //獲取核銷數據
-    getdata: function( type) {
-      Indicator.open('数据加载中...');
+    getdata: function(type) {
+      Indicator.open("数据加载中...");
       if (this.page == 1) {
         this.writedata = [];
       }
-      let _start = "2018/" + this.ind + "/01",isSuccess = false;
+      let _start = "2018/" + this.ind + "/01",
+        isSuccess = false;
       let _end = "";
       let _ind = this.ind * 1 + 1;
       if (_ind < 13) {
@@ -118,8 +120,8 @@ export default {
         page: this.page,
         rows: 10
       };
-      if(this.isbill ==1){
-        obj.isBill=1;
+      if (this.isbill == 1) {
+        obj.isBill = 1;
       }
       let parms = "",
         _value = "";
@@ -128,14 +130,14 @@ export default {
       }
       _value = _value.substring(0, _value.length - 1);
       setTimeout(() => {
-      if (!isSuccess) {
+        if (!isSuccess) {
           isSuccess = false;
           Indicator.close();
           Toast("网络异常，请检查网络连接");
         }
       }, Delay);
       this.$axios.get("/api/app/hx/list?" + _value).then(res => {
-        isSuccess= true;
+        isSuccess = true;
         Indicator.close();
         if (res.data.code == 0) {
           this.total = res.data.data.total;
@@ -184,8 +186,8 @@ export default {
     this.isbill = this.$route.params.isBill;
     this.money = this.$route.params.money;
     this.totalNoService = this.$route.params.totalNoService;
-    this.service=(this.money*1-this.totalNoService*1).toFixed(2);
-    this.diff = (this.money*1-this.service*1).toFixed(2);
+    this.service = (this.money * 1 - this.totalNoService * 1).toFixed(2);
+    this.diff = (this.money * 1 - this.service * 1).toFixed(2);
     this.getdata(this.pag);
   }
 };
@@ -204,13 +206,15 @@ export default {
     text-align: center;
     font-size: 35px;
     background: #fff;
-    p{margin: 16px 0;}
-    p:nth-child(1){
-      color: #FC5E2D;
+    p {
+      margin: 16px 0;
+    }
+    p:nth-child(1) {
+      color: #fc5e2d;
       font-size: 40px;
       margin-top: 40px;
     }
-    p:nth-child(2){
+    p:nth-child(2) {
       color: #191919;
       font-size: 30px;
     }
@@ -220,17 +224,19 @@ export default {
     height: 224px;
     background: #fff;
     padding-top: 80px;
-    p{margin: 20px 0;}
-    p:nth-child(1){
+    p {
+      margin: 20px 0;
+    }
+    p:nth-child(1) {
       color: #191919;
       font-size: 30px;
     }
-    p:nth-child(2){
+    p:nth-child(2) {
       color: #191919;
       font-size: 56px;
     }
-    p:nth-child(3){
-      color:#FC5E2D;
+    p:nth-child(3) {
+      color: #fc5e2d;
       font-size: 24px;
     }
   }
@@ -240,11 +246,11 @@ export default {
     z-index: 99999;
     position: fixed;
   }
-  .detasbj{
+  .detasbj {
     width: 100%;
     height: 412px;
   }
-  .songe{
+  .songe {
     width: 100%;
     height: 420px;
   }
@@ -262,13 +268,13 @@ export default {
   .detabox {
     width: 100%;
     .detasonul:before {
-        content: "加载中..";
-        position: absolute;
-        left: 0;
-        top: -50px;
-        height: 20px;
-        width: 100%;
-      }
+      content: "加载中..";
+      position: absolute;
+      left: 0;
+      top: -50px;
+      height: 20px;
+      width: 100%;
+    }
   }
   .order_history {
     background: #fff;

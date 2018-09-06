@@ -1,6 +1,6 @@
 <template>
   <div class="manage">
-      <mt-header :title="name">
+      <mt-header fixed :title="name">
         <mt-button slot="left" icon="back" @click="clickback"></mt-button>
         <mt-button slot="right" @click="save">保存</mt-button>
       </mt-header> 
@@ -511,6 +511,11 @@ export default {
 @import "mint-ui/lib/style.css";
 @import url(../../../common/css/common.css);
 .manage {
+  // position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #EBEBEB;
+    overflow: scroll;
   .mint-header {
     position: fixed;
     top: 0;

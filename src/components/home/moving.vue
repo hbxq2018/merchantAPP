@@ -1,9 +1,9 @@
 <template>
     <div class="moving">
         <mt-header fixed class="movheader">
-          <mt-button :class="isheader==1?'headerbut headerbut_active':'headerbut'" slot="right" @click="handHeader(1)">全部</mt-button>
-          <mt-button :class="isheader==2?'headerbut headerbut_active':'headerbut'" slot="right" @click="handHeader(2)">视频</mt-button>
-          <mt-button :class="isheader==3?'headerbut headerbut_active':'headerbut'" slot="right" @click="handHeader(3)">文章</mt-button>
+          <mt-button :class="isheader==1?'headerbut headerbut_active':'headerbut'" slot="left" @click="handHeader(1)">全部</mt-button>
+          <mt-button :class="isheader==2?'headerbut headerbut_active':'headerbut'" slot="left" @click="handHeader(2)">视频</mt-button>
+          <mt-button :class="isheader==3?'headerbut headerbut_active':'headerbut'" slot="left" @click="handHeader(3)">文章</mt-button> 
           <span slot="right" @click="handadd"><img class="addact" :src="addImg" alt="添加动态"></span>
         </mt-header>
 
@@ -135,7 +135,7 @@ export default {
             if (res.data.code == "0") {
               Toast("删除成功！");
               this.page = 1;
-              this.getlist();
+              this.loadTop();
             }
           });
         }
@@ -293,7 +293,7 @@ export default {
   .modalPopup {
     position: absolute;
     top: -580px;
-    right: -350px;
+    right: -750px;
     width: 162px;
     height: 191px;
     background: rgba(255, 255, 255, 1);

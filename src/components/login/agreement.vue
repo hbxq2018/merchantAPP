@@ -1,6 +1,6 @@
 <template>
     <div class="agreement">
-        <mt-header title="商家服务协议">
+        <mt-header fixed title="商家服务协议">
             <router-link to="/settlein" slot="left">
                 <mt-button icon="back"></mt-button>
             </router-link>
@@ -96,7 +96,7 @@ export default {
   letter-spacing: 4px;
   text-align: left;
   .agreement_content {
-    margin: 30px 0 30px 0;
+    margin: 120px 0 30px 0;
     padding: 0 18px 0 28px;
     p {
         text-indent: 2em;

@@ -196,7 +196,7 @@ export default {
       padding-left: 55px;
       float: left;
       & > .conli {
-        width: 300px;
+        width: 43%;
         height: 300px;
         padding: 0;
         margin: 0;
@@ -250,7 +250,7 @@ export default {
     }
   }
   .activity {
-    width: 632px;
+    width: 85%;
     height: 160px;
     box-shadow: 0px 0px 14px rgba(36, 36, 36, 0.28);
     border-radius: 30px;

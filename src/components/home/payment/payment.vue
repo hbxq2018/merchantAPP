@@ -1,32 +1,36 @@
 <template>
     <div class="payment">
-        <mt-header fixed title="缴服务费">
-          <router-link slot="left" :to="{path:'home',query:{'ind':2}}">
-            <mt-button icon="back"></mt-button>
-          </router-link>
-        </mt-header>
+        <div class="payTop">
+          <mt-header fixed title="缴服务费">
+            <router-link slot="left" :to="{path:'home',query:{'ind':2}}">
+              <mt-button icon="back"></mt-button>
+            </router-link>
+          </mt-header>
 
-        <div class="pay-top">
-            <p class="top-one">应缴服务费（元）</p>
-            <p class="top-two">{{money | changemoney}}</p>
-            <mt-button class="topPay" @click.native="handPayment" type="primary">立即交费</mt-button>
-            <p class="top-three">
-                <span @click="handRecord">缴费记录</span>
-                <span>|</span>
-                <span @click="handBill">月份账单</span>
-            </p>
+          <div class="pay-top">
+              <p class="top-one">应缴服务费（元）</p>
+              <p class="top-two">{{money | changemoney}}</p>
+              <mt-button class="topPay" @click.native="handPayment" type="primary">立即交费</mt-button>
+              <p class="top-three">
+                  <span @click="handRecord">缴费记录</span>
+                  <span>|</span>
+                  <span @click="handBill">月份账单</span>
+              </p>
+          </div>
+
+          <div class="pay-date">
+              <div class="date-left">
+                  <p class="date-pone">{{beginTime | changetime}}至{{endTime | changetime}}</p>
+                  <p class="data-ptwo">服务费{{total}}笔，共{{money | changemoney}}元</p>
+              </div>
+              <div class="date-right" @click="handdate">
+                  <img class="sel-date" src="../../../../static/images/calendar.png" alt="选择时间">
+                  <p class="data-pthree">自定义查询</p>
+              </div>
+          </div>
         </div>
-        <div class="pay-date">
-            <div class="date-left">
-                <p class="date-pone">{{beginTime | changetime}}至{{endTime | changetime}}</p>
-                <p class="data-ptwo">服务费{{total}}笔，共{{money | changemoney}}元</p>
-            </div>
-            <div class="date-right" @click="handdate">
-                <img class="sel-date" src="../../../../static/images/calendar.png" alt="选择时间">
-                <p class="data-pthree">自定义查询</p>
-            </div>
-        </div>
-        <div :class="lists.length?'pay-cont':'pay-cont actpay-cont'">
+        <div class="paybj"></div>
+        <div :class="lists.length?'pay-cont':'pay-cont actpay-cont'" :style="{'-webkit-overflow-scrolling': scrollMode,height:oDvheight}">
           <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="payment">
             <ul v-if="lists.length>0">
               <li class="item" v-for="(item,index) in lists" :key='index' :id='index'>
@@ -59,7 +63,9 @@ export default {
       _endTime: "",
       page: 1,
       allLoaded: false,
-      lists: []
+      lists: [],
+      oDvheight: "0px",
+      scrollMode: "auto"
     };
   },
   filters: {
@@ -327,6 +333,10 @@ export default {
     }
   },
   created() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
+      this.scrollMode = "touch";
+    }
     this.getBeginTime();
   }
 };
@@ -334,20 +344,21 @@ export default {
 
 <style lang="less">
 .payment {
-  position: fixed;
   width: 100%;
   height: 100%;
   background: #ebebeb;
   overflow: scroll;
-  .mint-header,
-  .pay-top,
-  .pay-date {
+  .payTop{
+    width: 100%;
+    height: 637px;
     position: fixed;
-    z-index: 100;
+    z-index: 1000;
   }
-  .mint-header {
-    z-index: 101;
+  .paybj{
+    width: 100%;
+    height: 637px;
   }
+
   .pay-top {
     padding-top: 80px;
     width: 100%;
@@ -427,20 +438,16 @@ export default {
     }
   }
   .pay-cont {
-    width: 672px;
-    padding: 0 39px;
-    position: relative;
-    top: 637px;
-    z-index: 50;
     background: #fff;
     .empty {
       width: 50%;
       margin-top: 20%;
     }
     .item {
-      width: 100%;
+      width: 672px;
       height: 90px;
-      padding: 15px 0;
+      padding: 15px 39px;
+      background: #fff;
       .item-left {
         width: 70%;
         height: 100%;

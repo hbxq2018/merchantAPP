@@ -18,6 +18,7 @@
     </div>
   </div>
 </template>
+
 <script>
   import { Toast , Picker} from 'mint-ui'
   import AMap from 'AMap'
@@ -43,6 +44,7 @@
         oDivWidth:'100%',
         oDivHeight:'400',
         goback:'settlein',
+        isfirst:true,
         ispro:false,
         myAddressSlots: [
           {
@@ -100,24 +102,25 @@
             this.obj.address=_arr[3];
           }
         }
-        
+        console.log('obj:',_this.obj);
         
         // 地图初始化
         let maparr =[],_maplng='',_maplat='';
-        _maplng = _this.obj.lng?_this.obj.lng:'114.367237';
-        _maplat = _this.obj.lat?_this.obj.lat:'30.571349';
+        _maplng = _this.obj.lng?_this.obj.lng:'110.786101';
+        _maplat = _this.obj.lat?_this.obj.lat:'32.652465';
+
         maparr.push(_maplng);
         maparr.push(_maplat);
         map = new AMap.Map('container', {
           center: maparr,
           resizeEnable: true,
-          zoom: 10
-        })
+          zoom: 15
+        });
         var marker = new AMap.Marker({
-            position: map.getCenter(),
-            draggable: true,
-            cursor: 'move',
-            raiseOnDrag: true
+          position: map.getCenter(),
+          draggable: true,
+          cursor: 'move',
+          raiseOnDrag: true
         });
         marker.setMap(map);
         map.plugin(['AMap.ToolBar', 'AMap.Scale','AMap.Marker'], function () {
@@ -129,22 +132,30 @@
           let geolocation = new AMap.Geolocation({
             timeout: 10000, //  超过10秒后停止定位，默认：无穷大
             // maximumAge: 0, // 定位结果缓存0毫秒，默认：0
+            showCircle: false,     //定位成功后用圆圈表示定位精度范围，默认：true  （去掉圆形区域）
             zoomToAccuracy: true  //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-          })
-          map.addControl(geolocation)
-          // geolocation.getCurrentPosition()
+          });
+          map.addControl(geolocation);  //左下角定位图标
+          if(!_this.obj.City){
+            console.log('getCurrentPosition');
+            geolocation.getCurrentPosition(); //自动定位当前位置
+          }
+
           AMap.event.addListener(geolocation, 'complete', (result) => {
             // result.position.getLng();//定位成功返回的经度
             // result.position.getLat();//定位成功返回的纬度
             let arr =[],_lng='',_lat='';
-            _lng = _this.obj.lng?_this.obj.lng:result.position.getLng();
-            _lat = _this.obj.lat?_this.obj.lat:result.position.getLat();
+            // _lng = _this.obj.lng?_this.obj.lng:result.position.getLng();
+            // _lat = _this.obj.lat?_this.obj.lat:result.position.getLat();
+
+            _lng = result.position.getLng()?result.position.getLng():_this.obj.lng;
+            _lat = result.position.getLat()?result.position.getLat():_this.obj.lat;
             arr.push(_lng);
             arr.push(_lat);
-             if (marker) {
-                marker.setMap(null);
-                marker = null;
-            }
+            if (marker) {
+              marker.setMap(null);
+              marker = null;
+            };
             map.setZoomAndCenter(14, arr);
             marker = new AMap.Marker({
               position:arr,
@@ -155,25 +166,26 @@
             marker.setMap(map);
           })  //  返回定位信息
           AMap.event.addListener(geolocation, 'error', (result) => {
-            console.log(result)
+            console.log('error:',result)
           })  //  返回定位出错信息
-        })
-        AMap.event.addListener(map, 'click', (result) => {
-            _this.obj.lng = result.lnglat.lng;
-            _this.obj.lat = result.lnglat.lat;
+        });
 
-            let arr =[];
-            arr.push(_this.obj.lng )
-            arr.push(_this.obj.lat)
-             if (marker) {
-                marker.setMap(null);
-                marker = null;
-            }
-            marker = new AMap.Marker({
-              position:arr,
-              draggable: true,
-              cursor: 'move',
-              raiseOnDrag: true
+        AMap.event.addListener(map, 'click', (result) => {
+          _this.obj.lng = result.lnglat.lng;
+          _this.obj.lat = result.lnglat.lat;
+
+          let arr =[];
+          arr.push(_this.obj.lng )
+          arr.push(_this.obj.lat)
+            if (marker) {
+              marker.setMap(null);
+              marker = null;
+          }
+          marker = new AMap.Marker({
+            position:arr,
+            draggable: true,
+            cursor: 'move',
+            raiseOnDrag: true
           });
           marker.setMap(map);
         });
@@ -244,6 +256,7 @@
     }
   }
 </script>
+
 <style lang="less">
 @import "mint-ui/lib/style.css";
 @import url(../../common/css/common.css);

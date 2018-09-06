@@ -1,7 +1,7 @@
 <template>
   <div class="dataRecode" :class="isSelected ? '' : 'active'">
     <div class="daily_header">
-      <mt-header fixed title="数据记录" class="header_inner">
+      <mt-header fixed title="数据记录">
           <router-link :to="toBackup" slot="left">
               <mt-button icon="back"></mt-button>
           </router-link>
@@ -489,10 +489,11 @@ export default {
 
 <style lang="less">
 .dataRecode {
-  position: fixed;
-  background-color: #ebebeb;
+  // position: fixed;
+  background: #ebebeb;
   box-sizing: border-box;
   height: 100%;
+  overflow: scroll;
   &.active {
     overflow: scroll;
   }
@@ -504,9 +505,6 @@ export default {
     height: 80px;
     z-index: 1000;
     background-color: #fc5e2d;
-    .header_inner {
-      height: 80px;
-    }
   }
   .daily_content {
     padding-top: 80px;

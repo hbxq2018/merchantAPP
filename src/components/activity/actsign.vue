@@ -9,9 +9,15 @@
         <div class="signcell">
             <!-- <mt-cell title="标题文字" icon="more" value="带 icon"></mt-cell> -->
             <mt-cell title="招牌菜" is-link :value="fascia" :to="{path:'/dishes',query:{type:2}}"></mt-cell>
-            <mt-cell title="原价" :value="Original"><input type="number" :placeholder="Original" v-on:blur="changeOriginal" v-model="Original"></mt-cell>
-            <mt-cell title="活动价" :value="Activity"><input type="number" :placeholder="Activity" v-on:blur="changeActivity" v-model="Activity"></mt-cell>
-            <mt-cell title="平台售价" :value="platform"></mt-cell>
+            <mt-cell title="原价" :value="Original">
+              <!-- <input type="number" :placeholder="Original" v-on:blur="changeOriginal" v-model="Original"> -->
+              <mt-field type="number" placeholder="请输入原价(元)" @blur.native.capture="changeOriginal" v-model="Original"></mt-field>
+            </mt-cell>
+            <mt-cell title="活动价" :value="Activity">
+              <!-- <input type="number" :placeholder="Activity" v-on:blur="changeActivity" v-model="Activity"> -->
+              <mt-field type="number" placeholder="请输入活动价(元)" @blur.native.capture="changeActivity" v-model="Activity"></mt-field>
+            </mt-cell>
+            <mt-cell title="平台售价" placeholder="享7平台价格" :value="platform"></mt-cell>
         </div>
         <div class="directions">
             <div class="direleft">例：</div>
@@ -36,8 +42,8 @@ export default {
       len: "",
       isfirst:true,
       fascia: "选择招牌菜",
-      Original: "请输入原价(元)",
-      Activity: "请输入活动价(元)",
+      Original: "",
+      Activity: "",
       platform: "享7平台价格",
       today:''
     };

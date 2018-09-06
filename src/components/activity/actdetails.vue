@@ -220,7 +220,6 @@ export default {
   }
   .introduction {
     text-indent: 2em;
-    padding: 20px 0;
     width: 694px;
     min-height: 100px;
     padding: 28px;

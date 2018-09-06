@@ -114,7 +114,7 @@ export default {
     getbycode: function(val) {
       console.log("getbycode:");
       this.$axios
-        .get(this.$GLOBAL.API + "app/cp/getByCode/" + val)
+        .get("/api/app/cp/getByCode/" + val)
         .then(res => {
           let data = res.data;
           console.log("getbycode_res:", res);

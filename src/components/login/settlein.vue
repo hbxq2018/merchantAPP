@@ -92,20 +92,28 @@
           <span class="otherInfo_arrow fr"></span>
         </div>
       </div>
-      <div class="otherInfo clearfix">
-        <div class="otherInfo_l">营业时段</div>
-        <div class="otherInfo_r">
-          <span class="timeTxt" @click="isTime(1)">{{startTime}}</span>
-          <span class="timeLine">~</span>
-          <span class="timeTxt" @click="isTime(2)">{{endTime}}</span>
-        </div>
-      </div>
+
       <div class="otherInfo clearfix">
         <div class="otherInfo_l">其他服务</div>
         <div class="otherInfo_r">
           <div v-for="(item,index) in otherArr" :key='index' class="other_item" :class="item.flag?'active':''" @click="setting(index)">{{item.name}}</div>
         </div>
       </div>
+
+      <div class="otherInfo clearfix">
+        <div class="otherInfo_l">营业时段</div>
+        <div class="otherInfo_r">
+          <span class="timeTxt" @click="isTime(1)">{{startTime}}</span>
+          <span class="timeLine">~
+            <i :class='isNextDay?"":"acti"' @click="NextDay">今日</i>
+            <i :class='isNextDay?"acti":""' @click="NextDay">次日</i></span>
+          <!-- <span class="timeLine">~</span> -->
+          <span class="timeTxt" @click="isTime(2)">{{endTime}}</span>
+        </div>
+      </div>
+
+      <!-- <mt-button>添加营业时间段</mt-button> -->
+
     </div>
     <div class="submitBox">
       <div class="agreement">
@@ -117,7 +125,7 @@
       <div class="submit_btn" @click="submitForm">
         <mt-button type="default">提交申请</mt-button>
       </div>
-      <p>入驻过程如有问题可拨打400-100-111</p>
+      <p>入驻过程如有问题可拨打<a href="tel:027-59728176">027-59728176</a></p>
     </div>
     <div class="weekBox" v-if="weekFlag">
       <mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
@@ -178,6 +186,7 @@ export default {
       userName: "",
       phone: "",
       ismobile: true, //联系方式是否是手机号
+      isNextDay:false,
       shopName: "",
       address: "定位选择详细地址",
       isSeleAdd: false, //是否选择地址
@@ -260,8 +269,8 @@ export default {
       this.setdata();
       this.$router.push({ path: "shopMap", query: { ind: "1" } });
     },
+    //上传图片
     getFile: function(e) {
-      //上传图片
       let _this = this,
         inputDOM = {};
       if (e == 1) {
@@ -324,8 +333,8 @@ export default {
           Toast("系统繁忙请稍后再试");
         });
     },
+    //图片预览
     imgPreview(file) {
-      //图片预览
       let _this = this;
       // 看支持不支持FileReader
       if (!file || !window.FileReader) return;
@@ -349,102 +358,118 @@ export default {
     allFlag() {
       this.weekFlag = false;
     },
-    onValuesChange(picker, values) {   //获取营业日的值
+    //获取营业日的值
+    onValuesChange(picker, values) {   
       if (values[0] > values[1]) {
         picker.setSlotValue(1, values[0]);
       }
       this.weekTxt = values[0] + '至' + values[1]
     },
-    isWeek(e) {     //营业日的弹窗是否显示
+    //营业日的弹窗是否显示
+    isWeek(e) {     
       e.stopPropagation();
       this.weekFlag = !this.weekFlag;
     },
-    handleConfirm (time) {    //获取营业时段的值
+    //获取营业时段的值
+    handleConfirm (time) {    
       if(this.selectTime == 1) {
         this.startTime = time;
       } else if(this.selectTime == 2) {
         this.endTime = time;
       }
     },
-    isTime(id) {     //营业时段的弹窗是否显示
+    //营业时段的弹窗是否显示
+    isTime(id) {     
       this.selectTime = id;
       this.$refs.picker.open();
     },
-    setting(idx) {    //设置其他服务
+    //是否选中次日
+    NextDay(){
+      this.isNextDay = !this.isNextDay;
+    },
+     //设置其他服务
+    setting(idx) {   
       this.otherArr[idx].flag = !this.otherArr[idx].flag;
     },
     //提交表单
     submitForm() {
-      console.log('shopInfo:',this.shopInfo)
       let _this = this;
       if (this.isNull(this.userName)) {
         Toast("请输入姓名");
-        return false;
+        return;
       }
-      let RegExp = /^((0\d{2,3}\d{7,8})|(1[345678]\d{9}))$/;
+      let RegExp = /^((0\d{2,3}\d{7,8})|(1[3456789]\d{9}))$/;
       let Reg1 = /^(0\d{2,3}\d{7,8})$/;
-      let Reg2 = /^(1[345678]\d{9})$/;
+      let Reg2 = /^(1[3456789]\d{9})$/;
       if (Reg1.test(this.phone)) {
         this.ismobile = false;
         this.phone = '';
         Toast('请输入一个手机号码');
-        return false;
+        return;
       } else if (Reg2.test(this.phone)) {
         this.ismobile = true;
       } else {
         Toast("请输入联系方式");
-        return false;
+        return;
       }
       if (this.isNull(this.shopName)) {
         Toast("请输入店铺名称");
-        return false;
+        return;
       }
       if (this.isNull(this.address) || this.address == "定位选择详细地址") {
         Toast("请输入详细地址");
-        return false;
+        return;
       }
       if (this.isNull(this.categoryTxt) || this.categoryTxt == "选择经营品类") {
         Toast("请输入经营品类");
-        return false;
+        return;
       }
       if (this.isNull(this.milieuTxt) || this.milieuTxt == "选择环境分类") {
         Toast("请输入环境分类");
-        return false;
+        return;
       }
       if (this.isNull(this.licenseUrl) || this.licenseUrl == this.defaultPic) {
         Toast("请上传营业执照");
-        return false;
+        return;
       }
       if (this.isNull(this.healthUrl) || this.healthUrl == this.defaultPic) {
         Toast("请上传卫生许可证");
-        return false;
+        return;
       }
       if (this.isNull(this.ShopPhotoUrl) || this.ShopPhotoUrl == this.defaultPic) {
         Toast("请上传门头照");
-        return false;
+        return;
       }
       if(this.weekTxt == '请设置营业日') {
         Toast("请设置营业日");
-        return false;
+        return;
       }
       if(this.startTime == '开始时间' || this.endTime == '结束时间') {
         Toast("请设置营业时间");
-        return false;
+        return;
       }
-      let startArr = [], endArr = [];
+      let startArr = [], endArr = [],_start = '',_end='',_endTime='';
+      _endTime = this.endTime;
       startArr = this.startTime.split(':');
       endArr = this.endTime.split(':');
-      if(parseInt(startArr[0]) * 60 + parseInt(startArr[1]) >= parseInt(endArr[0]) * 60 + parseInt(endArr[1])){
-        Toast('开始时间不得大于结束时间');
-        return false;
+      _start = parseInt(startArr[0]) * 60 + parseInt(startArr[1]);
+      _end = parseInt(endArr[0]) * 60 + parseInt(endArr[1]);
+      if(this.isNextDay){
+        _end += 60*24;
+        _endTime = '次日'+_endTime;
+      }
+      if(_start >= _end){
+        Toast('开始时间不得晚于结束时间');
+        return;
       }
       let otherService = '', shopHours = '';
-      shopHours = this.weekTxt + ',' + this.startTime + '至' + this.endTime
+      shopHours = this.weekTxt + ',' + this.startTime + '至' + _endTime;
       for(let i = 0; i < this.otherArr.length; i++) {
         if(this.otherArr[i].flag) {
           otherService += this.otherArr[i].name + ','
         }
       }
+  
       let _parms = {
         userName: this.userName,
         shopName: this.shopName,
@@ -487,6 +512,7 @@ export default {
           Toast("系统繁忙请稍后再试");
         });
     },
+    //判断是否为空
     isNull(value) {
       let flag = false;
       if (
@@ -751,11 +777,30 @@ export default {
         }
         .timeTxt {
           display: inline-block;
-          width: 45%;
+          width: 35%;
           height: 100%;
           font-size: 30px;
           color: #b1b1b1;
+          margin-left: 20px;
         }
+        .timeLine{
+          position: relative;
+          font-size: 18px;
+          i:nth-child(1){
+            position: relative;
+            top: -20px;
+            right: -40px;
+          }
+          i:nth-child(2){
+            position: relative;
+            top: 20px;
+            right: 0px;
+          }
+          .acti{
+            color: #fc5e2d;
+          }
+        }
+        
         .otherInfo_arrow {
           width: 40px;
           height: 40px;

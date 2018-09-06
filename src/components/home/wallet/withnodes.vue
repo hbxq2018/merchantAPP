@@ -291,7 +291,10 @@ export default {
     width: 50%;
     margin-top: 40%;
   }
-
+  .mint-popup{
+    left: 20px;
+    top: 400px;
+  }
   .conten {
     width: 100%;
     padding-top: 80px;

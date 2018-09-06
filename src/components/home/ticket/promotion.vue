@@ -36,7 +36,7 @@ export default {
               href: '/ticket'
           },
           {
-              url: require('../../../../static/images/ticket.png'),
+              url: require('../../../../static/images/kjpc-icon.png'),
               name: '砍价拼菜',
               info: '上传爆款菜品，引导趣味消费',
               href: '/cutdish'

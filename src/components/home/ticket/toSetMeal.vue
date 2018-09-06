@@ -15,21 +15,27 @@
             <img class="uploadPic" :src="picUrl" alt="" v-if="picUrl">
             <input type="file" ref="foodsPic" @change="getFile">
         </div>
+
         <div class="form_name form_item clearfix">
             <span class="fl">套餐名称</span>
-            <input class="fr" type="text" placeholder="例:双人餐" v-model="skuName" maxlength="13">
+            <mt-field  v-model="skuName" :attr="{ maxlength: 13 }" placeholder="例:双人餐" type="text" ></mt-field>
+            <!-- <input class="fr" type="text" placeholder="例:双人餐" v-model="skuName" maxlength="13"> -->
         </div>
+
         <div class="form_price">
             <div class="form_item clearfix">
                 <span class="fl">原价</span>
-                <input class="fr" type="number" placeholder="请输入原价（元）" v-model="sellPrice" maxlength="13">
+                <!-- <input class="fr" type="number" placeholder="请输入原价（元）" v-model="sellPrice" maxlength="13"> -->
+                <mt-field  v-model="sellPrice" :attr="{ maxlength: 13 }" placeholder="请输入原价（元）" type="number" ></mt-field>
                 <p class="form_line"></p>
             </div>
             <div class="form_item clearfix">
                 <span class="fl">优惠价</span>
-                <input class="fr" type="number" placeholder="请输入优惠价格（元）" v-model="agioPrice" maxlength="13">
+                <!-- <input class="fr" type="number" placeholder="请输入优惠价格（元）" v-model="agioPrice" maxlength="13"> -->
+                <mt-field  v-model="agioPrice" :attr="{ maxlength: 13 }" placeholder="请输入优惠价格（元）" type="number" ></mt-field>
             </div>
         </div>
+
         <div class="form_other">
             <p class="form_item_tit">主菜</p>
             <div class="form_inner">
@@ -37,10 +43,12 @@
                     <div class="form_item clearfix">
                         <span class="fl">菜品名称</span>
                         <input class="fr" type="text" placeholder="例如：麻婆豆腐(1份)" v-model="item.dish" maxlength="13">
+                        <!-- <mt-field  v-model="item.dish" :attr="{ maxlength: 13 }" placeholder="例如：麻婆豆腐(1份)" type="text" ></mt-field> -->
                     </div>
                     <div class="form_item clearfix">
                         <span class="fl">价格</span>
                         <input class="fr" type="number" placeholder="请输入原价" v-model="item.price" maxlength="13">
+                        <!-- <mt-field  v-model="item.price" :attr="{ maxlength: 13 }" placeholder="请输入原价" type="number" ></mt-field> -->
                     </div>
                 </div>
             </div>
@@ -55,6 +63,7 @@
                 </div>
             </div>
         </div>
+
         <div class="form_other">
             <p class="form_item_tit">其他(选填)</p>
             <div class="form_inner">
@@ -62,10 +71,12 @@
                     <div class="form_item clearfix">
                         <span class="fl">菜品名称</span>
                         <input class="fr" type="text" placeholder="例如：饮料、凉菜(1份)" v-model="item.dish" maxlength="13">
+                        <!-- <mt-field type="text" placeholder="例如：饮料、凉菜(1份)" v-model="item.dish" :attr="{ maxlength: 13 }"></mt-field> -->
                     </div>
                     <div class="form_item clearfix">
                         <span class="fl">价格</span>
                         <input class="fr" type="number" placeholder="请输入原价" v-model="item.price" maxlength="13">
+                        <!-- <mt-field type="number" placeholder="请输入原价" v-model="item.price" :attr="{ maxlength: 13 }"></mt-field> -->
                     </div>
                 </div>
             </div>
@@ -80,6 +91,7 @@
                 </div>
             </div>
         </div>
+
         <div class="form_other">
             <p class="form_item_tit">备注(选填)</p>
             <div class="form_inner">
@@ -87,6 +99,7 @@
                     <div class="form_item remark clearfix">
                         <span class="fl">备注名称</span>
                         <input class="fr" type="text" placeholder="例如：免费提供餐巾纸" v-model="item.dish" maxlength="50">
+                        <!-- <mt-field type="text" placeholder="例如：免费提供餐巾纸" v-model="item.dish" :attr="{ maxlength: 50 }"></mt-field> -->
                     </div>
                 </div>
             </div>
@@ -343,11 +356,14 @@ export default {
   }
 };
 </script>
+
 <style lang="less">
 @import url(../../../common/css/common.css);
 .toSetMeal {
-  background-color: #ebebeb;
+  width: 100%;
   height: 100%;
+  background: #ebebeb;
+  overflow: scroll;
   .mint-header{
     z-index: 9999;
   }
@@ -383,7 +399,7 @@ export default {
         z-index: 100;
       }
       .uploadPic {
-        max-width: 750px;
+        max-width: 100%;
         background-color: #fff;
         background-repeat: no-repeat;  
         background-size: 100% 100%; 
@@ -425,7 +441,7 @@ export default {
         color: #191919;
       }
       input {
-        width: 70%;
+        width: 40%;
         border: 0;
         height: 100%;
         color: #b1b1b1;
