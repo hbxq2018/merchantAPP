@@ -225,7 +225,9 @@ export default {
     //图片上传
     Vue.prototype.postImg = function (imageData) {
       let self = this;
-
+      let timestamp = new Date().getTime();
+      let _arr = loadfileName.split('.');
+      loadfileName = _arr[_arr.length-2]+timestamp+'.'+_arr[_arr.length-1];
       let formdata = new FormData();
       let _Url ="/api/app/img/uploadMp4";
       let _file = self.base64ToBlob(imageData);

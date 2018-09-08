@@ -102,7 +102,6 @@
             this.obj.address=_arr[3];
           }
         }
-        console.log('obj:',_this.obj);
         
         // 地图初始化
         let maparr =[],_maplng='',_maplat='';
@@ -190,7 +189,7 @@
           marker.setMap(map);
         });
       },
-       //屏幕可视高度
+      //屏幕可视高度
       getWindowHeight() {
         var windowHeight = 0;
         if (document.compatMode == "CSS1Compat") {
@@ -205,7 +204,11 @@
           picker.setSlotValues(1,Object.keys(myaddress[values[0]])); // Object.keys()会返回一个数组，当前省的数组
           picker.setSlotValues(2,myaddress[values[0]][values[1]]); // 区/县数据就是一个数组
           this.obj.Province = values[0];
-          this.obj.City = values[1];
+          if(values[1] == '市辖区'){  //针对四个直辖市处理
+            this.obj.City = values[0];
+          }else{
+            this.obj.City = values[1];
+          }
           this.obj.county = values[2];
         }
       },

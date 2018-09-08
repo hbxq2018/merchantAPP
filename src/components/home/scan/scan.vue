@@ -34,35 +34,38 @@ export default {
       codeUrl: "",
       codenum: "",
       addre: "...载入中...",
-      isCamera:false,
+      // isCamera:false,
       usedis: true
     };
   },
   created:{},
   mounted: function() {
     const ua = navigator.userAgent.toLowerCase();
+    this.startRecognize();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       //查询ios下是否授权调用相机
       let AVCaptureDevice = plus.ios.importClass("AVCaptureDevice");
+      console.log('AVCaptureDevice:',AVCaptureDevice)
       let Status = AVCaptureDevice.authorizationStatusForMediaType("vide");
+      console.log('Status:',Status);
       if (3 != Status) {  //没有授权
-        this.addre = "请在设置中允许使用相机";
-        let btnArray = ["确定"];
-        mui.confirm(" ", "请在设置中允许使用相机", btnArray, function(e) {});
+        this.addre = "请在设置隐私中允许使用相机";
+        // let btnArray = ["确定"];
+        // mui.confirm(" ", "请在设置中允许使用相机", btnArray, function(e) {});
       } else {
-        this.isCamera = true;
-        this.startRecognize();
+        // this.isCamera = true;
+        // this.startRecognize();
       }
     } else if (/(Android)/i.test(ua)) {
       //查询Android下是否授权调用相机
       let cmr = plus.camera.getCamera();
       if (cmr.supportedVideoResolutions.length < 1) {  //没有授权
         this.addre = "请在设置中允许使用相机";
-        let btnArray = ["确定"];
-        mui.confirm(" ", "请在设置中允许使用相机", btnArray, function(e) {});
+        // let btnArray = ["确定"];
+        // mui.confirm(" ", "请在设置中允许使用相机", btnArray, function(e) {});
       } else {
-        this.isCamera = true;
-        this.startRecognize();
+        // this.isCamera = true;
+        // this.startRecognize();
       }
     }
   },
@@ -156,16 +159,16 @@ export default {
     //返回home页面
     backhome() {
       console.log("backhome");
-      if(this.isCamera){
+      // if(this.isCamera){
         this.cancelScan();
-      }
+      // }
       this.$router.push({ name: "Home", params: {} });
     },
     //去核销页面
     gowrite() {
-      if(this.isCamera){
+      // if(this.isCamera){
         this.cancelScan();
-      }
+      // }
       let _parms = {};
       if (this.codenum) {
         _parms.code = this.codenum;
@@ -175,9 +178,9 @@ export default {
   },
   //销毁前运行
   beforeDestroy: function() {
-    if(this.isCamera){
+    // if(this.isCamera){
       this.cancelScan();
-    }
+    // }
   }
 };
 </script>

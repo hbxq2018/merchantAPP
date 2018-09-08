@@ -34,6 +34,8 @@ import PhotoList from '@/components/home/manage/photoList'
 import Ticket from '@/components/home/ticket/ticket'
 import Promotion from '@/components/home/ticket/promotion'
 import Cutdish from '@/components/home/ticket/cutdish'
+import Fresh from '@/components/home/ticket/fresh'
+import FreshDetails from '@/components/home/ticket/freshDetails'
 import Cutedit from '@/components/home/ticket/cutedit'
 import EditList from '@/components/home/ticket/editList'
 import SetMeal from '@/components/home/ticket/setMeal'
@@ -251,6 +253,16 @@ export default new Router({
       path:'/cutdish',
       name:'Cutdish',
       component:Cutdish
+    },
+    {
+      path:'/fresh',
+      name:'Fresh',
+      component:Fresh
+    },
+    {
+      path:'/freshDetails',
+      name:'FreshDetails',
+      component:FreshDetails
     },
     {
       path:'/cutedit',

@@ -1,8 +1,8 @@
 <template>
     <div class="cutedit">
-        <mt-header fixed title="编辑砍价拼菜">
+        <mt-header fixed :title="title">
             <mt-button slot="left" icon="back" @click="clickback"></mt-button>
-            <mt-button slot="right" @click="saveDish">保存</mt-button>
+            <mt-button slot="right" @click="saveDish">{{isCut?'保存':'发布'}}</mt-button>
         </mt-header>
         
         <div class="editcontent">
@@ -34,8 +34,8 @@
                     <p class="form_line"></p>
                 </div>
                 <div class="form_item clearfix">
-                    <span class="fl">底价（元）</span>
-                    <input class="fr" type="number" id="agio" placeholder="请输入底价" v-model="agioPrice" v-on:blur="agioblur()" maxlength='6'>
+                    <span class="fl">{{isCut?'底价（元）':'秒杀价（元）'}}</span>
+                    <input class="fr" type="number" id="agio" placeholder="请输入底价" :disabled="!isCut" v-model="agioPrice" v-on:blur="agioblur()" maxlength='6'>
                     <!-- <mt-field  v-model="agioPrice" :attr="{ maxlength: 6 }" placeholder="请输入底价" type="number" id="agio" @blur.native.capture="agioblur()"></mt-field> -->
                     <p class="form_line"></p>
                 </div>
@@ -45,14 +45,17 @@
                     <p class="form_line"></p>
                 </div>
             </div>
-            <div class="reveal" v-show="singleData.sellPrice || singleData.agioPrice">
+            <div class="reveal" v-if="isCut" v-show="singleData.sellPrice || singleData.agioPrice ">
                 <span class="fl">平台展示价格</span>
                 <span class="ri2">底价{{singleData.agioPrice?singleData.agioPrice*1+1:1}}</span>
                 <span class="ri1">原价{{singleData.sellPrice}}</span>
             </div>
-            <div class="legind">
+            <div class="legind" v-if="isCut">
                 <p class="lep1">示例：商家实际收款 = 消费者实际购买价格 - 1.5元服务费 </p>
                 <p class="lep2">（1.5元服务费 = 0.5元商家 + 1元消费者）</p>
+            </div>
+            <div class="legind" v-else>
+              <p class="lep1">限量秒杀为商家让利推广活动，统一售价和库存，平台不收取服务费</p>
             </div>
         </div>
     </div>
@@ -68,7 +71,10 @@ export default {
   name: "cutedit",
   data() {
     return {
+      title:"编辑砍价拼菜",
       ispopup: false,
+      isCut:true,
+      isPrice:false,
       deImg:require('../../../../static/images/camera.png'),
       singleData:{ //单个数据
         picUrl: "", //菜品图片
@@ -80,12 +86,13 @@ export default {
         isDeleted:0,
         skuInfo:""//详情
       },
+      oldInfo:"",
       isStock:false,
       picUrl:'',
       dishId: "", //单个数据ID
       sellPrice:'',
       agioPrice:'',
-      stockNum:15,
+      stockNum:"",
       Infos: []
     };
   },
@@ -95,6 +102,7 @@ export default {
   },
   watch:{
     sellPrice:function(){  //原价
+      this.isPrice = false;
       if(this.sellPrice == ''){
         this.singleData.sellPrice=''
         return false;
@@ -115,17 +123,34 @@ export default {
         return false;
       }
 
-      if(/^\d+(\.\d{1,1})?$/.test(_sell)){
-        this.singleData.sellPrice = _sell;
+      if(this.isCut){
+        if(/^\d+(\.\d{1,1})?$/.test(_sell)){
+          this.singleData.sellPrice = _sell;
+        }else{
+          var inputSell = document.getElementById("sell");
+          inputSell.blur();
+          _sell = Math.floor(_sell * 10) / 10;
+          this.sellPrice = _sell;
+          this.singleData.sellPrice = _sell;
+        }
       }else{
-        var inputSell = document.getElementById("sell");
-        inputSell.blur();
-        _sell = Math.floor(_sell * 10) / 10;
-        this.sellPrice = _sell;
-        this.singleData.sellPrice = _sell;
+        if(/^\d+(\.\d{1,2})?$/.test(_sell)){
+          this.singleData.sellPrice = _sell;
+        }else{
+          var inputSell = document.getElementById("sell");
+          inputSell.blur();
+          _sell = Math.floor(_sell * 100) / 100;
+          this.sellPrice = _sell;
+          this.singleData.sellPrice = _sell;
+        }
       }
+      
     },
     agioPrice:function(){  //底价
+      if(!this.isCut){
+        this.singleData.agioPrice =this.agioPrice;
+        return;
+      }
       if(this.agioPrice == ''){
         this.singleData.agioPrice = '';
         return false;
@@ -223,12 +248,12 @@ export default {
           if (action == "confirm") {
             this.singleData = {};
             this.setcutdObj(this.singleData);
-            this.$router.push({ name: "Cutdish", params: {} });
+            this.$router.push({ name: "Cutdish", params: {isCut:this.isCut} });
           }
         });
       } else {
         this.singleData = {};
-        this.$router.push({ name: "Cutdish", params: {} });
+        this.$router.push({ name: "Cutdish", params: {isCut:this.isCut} });
       }
     },
     //base64 转图片  适合后台不接收base64
@@ -251,13 +276,32 @@ export default {
         type: mime
       });
     },
-    sellblur:function(){  //焦点离开原价输入框
-      if(this.sellPrice*1<2.6){
-        this.sellPrice = '';
-        this.singleData.sellPrice='';
-        Toast('原价不得小于2.6元');
+    //焦点离开原价输入框
+    sellblur:function(){
+      if(this.sellPrice.length>6 || this.sellPrice>10000){
+        this.sellPrice = this.singleData.sellPrice;
+      }else{
+        this.singleData.sellPrice = this.sellPrice;
+      }
+      if(!this.isCut){
+        if(!this.sellPrice){
+          this.isPrice = true;
+          Toast('请输入原价');
+        }else if(this.sellPrice*1 <= 0.01){
+          this.sellPrice = '';
+          this.singleData.sellPrice='';
+          this.isPrice = true;
+          Toast('原价应大于0.01元');
+        }
+      }else{
+        if(this.sellPrice*1<2.6){
+          this.sellPrice = '';
+          this.singleData.sellPrice='';
+          Toast('原价不得小于2.6元');
+        }
       }
     },
+    //焦点离开底价输入框
     agioblur:function(){
       if(this.agioPrice*1<0.5){
         this.agioPrice = '';
@@ -271,7 +315,6 @@ export default {
       let image = document.getElementById('loadimg'); 
       let reg = /^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*?)\s*$/i;
       let _imgsrc = image.src;
-      
       if(reg.test(_imgsrc) || !_imgsrc){  //如果图片是base64格式，则表示图片是默认图片，
         Toast("请上传菜品图片");
         return false;
@@ -283,7 +326,10 @@ export default {
         return false;
       }
       if (!this.singleData.sellPrice ||this.singleData.sellPrice==0) {
-        Toast("请输入菜品原价");
+        if(!this.isPrice){
+          Toast("请输入菜品原价");
+        }
+        this.isPrice = false;
         return false;
       }
       if (!this.singleData.agioPrice ||this.singleData.agioPrice==0) {
@@ -304,28 +350,34 @@ export default {
         Toast("请输入菜品库存量");
         return false;
       }
-      
-      if (this.dishId) {
-        //更新
+      if (this.dishId) {//更新
         this.getUpdate();
-      } else {
-        //新增
+      } else {//新增
         let obj1 = {},
           obj2 = {},
           _value1 = "",
           _value2 = "",
+          _Url = "",
           _info = "";
           
         obj1 = {
-          skuName: this.singleData.agioPrice*1+1 + "元砍价券",
           skuType: 4,
-          stockNum:15,
+          stockNum:this.isCut?15:this.stockNum,
           opreatorId: this.shopInfo.id,
           inPrice: 20,
-          agioPrice: this.singleData.agioPrice*1+1,
-          opreatorName: this.shopInfo.userName,
-          sellPrice: this.singleData.agioPrice*1+1,
+          opreatorName: this.shopInfo.userName
         };
+        if(this.isCut){
+          obj1.skuType = 4;
+          obj1.skuName= this.singleData.agioPrice*1+1 + "元砍价券",
+          obj1.agioPrice= this.singleData.agioPrice*1+1;
+          obj1.sellPrice= this.singleData.agioPrice*1+1;
+        }else{
+          obj1.skuType = 8;
+           obj1.skuName= this.singleData.agioPrice*1 + "元抢购券",
+          obj1.agioPrice= this.singleData.agioPrice;
+          obj1.sellPrice= this.singleData.agioPrice;
+        }
         for (var key in obj1) {
           _value1 += key + "=" + obj1[key] + "&";
         }
@@ -333,34 +385,47 @@ export default {
         obj2 = {
           skuName:this.singleData.skuName,
           skuType: 6,
-          stockNum:15,//this.singleData.stockNum,
+          stockNum:this.isCut?15:this.stockNum,
           opreatorId: this.shopInfo.id,
           opreatorName: this.shopInfo.userName,
           sellPrice: this.singleData.sellPrice,
           inPrice: 20,
           picUrl: this.singleData.picUrl,
-          agioPrice: this.singleData.agioPrice*1+1,
           skuInfo:this.singleData.skuInfo,
           shopId: this.userInfo.id
         };
-        
+        if(this.isCut){
+          obj2.skuType = 6;
+          obj2.agioPrice = this.singleData.agioPrice*1+1;
+        }else{
+          obj2.skuType = 7;
+          obj2.agioPrice = this.singleData.agioPrice;
+        }
         for (var key in obj2) {
           _value2 += key + "=" + obj2[key] + "&";
         }
         _value2 = _value2.substring(0, _value2.length - 1);
          
         Indicator.open("菜品保存中...");
-        this.$axios.post("/api/app/sku/addSkuForKj?" + _value1).then(res => {
+        
+        if(this.isCut){
+          _Url = "/api/app/sku/addSkuForKj?";
+          console.log('addSkuForKj');
+        }else{
+          _Url = "/api/app/sku/addSkuForQg?";
+          console.log('addSkuForQg');
+        }
+        this.$axios.post(_Url + _value1).then(res => {
           if (res.data.code == 0) {
-            console.log("新增砍价券成功 ");
+            console.log("新增券成功 ");
             this.$axios.post("/api/app/sku/add?" + _value2).then(res => {
               if (res.data.code == 0) {
-                console.log("新增砍价菜成功 ");
+                console.log("新增菜成功 ");
                 Indicator.close();
                 Toast("保存成功！");
                 this.singleData = {};
                 this.setcutdObj(this.singleData);
-                this.$router.push({ name: "Cutdish", params: {} });
+                this.$router.push({ name: "Cutdish", params: {isCut:this.isCut} });
               }
             });
           }
@@ -374,26 +439,31 @@ export default {
         _value = "";
       _parms = {
         skuName: this.singleData.skuName,
-        skuType: 6,
-        stockNum:15,// this.singleData.stockNum,
+        stockNum:this.isCut?15:this.stockNum,
         opreatorId: this.shopInfo.id,
         opreatorName: this.shopInfo.userName,
         sellPrice: this.singleData.sellPrice,
         inPrice: 20,
         picUrl: this.singleData.picUrl,
-        agioPrice: this.singleData.agioPrice*1+1,
         skuInfo:this.singleData.skuInfo,
         shopId: this.userInfo.id,
         id: this.dishId,
         isDeleted: this.singleData.isDeleted*1
       };
+      if(this.isCut){
+        _parms.skuType = 6;
+        _parms.agioPrice= this.singleData.agioPrice*1+1;
+      }else{
+        _parms.skuType = 7;
+        _parms.agioPrice= this.singleData.agioPrice;
+      }
       for (var key in _parms) {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
       Indicator.open("数据保存中...");
       setTimeout(() => {
-          Indicator.close();
+        Indicator.close();
       }, 15000);
       this.$axios.post("/api/app/sku/update?" + _value).then(res => {
         if (res.data.code == 0) {
@@ -401,7 +471,7 @@ export default {
           Toast("保存成功！");
           this.singleData = {};
           this.setcutdObj(this.singleData);
-          this.$router.push({ name: "Cutdish", params: {} });
+          this.$router.push({ name: "Cutdish", params: {isCut:this.isCut} });
         }
       });
     },
@@ -456,8 +526,14 @@ export default {
         "&zanUserId=" +
         this.shopInfo.id +
         "&shopId=" +
-        this.userInfo.id;
-      this.$axios.get("/api/app/sku/getKjc?" + _value).then(res => {
+        this.userInfo.id,
+        _Url = "";
+      if(this.isCut){
+        _Url = "/api/app/sku/getKjc?";
+      }else{
+        _Url = "/api/app/sku/getQgc?";
+      }
+      this.$axios.get(_Url + _value).then(res => {
         if (res.data.code == 0) {
           let _data = res.data.data;
           for (let key in _data) {
@@ -467,8 +543,15 @@ export default {
               }
             }
           }
+
+          this.singleData.skuInfo=this.oldInfo?this.oldInfo:this.singleData.skuInfo;
+
           // this.stockNum = _data.stockNum;
-          this.agioPrice = _data.agioPrice*1-1;
+          if(this.isCut){
+            this.agioPrice = _data.agioPrice*1-1;
+          }else{
+            this.agioPrice = _data.agioPrice*1;
+          }
           this.sellPrice = _data.sellPrice;
           
         }
@@ -486,20 +569,38 @@ export default {
        this.singleData.picUrl = _imgsrc;
       }
       this.setcutdObj(this.singleData);
-      this.$router.push({ name: "EditList", params: {str:this.singleData.skuInfo,dishId:this.dishId} });
+      this.$router.push({ name: "EditList", params: {str:this.singleData.skuInfo,dishId:this.dishId,isCut:this.isCut} });
     },
   },
   created: function() {
+    console.log('cute_this.$route.params:',this.$route.params)
+    this.isCut = this.$route.params.isCut;
+    
+    if(this.isCut){
+      this.title="编辑砍价拼菜";
+    }else{
+      this.title="编辑限量秒杀";
+      this.agioPrice = "0.01";
+      this.singleData.agioPrice = "0.01";
+    }
+
+    if (this.$route.params.info) {
+      let _info = this.$route.params.info;
+      if(_info == 1){
+        this.singleData.skuInfo= '';
+      }else{
+        this.oldInfo = _info;
+        this.singleData.skuInfo = _info;
+      }
+    }
+
     if (this.$route.params.id) {
       let id = this.$route.params.id;
       this.dishId = id;
       this.getSingle(id);
     }
 
-    if(this.$route.params.dishId){
-      this.dishId = this.$route.params.dishId;
-    }
-
+    
     for (let key in this.cutdObj) {
       for (let ind in this.singleData) {
         if (key == ind) {
@@ -507,7 +608,9 @@ export default {
         }
       }
     }
+    this.singleData.skuInfo=this.oldInfo?this.oldInfo:this.singleData.skuInfo;
 
+    
     if(this.singleData.stockNum){
       this.stockNum = this.singleData.stockNum;
     }
@@ -520,14 +623,7 @@ export default {
   
 
 
-    if (this.$route.params.info) {
-      let _info = this.$route.params.info;
-      if(_info == 1){
-        this.singleData.skuInfo= '';
-      }else{
-        this.singleData.skuInfo= _info;
-      }
-    }
+    
   }
 };
 </script>
@@ -549,7 +645,6 @@ export default {
       display: inline-block;
       margin: 0 10px;
     }
-
     a {
       color: #42b983;
     }
@@ -570,7 +665,6 @@ export default {
   }
   .editcontent {
     z-index: 100;
-    
     .addPicBox {
       height: 420px;
       box-sizing: border-box;

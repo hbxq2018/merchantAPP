@@ -169,6 +169,21 @@ ol {
 .mint-cell-value.is-link {
     margin-right: 30px;
 }
+.mint-msgbox{
+  /* 为适应安卓低版本而修改 */
+  position: fixed;
+  top: 30%;
+  left: 8%;
+  transform:none;
+  -webkit-transform:none;
+}
+.mint-popup{
+  /* 为适应安卓低版本而修改 */
+  position: fixed;
+  left: 0;
+  transform:none;
+  -webkit-transform:none;
+}
 
 /* 公共样式 非mint-ui样式 */
 .loadBottom{
@@ -201,6 +216,7 @@ ol {
     width: 50%;
     margin-top: 30%;
 }
+
 
 
 

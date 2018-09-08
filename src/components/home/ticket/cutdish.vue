@@ -1,6 +1,6 @@
 <template>
     <div class="cutdish">
-        <mt-header fixed title="砍价拼菜">
+        <mt-header fixed :title="title">
             <mt-button slot="left" icon="back" @click="clickback"></mt-button>
             <mt-button slot="right" @click="addDish">+添加菜品</mt-button>
         </mt-header> 
@@ -9,7 +9,8 @@
             <div :class="issell?'topLeft actTop':'topLeft'" @click="handTab(1)">出售中 ({{Ltotal}})</div>
             <div :class="!issell && isRight?'topRight actTop':'topRight'" @click="handTab(2)">已下架 ({{Rtotal}})</div>
         </div>
-
+    
+        <div class="cutbj"></div>
         <div class="cutdishcontent">
             <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="cutmore">
                 <ul v-if="dataList.length>0 && isRight">
@@ -29,8 +30,8 @@
                                 <span class="turnover">销量: <em class="turNum">{{item.sellNum}}</em></span>
                             </p>
                             <div class="Itembut">
-                                <div class="pushBut" v-if="!issell || isEdit" :id="item.id" @click="handEdit">编辑</div>
-                                <div class="pushBut" :id="item.id" @click="handStand">{{issell?'下架':'上架'}}</div>
+                                <div class="pushBut" v-if="!issell || isEdit ||!isCut" :id="item.id" @click="handEdit">编辑</div>
+                                <div class="pushBut" v-if="isCut || !issell" :id="item.id" @click="handStand">{{issell?'下架':'上架'}}</div>
                                 <!-- <button :id="item.id" @click="handEdit">编辑</button> -->
                                 <!-- <button :id="item.id" @click="handStand">{{issell?'下架':'上架'}}</button> -->
                             </div>
@@ -56,15 +57,18 @@ export default {
   name: "cutdish",
   data() {
     return {
+      title:"砍价拼菜",
       issell: true,//是否是上架状态
       isEdit:false,  //上架状态下是否可以编辑
       Insale: [], //出售中
       Obtained: [], //已下架
+      isfrist:true,
       page: 1,
       Ltotal: 0, //在售总量
       Rtotal: 0, //下架总量
       allLoaded: false,
       isRight: false,
+      isCut:true,//是否为砍菜  true砍菜  flase限量秒杀
       dataList: []
     };
   },
@@ -79,7 +83,8 @@ export default {
     },
     //点击添加菜品
     addDish: function() {
-      this.$router.push({ name: "Cutedit", params: {} });
+      let _isCut = this.isCut;
+      this.$router.push({ name: "Cutedit", params: {isCut:_isCut} });
     },
     //顶部Tab
     handTab: function(val) {
@@ -91,8 +96,8 @@ export default {
     },
     //点击编辑
     handEdit: function(e) {
-      let _id = e.currentTarget.id;
-      this.$router.push({ name: "Cutedit", params: { id: _id } });
+      let _id = e.currentTarget.id,_isCut = this.isCut;
+      this.$router.push({ name: "Cutedit", params: { id: _id, isCut:_isCut} });
     },
     //点击上下架
     handStand: function(e) {
@@ -105,7 +110,6 @@ export default {
               let _data = this.dataList[i];
               _parms = {
                 skuName: _data.skuName,
-                skuType: 6,
                 stockNum:_stockNum,
                 opreatorId: _data.opreatorId,
                 opreatorName: _data.opreatorName,
@@ -118,6 +122,11 @@ export default {
                 id: _id,
                 isDeleted: this.issell ? "1" : "0" //0是在售  1是下架
               };
+              if(this.isCut){
+                _parms.skuType= 6;
+              }else{
+                _parms.skuType= 7;
+              }
               for (var key in _parms) {
                 _value += key + "=" + _parms[key] + "&";
               }
@@ -147,6 +156,7 @@ export default {
       Indicator.open("数据加载中...");
       let _parms = {},
         _value = "",
+        _Url = "",
         isSuccess = false;
       _parms = {
         shopId: this.userInfo.id,
@@ -159,27 +169,32 @@ export default {
         _value += key + "=" + _parms[key] + "&";
       }
       _value = _value.substring(0, _value.length - 1);
-      if (this.page == 1) {
-        this.dataList = [];
-      }
+      
       setTimeout(() => {
         if (!isSuccess) {
           Indicator.close();
           Toast("网络异常，请检查网络连接");
         }
       }, Delay);
-
-      this.$axios.get("/api/app/sku/kjcList?" + _value).then(res => {
+      if(this.isCut){  //砍菜
+        _Url = "/api/app/sku/kjcList?";
+      }else{  //秒杀
+        _Url = "/api/app/sku/qgcList?";
+      }
+      this.$axios.get(_Url + _value).then(res => {
         Indicator.close();
         isSuccess = true;
         if (res.data.code == 0) {
           let _data = res.data.data;
+          if (this.page == 1) {
+            this.dataList = [];
+          }
           if (this.issell) {
             this.Ltotal = _data.total;
           } else {
             this.Rtotal = _data.total;
           }
-          if (!this.isRight) {
+          if (this.isfrist) {
             return false;
           }
           if (_data && _data.list && _data.list.length > 0) {
@@ -219,6 +234,22 @@ export default {
     }
   },
   created: function() {
+    let  url = window.location.href;
+    if(url.indexOf("?") != -1){
+      let urlArr = url.split('?');
+      if(urlArr[1] == 1){
+        this.isCut = true;
+      }else if(urlArr[1] == 2){
+        this.isCut = false;
+      }
+    }else{
+      this.isCut = this.$route.params.isCut;
+    }
+    if(this.isCut){
+      this.title = "砍价拼菜";
+    }else{
+      this.title = "限量秒杀";
+    }
     this.page = 1;
     this.issell = false;
     this.getisEdif();
@@ -228,6 +259,7 @@ export default {
       this.issell = true;
       this.isRight = true;
       this.allLoaded = false;
+      this.isfrist=false;
       this.dataList = [];
       this.getDatelist();
     }, 500);
@@ -268,10 +300,13 @@ export default {
       border-bottom: 1px solid #fc5e2d;
     }
   }
+  .cutbj{
+    width: 100%;
+    height: 160px;
+    margin-bottom: 30px;
+  }
   .cutdishcontent {
     width: 100%;
-    margin-top: 1px;
-    margin-top: 160px;
     .cutItem {
       width: 712px;
       height: 200px;

@@ -39,13 +39,25 @@ export default {
               url: require('../../../../static/images/kjpc-icon.png'),
               name: '砍价拼菜',
               info: '上传爆款菜品，引导趣味消费',
-              href: '/cutdish'
+              href: '/cutdish?1'
           },
           {
               url: require('../../../../static/images/setMeal.png'),
               name: '套餐',
               info: '任意搭配套餐，大优惠力度，吸引更多消费者',
               href: '/setMeal'
+          },
+          {
+              url: require('../../../../static/images/spike.png'),
+              name: '限量秒杀',
+              info: '吸引流量、提高店铺曝光度',
+              href: '/cutdish?2'
+          },
+          {
+              url: require('../../../../static/images/fresh.png'),
+              name: '享7生鲜',
+              info: '享7平台支持推广',
+              href: '/fresh'
           }
       ]
     };
@@ -63,6 +75,7 @@ export default {
   }
 };
 </script>
+
 <style lang="less">
 @import url(../../../common/css/common.css);
 .promotion {

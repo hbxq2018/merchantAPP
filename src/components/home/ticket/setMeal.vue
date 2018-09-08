@@ -5,26 +5,24 @@
             <mt-button icon="back"></mt-button>
         </router-link>
     </mt-header>
-    <!-- <div id="setMealBox" class="setMealBox" :style="{'-webkit-overflow-scrolling': scrollMode}"> -->
-        <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="mealmore">
-            <ul v-if="list.length>0" id="setMealUl" class="setMealUl" >
-                <li class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
-                    <img class="icon fl" :src="item.picUrl" alt="">
-                    <div class="text fl">
-                        <p>{{item.skuName}}</p>
-                        <p>
-                            <span>折后价 ￥{{item.agioPrice}}元</span>
-                            <span>门市价 ￥{{item.sellPrice}}元</span>
-                        </p>
-                        <p>发布日期：{{item.updateTime}}</p>
-                    </div>
-                    <div class="arrow fr"></div>
-                </li>
-            </ul>
-            <img v-else class="emtpy" :src="url" alt="什么都没有">
-        </mt-loadmore>
+      <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" ref="mealmore">
+          <ul v-if="list.length>0" id="setMealUl" class="setMealUl" >
+              <li class="setMeal_list clearfix" v-for="(item,index) in list" :key="index" :id="item.id" @click="toSetMeal(item.id)">
+                  <img class="icon fl" :src="item.picUrl" alt="">
+                  <div class="text fl">
+                      <p>{{item.skuName}}</p>
+                      <p>
+                          <span>折后价 ￥{{item.agioPrice}}元</span>
+                          <span>门市价 ￥{{item.sellPrice}}元</span>
+                      </p>
+                      <p>发布日期：{{item.updateTime}}</p>
+                  </div>
+                  <div class="arrow fr"></div>
+              </li>
+          </ul>
+          <img v-else class="emtpy" :src="url" alt="什么都没有">
+      </mt-loadmore>
         
-    <!-- </div> -->
     <div id="setMealBottom" class="setMealBottom" @click="toSetMeal()">
         <span>+</span>
         <span>添加套餐</span>
@@ -102,7 +100,7 @@ export default {
     toSetMeal(id) {
       this.$router.push({ name: "ToSetMeal", params: { id: id } });
     },
-     //下拉
+    //下拉
     loadTop() {
       this.page = 1;
       this.allLoaded = false;
@@ -116,7 +114,7 @@ export default {
       this.setMealList();
       this.$refs.mealmore.onBottomLoaded();
     },
-     //转换日期
+    //转换日期
     switchDate(s) {
       let dateStr = new Date(s);
       let yearStr = dateStr.getFullYear();
@@ -125,14 +123,17 @@ export default {
         dateStr.getDate() > 9 ? dateStr.getDate() : "0" + dateStr.getDate();
       monthStr = monthStr > 9 ? monthStr : "0" + monthStr;
       return yearStr + "-" + monthStr + "-" + dayStr;
-    }
+    },
   },
   created: function() {
     const ua = navigator.userAgent.toLowerCase();
     if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
       this.scrollMode = "touch";
     }
+    
     this.setMealList();
+    
+    
   }
 };
 </script>

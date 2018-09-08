@@ -278,6 +278,9 @@ export default {
       // 这里加个回调也是可以的
       this.onChange && this.onChange(this.file, inputDOM.value);
       // this.imgPreview(this.file);
+      let timestamp = new Date().getTime();
+      let _arr = this.file.name.split('.');
+      this.file.name = _arr[_arr.length-2]+timestamp+'.'+_arr[_arr.length-1];
       let form = new FormData();
       form.append("file", this.file, this.file.name);
       form.append("userName", this.shopInfo.userName);

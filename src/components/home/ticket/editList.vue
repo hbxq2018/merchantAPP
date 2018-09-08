@@ -4,6 +4,7 @@
             <mt-button slot="left" icon="back" @click="clickback(1)"></mt-button>
             <mt-button slot="right" @click="clickback(2)">保存</mt-button>
         </mt-header>
+        <div class="editbj"></div>
         <div class="poputDiv">
             <div class="popupLi" v-for="(item,index) in Infos" :key="index">
                 <textarea class="popuArea" name="textarea" id="textarea" cols="15" rows="3" placeholder="请输入详情说明" v-model="item._value"></textarea>
@@ -28,7 +29,8 @@ export default {
     return {
       Infos: [{ _value: "" }],
       oldInfo: "",
-      dishId: ""
+      dishId: "",
+      isCut:true
     };
   },
   methods: {
@@ -43,12 +45,11 @@ export default {
       } else {
         _info = "1";
       }
-     
       if (val == 1) {
         if (_info == this.oldInfo) {
           this.$router.push({
             name: "Cutedit",
-            params: { info: this.oldInfo, dishId: this.dishId }
+            params: { info: this.oldInfo, id: this.dishId,isCut:this.isCut }
           });
         } else {
           let _str = "";
@@ -58,16 +59,15 @@ export default {
             if (action == "confirm") {
               this.$router.push({
                 name: "Cutedit",
-                params: { info: this.oldInfo, dishId: this.dishId }
+                params: { info: this.oldInfo, id: this.dishId,isCut:this.isCut }
               });
             }
           });
         }
       } else if (val == 2) {
-
         this.$router.push({
           name: "Cutedit",
-          params: { info: _info, dishId: this.dishId }
+          params: { info: _info, id: this.dishId,isCut:this.isCut }
         });
       }
     },
@@ -99,10 +99,11 @@ export default {
     if(this.$route.params.dishId){
        this.dishId = this.$route.params.dishId;
     }
+    this.isCut = this.$route.params.isCut;
     if (this.$route.params.str) {
       let _skuInfo = this.$route.params.str;
       this.oldInfo = this.$route.params.str;
-     
+      
       if (_skuInfo) {
         this.Infos = [];
         if (_skuInfo.indexOf("Œ") == -1) {
@@ -123,14 +124,18 @@ export default {
 
 <style lang="less">
 .editList {
-  position: fixed;
+  // position: fixed;
   width: 100%;
   height: 100%;
   background: #ebebeb;
   overflow: scroll;
+  .editbj{
+    width: 100%;
+    height: 90px;
+    margin-bottom: 20px;
+  }
   .poputDiv {
     width: 690px;
-    padding-top: 80px;
     .popupLi {
       width: 100%;
       height: 220px;
