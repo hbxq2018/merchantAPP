@@ -116,6 +116,7 @@ export default {
     },
     //转换日期
     switchDate(s) {
+      s = s.replace(/-/g, "/");
       let dateStr = new Date(s);
       let yearStr = dateStr.getFullYear();
       let monthStr = +dateStr.getMonth() + 1;

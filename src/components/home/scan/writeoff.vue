@@ -45,6 +45,9 @@ export default {
   },
   watch: {
     value: function() {
+      if(this.value.length == 0 || !this.value){
+        this.ticket={};
+      }
       if (this.value.length == 4 || this.value.length == 9) {
         this.value += " ";
       }
@@ -81,8 +84,12 @@ export default {
         this.ticket.shopAmount = this.original;
         let _ticket = this.ticket;
         console.log('_ticket:',_ticket)
-        console.log('shopInfo:',this.shopInfo)
-        console.log('shopInfo:',this.userInfo)
+        if(_ticket.shopId){
+          if(_ticket.shopId != this.userInfo.id){
+            Toast("此券不是在该商家购买");
+             return
+          }
+        }
         let obj = {
           soId: _ticket.soId, //订单id	Long
           shopId: this.userInfo.id, //商家id	Long
@@ -127,6 +134,7 @@ export default {
           let data = res.data;
           console.log('res:',res)
           if (data.code == 0) {
+            
             if(data.data.isUsed == 1){
               Toast("券不存在或者已经被使用");
                setTimeout(function(){

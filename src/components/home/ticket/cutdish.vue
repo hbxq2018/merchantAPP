@@ -149,10 +149,12 @@ export default {
           }
         }
       });
-      
     },
     //获取列表数据
     getDatelist: function() {
+      if (this.page == 1) {
+        this.dataList = [];
+      }
       Indicator.open("数据加载中...");
       let _parms = {},
         _value = "",
@@ -186,9 +188,7 @@ export default {
         isSuccess = true;
         if (res.data.code == 0) {
           let _data = res.data.data;
-          if (this.page == 1) {
-            this.dataList = [];
-          }
+          
           if (this.issell) {
             this.Ltotal = _data.total;
           } else {
@@ -199,6 +199,7 @@ export default {
           }
           if (_data && _data.list && _data.list.length > 0) {
             for (let j = 0; j < _data.list.length; j++) {
+              _data.list[j].stockNum=_data.list[j].stockNum==0?15:_data.list[j].stockNum;
               this.dataList.push(_data.list[j]);
             }
           } else {

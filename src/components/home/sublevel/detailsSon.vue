@@ -15,7 +15,7 @@
         <p>¥{{diff  | changemoney}}</p>
         <p>本月总服务费¥{{money}}，已缴¥{{service  | changemoney}}</p>
       </div>
-      <div class="murcielago" v-if="first.totalService">
+      <div class="murcielago">
           <p>本月已核销<span>{{total}}</span>张代金券</p>
       </div>
     </div>
@@ -121,7 +121,7 @@ export default {
         rows: 10
       };
       if (this.isbill == 1) {
-        obj.isBill = 1;
+        // obj.isBill = 1;
       }
       let parms = "",
         _value = "";

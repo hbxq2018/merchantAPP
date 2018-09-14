@@ -1,6 +1,6 @@
 <template>
     <div class="editList">
-        <mt-header fixed title="编辑砍价拼菜说明">
+        <mt-header fixed :title="title">
             <mt-button slot="left" icon="back" @click="clickback(1)"></mt-button>
             <mt-button slot="right" @click="clickback(2)">保存</mt-button>
         </mt-header>
@@ -27,6 +27,7 @@ export default {
   name: "editlist",
   data() {
     return {
+      title:"编辑砍价拼菜说明",
       Infos: [{ _value: "" }],
       oldInfo: "",
       dishId: "",
@@ -100,6 +101,11 @@ export default {
        this.dishId = this.$route.params.dishId;
     }
     this.isCut = this.$route.params.isCut;
+    if(this.isCut){
+      this.title = "编辑砍价拼菜说明"
+    }else{
+      this.title = "编辑限量秒杀说明"
+    }
     if (this.$route.params.str) {
       let _skuInfo = this.$route.params.str;
       this.oldInfo = this.$route.params.str;

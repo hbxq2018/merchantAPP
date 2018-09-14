@@ -286,7 +286,7 @@ export default {
       if(!this.isCut){
         if(!this.sellPrice){
           this.isPrice = true;
-          Toast('请输入原价');
+          // Toast('请输入原价');
         }else if(this.sellPrice*1 <= 0.01){
           this.sellPrice = '';
           this.singleData.sellPrice='';
@@ -326,9 +326,9 @@ export default {
         return false;
       }
       if (!this.singleData.sellPrice ||this.singleData.sellPrice==0) {
-        if(!this.isPrice){
+        // if(!this.isPrice){
           Toast("请输入菜品原价");
-        }
+        // }
         this.isPrice = false;
         return false;
       }
@@ -347,8 +347,7 @@ export default {
         return false;
       }
       if (!this.singleData.stockNum ||this.singleData.stockNum==0) {
-        Toast("请输入菜品库存量");
-        return false;
+        this.singleData.stockNum = 15;
       }
       if (this.dishId) {//更新
         this.getUpdate();
@@ -415,6 +414,7 @@ export default {
           _Url = "/api/app/sku/addSkuForQg?";
           console.log('addSkuForQg');
         }
+       
         this.$axios.post(_Url + _value1).then(res => {
           if (res.data.code == 0) {
             console.log("新增券成功 ");
@@ -545,7 +545,10 @@ export default {
           }
 
           this.singleData.skuInfo=this.oldInfo?this.oldInfo:this.singleData.skuInfo;
-
+          if(this.isCut){
+            this.stockNum = 15;
+            this.singleData.stockNum = 15;
+          }
           // this.stockNum = _data.stockNum;
           if(this.isCut){
             this.agioPrice = _data.agioPrice*1-1;
@@ -597,7 +600,9 @@ export default {
     if (this.$route.params.id) {
       let id = this.$route.params.id;
       this.dishId = id;
-      this.getSingle(id);
+      if(!this.cutdObj.sellPrice){
+        this.getSingle(id);
+      }
     }
 
     

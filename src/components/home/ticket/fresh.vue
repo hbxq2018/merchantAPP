@@ -10,7 +10,7 @@
             <div :class="!isAll?'topRight actTop':'topRight'" @click="handTab(2)">参与中</div>
         </div>
         <div class="freshcont">
-            <ul class="freshUl" v-for="(item,index) in list" :key="index">
+            <ul class="freshUl" v-if="listdata.length > 0" v-for="(item,index) in listdata" :key="index">
                 <li class="freshLi" @click="handLi(item.id)">
                     <img class="liImg" :src="item.url" alt="图片">
                     <div class="libot">
@@ -24,6 +24,7 @@
                     </div>
                 </li>
             </ul>
+            <img v-if="listdata.length == 0" class="emtpy" :src="url" alt="什么都没有">
         </div>
     </div>
 </template>
@@ -37,17 +38,20 @@ export default {
   name: "fresh",
   data() {
     return {
-      isAll: false,
+      isAll: true,
       isSign:true, //是否参与活动   
-      url: require('../../../../static/images/logo.png'),
+      url: require('../../../../static/images/zhanweitu.png'),
+      listl:[],
+      listr:[],
       list:[
         {
-          url:require('../../../../static/images/logo.png'),
+          url:require('../../../../static/images/crab.png'),
           p1:"9.8元品阳澄湖大闸蟹",
           p2:"平台补贴，引流到店",
           id:1
         }
-      ]
+      ],
+      listdata:[]
     };
   },
     store,
@@ -58,6 +62,12 @@ export default {
       //切换顶部tab
       handTab(val){
         this.isAll = val ==1?true:false;
+        if(val == 1){
+            this.listdata = this.list;
+        }else if(val == 2 && !this.isSign){
+            this.listdata = this.listr;
+        }
+        console.log('listdata:',this.listdata.length)
       },
       //查询当前商家是否参与活动
       getInquire(){
@@ -75,6 +85,7 @@ export default {
       }
   },
   created:function(){
+      this.listdata = this.list;
       this.getInquire();
   }
 };

@@ -15,6 +15,7 @@
                 <!-- <img src="../../../static/images/news.png" alt="消息" class="news"> -->
             </div>
       </div>
+      <div class="menu_topbj"></div>
       <div class="menu_content">
           <ul class="conul">
               <li class="conli" v-for="(item,index) in lidata" :key="index" :id="item.id" @click="clickli">
@@ -32,6 +33,7 @@
           </div>
           <img :src="actimg" alt="">
         </div>
+        <div class="menubj"></div>
       </div>
   </div>
       
@@ -135,6 +137,7 @@ export default {
     width: 100%;
     height: 310px;
     background: #fc5e2d;
+    position: fixed;
     & > .eaves {
       position: absolute;
       top: 0;
@@ -184,6 +187,10 @@ export default {
         margin-top: 31px;
       }
     }
+  }
+  .menu_topbj{
+    width: 100%;
+    height: 310px;
   }
 
   .menu_content {
@@ -282,6 +289,10 @@ export default {
         font-size: 30px;
       }
     }
+  }
+  .menubj{
+    width: 100%;
+    height: 100px;;
   }
 }
 </style>

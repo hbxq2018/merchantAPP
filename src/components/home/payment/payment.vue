@@ -182,9 +182,9 @@ export default {
               _list = _list.slice(1);
             }
             for (let i = 0; i < _list.length; i++) {
-              if (_list[i].skuName && _list[i].servicePrice) {
+              // if (_list[i].skuName && _list[i].servicePrice) {
                 _this.lists.push(_list[i]);
-              }
+              // }
             }
           } else {
             this.allLoaded = true; // 若数据已全部获取完毕
